@@ -1,11 +1,11 @@
 // src/App.jsx
 import React from "react";
-import Navbar from "/Users/canotlivewithoutyou/G-Learn-E-FE/src/components/Navbar.jsx"; 
+import Login from "/Users/canotlivewithoutyou/G-Learn-E-FE/src/pages/Login.jsx";
 
 function App() {
   return (
     <>
-      <Navbar />
+      <Login/>
     </>
   );
 }
