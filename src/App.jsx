@@ -8,7 +8,7 @@ import FindPassword from "./pages/FindPassword.jsx";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Login />} /> 
+      <Route path="/" element={<Login />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/find-password" element={<FindPassword />} />

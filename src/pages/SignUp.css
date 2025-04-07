@@ -1,14 +1,21 @@
 /* 📄 전체 회원가입 페이지 배경 및 폰트 설정 */
 .signup-page {
   min-height: 100vh;
-  background-color: #F9F4ED; /* 연한 베이지 배경 */
+  background-color: #F9F4ED;
+  /* 연한 베이지 배경 */
   justify-content: center;
   align-items: flex-start;
   font-family: sans-serif;
 
-  display: flex;              /* ✅ Flex로 만들고 */
-  flex-direction: column;     /* ✅ 세로 배치 */
-  align-items: center;        /* ✅ 수평 가운데 정렬 */
+  display: flex;
+  /* ✅ Flex로 만들고 */
+  flex-direction: column;
+  /* ✅ 세로 배치 */
+  align-items: center;
+  /* ✅ 수평 가운데 정렬 */
+
+  position: relative;
+  overflow: hidden;
 }
 
 /* 📦 폼을 감싸는 전체 컨테이너 */
@@ -17,7 +24,19 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 80px); /* Navbar 높이만큼 제외 */
+  min-height: calc(100vh - 80px);
+  /* Navbar 높이만큼 제외 */
+  margin-top: 80px;
+}
+
+.login-scroll-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  width: 100%;
+  margin-top: 80px;
+  /* 상단바 높이만큼 아래로 내리기 */
+  padding-bottom: 40px;
+  /* 하단 여유 공간 */
 }
 
 .signup-container {
@@ -25,21 +44,29 @@
   text-align: center;
   display: flex;
   flex-direction: column;
-  align-items: center;  
+  align-items: center;
 
-  width: 100%;          /* ✅ 추가 */
-  max-width: 600px;     /* ✅ 추가: 적당한 폼 폭 제한 */
+  width: 100%;
+  /* ✅ 추가 */
+  max-width: 600px;
+  /* ✅ 추가: 적당한 폼 폭 제한 */
 }
 
 /* 🧾 "회원가입" 제목 텍스트 */
 .signup-title {
-  font-size: 36px;                  /* 폰트 크기 */
-  font-weight: bold;               /* 굵은 글씨 */
+  font-size: 36px;
+  /* 폰트 크기 */
+  font-weight: bold;
+  /* 굵은 글씨 */
   display: inline-block;
-  position: relative;              /* 밑줄을 위한 위치 기준 */
-  padding-bottom: 16px;            /* 밑줄을 넣기 위한 여백 */
-  margin-bottom: 32px;             /* 제목 아래 간격 */
-  color: #5F360A;                   /* 진한 갈색 텍스트 */
+  position: relative;
+  /* 밑줄을 위한 위치 기준 */
+  padding-bottom: 16px;
+  /* 밑줄을 넣기 위한 여백 */
+  margin-bottom: 32px;
+  /* 제목 아래 간격 */
+  color: #5F360A;
+  /* 진한 갈색 텍스트 */
 }
 
 /* ✅ 연한 밑줄 (배경 밑줄 역할) */
@@ -50,8 +77,10 @@
   bottom: 0;
   height: 6px;
   width: 100%;
-  background-color: #DDCCB9;        /* 연한 갈색 (밑줄 배경) */
-  z-index: 0;                       /* 진한 밑줄 뒤에 오도록 */
+  background-color: #DDCCB9;
+  /* 연한 갈색 (밑줄 배경) */
+  z-index: 0;
+  /* 진한 밑줄 뒤에 오도록 */
 }
 
 /* ✅ 진한 밑줄 (겹쳐진 강조용) */
@@ -62,46 +91,63 @@
   bottom: 0;
   height: 3px;
   width: 100%;
-  background-color: #5F360A;        /* 진한 갈색 (강조 밑줄) */
-  z-index: 1;                       /* 연한 줄 위에 오도록 */
+  background-color: #5F360A;
+  /* 진한 갈색 (강조 밑줄) */
+  z-index: 1;
+  /* 연한 줄 위에 오도록 */
 }
 
 /* 📢 설명 문장 스타일 */
 .signup-description {
-  color: #9D8265;                  /* 연한 갈색 */
-  text-align: center;             /* 가운데 정렬 */
-  font-size:14px;
-  line-height: 1.6;               /* 줄 간격 */
-  margin-bottom: 32px;            /* 설명 아래 여백 */
+  color: #9D8265;
+  /* 연한 갈색 */
+  text-align: center;
+  /* 가운데 정렬 */
+  font-size: 14px;
+  line-height: 1.6;
+  /* 줄 간격 */
+  margin-bottom: 32px;
+  /* 설명 아래 여백 */
 }
 
 /* 📄 전체 폼 컨테이너 */
 .signup-form {
-  width: 360px;                   /* 폼 너비 고정 */
+  width: 360px;
+  /* 폼 너비 고정 */
   margin: 0 auto;
   display: flex;
-  flex-direction: column;        /* 세로 정렬 */
-  gap: 12px;                      /* 입력창 사이 간격 */
+  flex-direction: column;
+  /* 세로 정렬 */
+  gap: 12px;
+  /* 입력창 사이 간격 */
 }
 
 /* ⬅️➡️ 2개 input을 나란히 정렬하는 줄 */
 .signup-row {
   display: flex;
-  gap: 8px;                       /* 좌우 간격 */
+  gap: 8px;
+  /* 좌우 간격 */
 }
 
 /* ✍️ 공통 input / select 스타일 */
 .signup-form input,
 .signup-form select {
-  padding: 12px;                  /* 안쪽 여백 */
+  padding: 12px;
+  /* 안쪽 여백 */
   font-size: 14px;
-  border: 1px solid #6b3f1d;      /* 진한 갈색 테두리 */
-  border-radius: 4px;             /* 모서리 둥글게 */
+  border: 1px solid #6b3f1d;
+  /* 진한 갈색 테두리 */
+  border-radius: 4px;
+  /* 모서리 둥글게 */
   width: 100%;
-  box-sizing: border-box;   /* ✅ padding + border 포함한 전체 너비 계산 */
-  height: 48px;              /* ✅ input과 select 높이 통일 */
-  appearance: none;          /* ✅ 브라우저 기본 select 스타일 제거 (optional) */
-  background-color: white;   /* ✅ 일관된 배경 */
+  box-sizing: border-box;
+  /* ✅ padding + border 포함한 전체 너비 계산 */
+  height: 48px;
+  /* ✅ input과 select 높이 통일 */
+  appearance: none;
+  /* ✅ 브라우저 기본 select 스타일 제거 (optional) */
+  background-color: white;
+  /* ✅ 일관된 배경 */
 }
 
 /* ✅ 제출 버튼 (회원가입 완료 버튼) */
@@ -117,52 +163,57 @@
   cursor: pointer;
   margin-top: 12px;
 }
-.submit-button:hover{
-  background-color:#5F360A;
+
+.submit-button:hover {
+  background-color: #5F360A;
 }
 
-  /* 이메일 / 비밀번호 라벨 스타일 */
-  .singup-label {
-    font-size: 12px;
-    color: #5F360A;
-    text-align: left;
-    margin: 4px 0 -4px 4px;
-  }
+/* 이메일 / 비밀번호 라벨 스타일 */
+.singup-label {
+  font-size: 12px;
+  color: #5F360A;
+  text-align: left;
+  margin: 4px 0 -4px 4px;
+}
 
-  .custom-select-wrapper {
-    position: relative;
-    width: 100%;
-  }
-  
-  .custom-select {
-    width: 100%;
-    padding: 12px;
-    padding-right: 36px; /* 오른쪽에 아이콘 공간 확보 */
-    font-size: 14px;
-    border: 1px solid #6b3f1d;
-    border-radius: 4px;
-    appearance: none;         /* 기본 화살표 제거 */
-    -webkit-appearance: none; /* 사파리 대응 */
-    -moz-appearance: none;    /* 파이어폭스 대응 */
-    background-color: white;
-    color: #333;
-    cursor: pointer;
-  }
-  
-  /* 아이콘: 오른쪽에 얹기 */
-  .custom-arrow {
-    position: absolute;
-    top: 52%;
-    right: 10px;
-    line-height:1;
-    pointer-events: none;  /* 클릭 이벤트는 select에 전달되게 */
-    transform: translateY(-50%);
-    font-size: 10px;
-    color: #9D8265;
-  }
-  .custom-select:invalid {
-    color: #aaa;
-      /* 연한 회색 */
-  }
+.custom-select-wrapper {
+  position: relative;
+  width: 100%;
+}
 
+.custom-select {
+  width: 100%;
+  padding: 12px;
+  padding-right: 36px;
+  /* 오른쪽에 아이콘 공간 확보 */
+  font-size: 14px;
+  border: 1px solid #6b3f1d;
+  border-radius: 4px;
+  appearance: none;
+  /* 기본 화살표 제거 */
+  -webkit-appearance: none;
+  /* 사파리 대응 */
+  -moz-appearance: none;
+  /* 파이어폭스 대응 */
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+}
 
+/* 아이콘: 오른쪽에 얹기 */
+.custom-arrow {
+  position: absolute;
+  top: 52%;
+  right: 10px;
+  line-height: 1;
+  pointer-events: none;
+  /* 클릭 이벤트는 select에 전달되게 */
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: #9D8265;
+}
+
+.custom-select:invalid {
+  color: #aaa;
+  /* 연한 회색 */
+}
