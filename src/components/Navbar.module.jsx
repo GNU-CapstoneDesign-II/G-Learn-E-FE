@@ -1,7 +1,7 @@
-// src/components/Navbar.jsx
 import React from "react";
+import { Link } from "react-router-dom"; // 추가
 import styles from "./Navbar.module.css";
-import logoImage from "/Users/canotlivewithoutyou/G-Learn-E-FE/src/assets/logo.png"; 
+import logoImage from "../assets/logo.png";
 
 function Navbar() {
   return (
@@ -10,13 +10,15 @@ function Navbar() {
         <div className={styles.navbarInner}>
           {/* 왼쪽 영역: 로고 + 메뉴 */}
           <div className={styles.navbarLeft}>
-            <img src={logoImage} alt="G-Learn-E Logo" className={styles.logo} />
+            <Link to="/">
+              <img src={logoImage} alt="G-Learn-E Logo" className={styles.logo} />
+            </Link>
             <nav className={styles.menu}>
-              <a href="#">문제 생성</a>
+              <Link to="/generate">문제 생성</Link>
               <span>|</span>
-              <a href="#">문제집 리스트</a>
+              <Link to="/list">문제집 리스트</Link>
               <span>|</span>
-              <a href="#">랭킹</a>
+              <Link to="/ranking">랭킹</Link>
             </nav>
           </div>
 
