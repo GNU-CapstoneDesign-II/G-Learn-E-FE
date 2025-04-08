@@ -25,29 +25,27 @@ export default function MainPage() {
 
 
             {/* 소개 섹션 */}
-            <section className="intro-section section-cream">
+            <section className="intro-section section-cream intro-circle-bg">
                 <div className="container">
-                    <section className="intro-section">
-                        <h2 className="platform-name">G-Learn-E</h2>
-                        <p className="intro-text">
-                            지런이는 경상국립대학교 학생들을 위한 맞춤형 학습 플랫폼입니다.<br />
-                        </p>
-                        <p className="intro-subtext">
-                            고등학생처럼 기성 문제집에 의존할 수 없는 대학생들을 위해,<br />
-                            지런이는 당신이 공부한 자료에서 문제를 생성하고, 연습하며 학습을 완성할 수 있도록 돕습니다.<br />
-                            같은 목표를 가진 학생들과 문제를 공유하며, 배움을 더 넓고 깊게 확장하세요.
-                        </p>
-                        <p className="intro-subtext-bottom">
-                            For college students who can't rely on ready-made workbooks, like high school students,<br />
-                            G-Learn-E helps you create problems, practice, and complete learning from the materials you study.<br />
-                            Share problems with students who share the same goals, and expand your learning wider and deeper.<br />
-                        </p>
-                    </section>
+                    <img src="src/assets/text-logo.png" alt="G-Learn-E" />
+                    <p className="intro-text">
+                        지런이는 경상국립대학교 학생들을 위한 맞춤형 학습 플랫폼입니다.<br />
+                    </p>
+                    <p className="intro-subtext">
+                        고등학생처럼 기성 문제집에 의존할 수 없는 대학생들을 위해,<br />
+                        지런이는 당신이 공부한 자료에서 문제를 생성하고, 연습하며 학습을 완성할 수 있도록 돕습니다.<br />
+                        같은 목표를 가진 학생들과 문제를 공유하며, 배움을 더 넓고 깊게 확장하세요.
+                    </p>
+                    <p className="intro-subtext-bottom">
+                        For college students who can't rely on ready-made workbooks, like high school students,<br />
+                        G-Learn-E helps you create problems, practice, and complete learning from the materials you study.<br />
+                        Share problems with students who share the same goals, and expand your learning wider and deeper.<br />
+                    </p>
                 </div>
             </section>
 
             {/* 명언 섹션 1 */}
-            <section className="quote-section section-white">
+            <section className="quote-section section-white" >
                 <div className="container">
                     <section className="quote-section light">
                         <blockquote>
@@ -60,10 +58,10 @@ export default function MainPage() {
                         </p>
                     </section>
                 </div>
-            </section>
+            </section >
 
             {/* 명언 섹션 2 */}
-            <section className="quote-section light section-cream">
+            <section className="quote-section light section-cream" >
                 <div className="container">
                     <section className="quote-section">
                         <blockquote>
@@ -77,16 +75,16 @@ export default function MainPage() {
                         </p>
                     </section>
                 </div>
-            </section>
+            </section >
 
             {/* Footer */}
-            <div className="container">
+            <div className="container" >
                 <footer className="main-footer">
                     <p>경상국립대학교 컴퓨터공학과 전공종합설계 PBL</p>
                     <p>지도교수 : 김건우 | 팀원 : 최원영 박지원 김수현 강지우</p>
                     <div className="footer-logo">G-Learn-E</div>
                 </footer>
             </div >
-        </div>
+        </div >
     );
 }

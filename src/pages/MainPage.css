@@ -16,8 +16,12 @@
 
 /* 섹션 공통 스타일 */
 section {
-
+    min-height: 35vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 100px 24px;
+    box-sizing: border-box;
     width: 100%;
     /* 전체 폭 차지 */
 }
@@ -103,4 +107,43 @@ section {
     text-align: center;
     border-top: 1px solid #eee;
     /* 높이 지정 ❌ -> 콘텐츠 양만큼 자동 */
+}
+
+.intro-section {
+    text-align: center;
+}
+
+/* 소개 문단 */
+.intro-text {
+    margin-top: 50px;
+    font-size: 22px;
+    color: #6e3f1e;
+    font-weight: 500;
+    margin-bottom: 18px;
+}
+
+/* 설명 텍스트 */
+.intro-subtext {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #9A7E5F;
+    margin-bottom: 18px;
+}
+
+/* 하단 영문 설명 */
+.intro-subtext-bottom {
+    font-size: 10px;
+    color: #C2AE97;
+    line-height: 1.5;
+}
+
+.intro-circle-bg {
+    background: radial-gradient(circle at center,
+            rgba(215, 184, 154, 0.45) 0%,
+            #f8f1e7 70%);
+}
+
+/* 내부 container는 배경 X */
+.intro-circle-bg .container {
+    background: none;
 }
