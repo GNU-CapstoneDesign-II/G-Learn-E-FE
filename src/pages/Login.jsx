@@ -36,7 +36,7 @@ export default function Login() {
             <span>|</span>
             <button className="login-link" onClick={() => navigate("/find-password")}>비밀번호 찾기</button>
 
-          </div>
+          </div> 
 
         </div>
       </div>
