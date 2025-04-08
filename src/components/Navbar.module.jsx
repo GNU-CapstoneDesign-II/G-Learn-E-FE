@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom"; // 추가
 import styles from "./Navbar.module.css";
 import logoImage from "../assets/logo.png";
-import MainPage from "../pages/MainPage";
 
 function Navbar() {
   return (
@@ -11,7 +10,7 @@ function Navbar() {
         <div className={styles.navbarInner}>
           {/* 왼쪽 영역: 로고 + 메뉴 */}
           <div className={styles.navbarLeft}>
-            <Link to="src/pages/MainPage.jsx">
+            <Link to="/">
               <img src={logoImage} alt="G-Learn-E Logo" className={styles.logo} />
             </Link>
             <nav className={styles.menu}>
@@ -38,7 +37,9 @@ function Navbar() {
             </div>
 
             {/* 로그인 버튼 */}
-            <button className={styles.loginButton}>Login / Sign up</button>
+            <Link to="/login" className={styles.loginButton}>
+              Login / Sign up
+            </Link>
           </div>
         </div>
       </header>

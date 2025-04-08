@@ -100,9 +100,14 @@
 }
 
 .loginButton {
+  text-decoration: none;
   background: none;
   border: none;
   font-size: 14px;
   color: #ae8c6d;
   cursor: pointer;
+}
+
+.loginButton:hover {
+  color: #5F360A;
 }
