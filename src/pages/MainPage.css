@@ -7,24 +7,23 @@
 }
 
 .section-white {
+    padding-top: 285px;
+    display: flex;
     background-color: #FFFFFF;
+    align-items: center;
+    width: 100%;
+    padding-bottom: 285px;
 }
 
 .section-cream {
+    padding-top: 285px;
+    display: flex;
     background-color: #F9F4ED;
+    align-items: center;
+    width: 100%;
+    padding-bottom: 285px;
 }
 
-/* 섹션 공통 스타일 */
-section {
-    min-height: 35vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 100px 24px;
-    box-sizing: border-box;
-    width: 100%;
-    /* 전체 폭 차지 */
-}
 
 /* 콘텐츠만 가운데 정렬 */
 .container {
@@ -32,20 +31,14 @@ section {
     margin: 0 auto;
 }
 
-/* HERO SECTION 전체 영역 */
 .hero-section {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     /* 서로 높이 다를 경우 위쪽 정렬 */
-    padding-top: 200px;
-    /* 상단바 고려하여 여백 늘림 */
     gap: 60px;
-    /* 좌우 요소 간 간격 */
-    max-width: 1200px;
     margin: 0 auto;
     flex-wrap: wrap;
-    /* 반응형 대응 */
 }
 
 /* 왼쪽 텍스트 이미지 묶음 */
@@ -54,8 +47,6 @@ section {
     display: flex;
     flex-direction: column;
     gap: 24px;
-    /* 이미지들 사이 여백 */
-    margin-top: -140px;
 }
 
 /* 왼쪽 이미지들 */
@@ -89,7 +80,6 @@ section {
     align-items: center;
     /* 중앙 정렬 */
     gap: 24px;
-    margin-top: -200px;
 }
 
 /* 로고 이미지 크기 조절 영역 */

@@ -48,67 +48,61 @@ export default function FindPassword() {
     };
 
     return (
-        <div className="find-page">
+        <>
             <Navbar />
+            <div className="find-page">
+                <div className="find-wrapper">
+                    <div className="find-container">
+                        <h1 className="find-title">비밀번호 찾기</h1>
 
-            <div className="find-wrapper">
-                <div className="find-container">
-                    <h1 className="find-title">비밀번호 찾기</h1>
+                        <form className="find-form" onSubmit={handleSubmit}>
+                            <label className="find-label" htmlFor="name">이름</label>
+                            <input id="name" type="text" placeholder="이름" className="find-input" />
 
-                    <form className="find-form" onSubmit={handleSubmit}>
-                        <label className="find-label" htmlFor="name">이름</label>
-                        <input id="name" type="text" placeholder="이름" className="find-input" />
+                            <label className="find-label" htmlFor="email">email</label>
+                            <div className="email-row">
+                                <input id="email" type="email" placeholder="학교 이메일" className="find-input" />
+                                <button type="button" className="code-button" onClick={handleSendCode}>
+                                    인증코드 전송
+                                </button>
+                            </div>
+                            <input id="name" type="text" placeholder="인증코드 입력" className="find-input" />
 
-                        <label className="find-label" htmlFor="email">email</label>
-                        <div className="email-row">
-                            <input id="email" type="email" placeholder="학교 이메일" className="find-input" />
-                            <button type="button" className="code-button" onClick={handleSendCode}>
-                                인증코드 전송
+                            <button type="button" className="verify-button" onClick={handleVerify}>
+                                인증 하기
                             </button>
-                        </div>
 
-                        <button type="button" className="verify-button" onClick={handleVerify}>
-                            인증 하기
-                        </button>
+                            {error && (
+                                <p className="error-message">{error}</p>
+                            )}
 
-                        {error && (
-                            <p className="error-message">{error}</p>
-                        )}
+                            <hr />
 
-                        <hr />
+                            {verified && (
+                                <>
+                                    <label className="find-label" htmlFor="password">password</label>
+                                    <input id="password" type="password" placeholder="비밀번호" className="find-input" value={password} onChange={(e) => setPassword(e.target.value)} />
 
-                        {verified && (
-                            <>
-                                <label className="find-label" htmlFor="password">password</label>
-                                <input
-                                    id="password"
-                                    type="password"
-                                    placeholder="비밀번호"
-                                    className="find-input"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                />
+                                    <input
+                                        id="confirm-password"
+                                        type="password"
+                                        placeholder="비밀번호 확인"
+                                        className="find-input"
+                                        value={passwordCheck}
+                                        onChange={(e) => setPasswordCheck(e.target.value)}
+                                    />
 
-                                <label className="find-label" htmlFor="confirm-password">password</label>
-                                <input
-                                    id="confirm-password"
-                                    type="password"
-                                    placeholder="비밀번호 확인"
-                                    className="find-input"
-                                    value={passwordCheck}
-                                    onChange={(e) => setPasswordCheck(e.target.value)}
-                                />
+                                    {!passwordMatch && (
+                                        <p className="error-message">❗ 비밀번호가 일치하지 않습니다.</p>
+                                    )}
 
-                                {!passwordMatch && (
-                                    <p className="error-message">❗ 비밀번호가 일치하지 않습니다.</p>
-                                )}
-
-                                <button className="submit-button" type="submit">비밀번호 변경</button>
-                            </>
-                        )}
-                    </form>
+                                    <button className="submit-button" type="submit">비밀번호 변경</button>
+                                </>
+                            )}
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }

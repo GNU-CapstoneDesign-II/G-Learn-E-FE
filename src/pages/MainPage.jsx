@@ -6,7 +6,6 @@ export default function MainPage() {
     return (
         <div className="main-page">
             <Navbar />
-
             {/* Hero Section */}
             <section className="hero-section section-white">
                 <div className="container">
