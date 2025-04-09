@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom"; // 추가
+import { Link } from "react-router-dom"; 
 import styles from "./Navbar.module.css";
 import logoImage from "../assets/logo.png";
 
