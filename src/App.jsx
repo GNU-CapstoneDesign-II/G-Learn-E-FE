@@ -1,3 +1,4 @@
+/*
 // src/App.jsx
 import React from "react";
 import { Routes, Route } from "react-router-dom";
@@ -14,6 +15,22 @@ function App() {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/find-password" element={<FindPassword />} />
     </Routes>
+  );
+}
+
+export default App;
+*/
+
+// src/App.jsx 테스트
+import React from "react";
+import LeftSidebar from "./components/LeftSidebar.module";
+
+function App() {
+  return (
+    <div>
+      <h1>🔥 테스트용 페이지입니다</h1>
+      <LeftSidebar />
+    </div>
   );
 }
 
