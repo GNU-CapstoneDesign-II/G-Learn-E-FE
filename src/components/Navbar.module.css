@@ -24,8 +24,11 @@
   justify-content: center;
   align-items: center;
   padding: 16px 40px;
+  position: fixed;
+  top: 0;
   border-bottom: 1px solid #eee;
   font-family: 'Noto Sans KR', sans-serif;
+  flex-direction: column;
 }
 
 .navbarInner {
