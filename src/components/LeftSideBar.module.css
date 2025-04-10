@@ -1,7 +1,7 @@
 /* LeftSidebar.module.css */
 
 .sidebar-filter {
-    width: 240px;
+    width: 200px;
     /* ✅ 고정 너비로 변경 */
     height: 100vh;
     /* ✅ 전체 높이 */
@@ -15,10 +15,10 @@
     position: fixed;
     /* ✅ 왼쪽에 고정 */
     flex-direction: column;
-    border-radius: 0 32px 0 0;
 }
 
 .tab-toggle {
+    padding-top: 30px;
     display: flex;
     flex-direction: column;
     gap: 12px;

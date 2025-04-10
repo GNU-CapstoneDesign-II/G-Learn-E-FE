@@ -24,9 +24,9 @@ export default App;
 
 */
 
+
+
 /*
-
-
 // src/App.jsx
 import React from "react";
 import { Routes, Route } from "react-router-dom";
@@ -35,7 +35,7 @@ import SignUp from "./pages/SignUp.jsx";
 import FindPassword from "./pages/FindPassword.jsx";
 import MainPage from "./pages/MainPage.jsx";
 import Private from "./pages/Private.jsx";
-import Public from "./pages/Public.jsx";
+
 
 function App() {
   return (
@@ -45,15 +45,13 @@ function App() {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/find-password" element={<FindPassword />} />
       <Route path="/private" element={<Private />} />
-      <Route path="/Public" element={<Public />} />
     </Routes>
   );
 }
 
 export default App;
-
-
 */
+
 
 /*
 // src/App.jsx 테스트 (테스트용_ 삭제하지 말아주세요.)
@@ -74,7 +72,7 @@ export default App;
 */
 
 
-
+/*
 // cards컴포넌트 테스트용 - 삭제하지 마세요. 
 import React from "react";
 import FolderCard from "./components/cards/FolderCard.module";
@@ -100,3 +98,17 @@ function App() {
 
 export default App;
 
+*/
+
+// src/App.jsx 테스트 (테스트용_ 삭제하지 말아주세요.)
+import React from "react";
+import Private from "./pages/Private";
+function App() {
+  return (
+    <div>
+      <Private />
+    </div>
+  );
+}
+
+export default App;
