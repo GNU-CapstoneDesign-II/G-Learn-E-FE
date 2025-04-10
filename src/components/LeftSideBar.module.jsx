@@ -1,4 +1,5 @@
 import React, { useReducer, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./LeftSidebar.module.css";
 import {
     getColleges,
@@ -22,17 +23,18 @@ const initialState = {
 function reducer(state, action) {
     switch (action.type) {
         case "SET_MAIN":
-            return { main: action.value, sub: "", year: "", subject: "" };
+            return { ...state, main: action.value, sub: "", year: "", subject: "" };
         case "SET_SUB":
             return { ...state, sub: action.value, year: "", subject: "" };
         case "SET_YEAR":
-            return { ...state, year: action.value, subject: "" };
+            return { ...state, year: action.value };
         case "SET_SUBJECT":
             return { ...state, subject: action.value };
         default:
             return state;
     }
 }
+
 
 export default function LeftSidebar() {
     const [state, dispatch] = useReducer(reducer, initialState);
@@ -41,6 +43,8 @@ export default function LeftSidebar() {
     const [colleges, setColleges] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [subjects, setSubjects] = useState([]);
+
+    const navigate = useNavigate();
 
     const isGeneral = state.main === "교양";
 
@@ -91,23 +95,27 @@ export default function LeftSidebar() {
         fetchSubjects();
     }, [state.sub, state.main]);
 
+    const handleTabClick = (tab) => {
+        setSelectedTab(tab);
+        navigate(`/${tab}`); // ✅ 페이지 이동 처리
+    };
+
     return (
         <div className={styles["sidebar-filter"]}>
             <div className={styles["tab-toggle"]}>
                 <button
                     className={selectedTab === "private" ? styles.active : ""}
-                    onClick={() => setSelectedTab("private")}
+                    onClick={() => handleTabClick("private")} // ✅ 변경
                 >
                     <span>👤</span> private
                 </button>
                 <button
                     className={selectedTab === "public" ? styles.active : ""}
-                    onClick={() => setSelectedTab("public")}
+                    onClick={() => handleTabClick("public")} // ✅ 변경
                 >
                     <span>🧑‍🤝‍🧑</span> public
                 </button>
             </div>
-
             {selectedTab === "public" && (
                 <>
                     <h3 className={styles["menu-title"]}>public</h3>
@@ -188,4 +196,4 @@ export default function LeftSidebar() {
             )}
         </div>
     );
-}
+};
