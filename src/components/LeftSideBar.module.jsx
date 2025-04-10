@@ -108,12 +108,6 @@ export default function LeftSidebar() {
                 </button>
             </div>
 
-            {selectedTab === "private" && (
-                <div className={styles["private-placeholder"]}>
-                    <p>내 문제집 목록이 여기에 표시됩니다.</p>
-                </div>
-            )}
-
             {selectedTab === "public" && (
                 <>
                     <h3 className={styles["menu-title"]}>public</h3>

@@ -1,13 +1,19 @@
 /* LeftSidebar.module.css */
 
 .sidebar-filter {
+    width: 240px;
+    /* ✅ 고정 너비로 변경 */
+    height: 100vh;
+    /* ✅ 전체 높이 */
     background-color: #ffffff;
-    width: 100%;
-    height: 100%;
     padding: 20px 12px;
     box-sizing: border-box;
     font-family: 'Noto Sans KR', sans-serif;
     display: flex;
+    border-right: 1px solid #eee;
+    /* ✅ 다른 콘텐츠와 구분 */
+    position: fixed;
+    /* ✅ 왼쪽에 고정 */
     flex-direction: column;
     border-radius: 0 32px 0 0;
 }
@@ -93,6 +99,7 @@
 .custom-select-wrapper {
     position: relative;
     width: 100%;
+    margin-bottom: 12px;
 }
 
 .custom-select {
