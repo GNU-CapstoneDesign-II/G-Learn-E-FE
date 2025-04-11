@@ -25,11 +25,17 @@ export default function Private() {
         <>
             <Navbar />
             <LeftSideBar />
-            <PrivateHeader />
+            <PrivateHeader
+                selectedFolder={selectedFolder}
+                selectedItems={[]} // 또는 상태로 관리해도 좋아요
+                sortOption="최신순"
+                onSortChange={(v) => console.log("정렬 변경:", v)}
+                onClearSelection={() => console.log("선택 해제")}
+                onBack={() => setSelectedFolder(null)}
+            />
+
             <div className="container">
                 <main className="main">
-                    <h2 className="title">private</h2>
-
                     {!selectedFolder && (
                         <div className="grid">
                             {folders.map((folder) => (
@@ -45,11 +51,6 @@ export default function Private() {
 
                     {selectedFolder && (
                         <>
-                            <div className="folderHeader">
-                                <button onClick={() => setSelectedFolder(null)}>◀ 뒤로</button>
-                                <h3>{selectedFolder.name}</h3>
-                            </div>
-
                             <div className="grid">
                                 {documents.map((doc) => (
                                     <DocumentCard key={doc.id} title={doc.title} />

@@ -1,7 +1,7 @@
 /* LeftSidebar.module.css */
 
 .sidebar-filter {
-    margin-top: 30px;
+    margin-top: 0px;
     width: 200px;
     /* ✅ 고정 너비로 변경 */
     height: 100%;

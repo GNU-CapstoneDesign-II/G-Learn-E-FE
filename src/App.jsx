@@ -100,6 +100,7 @@ export default App;
 
 */
 
+/*
 // src/App.jsx 테스트 (테스트용_ 삭제하지 말아주세요.)
 import React from "react";
 import PrivateHeader from "./components/UseInPages/PrivateHeader.module.jsx";
@@ -128,3 +129,14 @@ function App() {
 
 export default App;
 
+*/
+
+
+import React from "react";
+import Private from "./pages/Private"; // 실제 Private 페이지
+
+function App() {
+  return <Private />;
+}
+
+export default App;
