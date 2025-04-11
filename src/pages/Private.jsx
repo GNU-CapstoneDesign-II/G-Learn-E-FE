@@ -5,6 +5,7 @@ import FolderCard from "../components/cards/FolderCard.module";
 import DocumentCard from "../components/cards/DocumentCard.module";
 import AddCard from "../components/cards/AddCard.module";
 import "./Private.css";
+import PrivateHeader from "../components/UseInPages/PrivateHeader.module";
 
 export default function Private() {
     const [selectedFolder, setSelectedFolder] = useState(null);
@@ -24,6 +25,7 @@ export default function Private() {
         <>
             <Navbar />
             <LeftSideBar />
+            <PrivateHeader />
             <div className="container">
                 <main className="main">
                     <h2 className="title">private</h2>

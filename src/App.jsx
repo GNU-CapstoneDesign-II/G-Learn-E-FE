@@ -102,13 +102,29 @@ export default App;
 
 // src/App.jsx 테스트 (테스트용_ 삭제하지 말아주세요.)
 import React from "react";
-import Private from "./pages/Private";
+import PrivateHeader from "./components/UseInPages/PrivateHeader.module.jsx";
+
+
 function App() {
+  const [selectedItems, setSelectedItems] = React.useState([
+    { id: 1, name: "문제집1" },
+    { id: 2, name: "문제집2" },
+  ]);
+
+  const selectedFolder = { id: 100, name: "운영체제" };
+
   return (
-    <div>
-      <Private />
-    </div>
+    <PrivateHeader
+      selectedFolder={selectedFolder}
+      selectedItems={selectedItems}
+      sortOption="최신순"
+      onSortChange={(v) => console.log(v)}
+      onClearSelection={() => setSelectedItems([])}
+      onBack={() => console.log("back")}
+    />
   );
 }
 
+
 export default App;
+
