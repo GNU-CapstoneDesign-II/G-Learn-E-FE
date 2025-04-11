@@ -5,6 +5,7 @@ import Login from "./pages/Login.jsx";
 import SignUp from "./pages/SignUp.jsx";
 import FindPassword from "./pages/FindPassword.jsx";
 import MainPage from "./pages/MainPage.jsx";
+import WorkbookSolve from "./pages/WorkbookSolve.jsx";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/find-password" element={<FindPassword />} />
+      <Route path="/solve/:workbookId" element={<WorkbookSolve />} />
     </Routes>
   );
 }
