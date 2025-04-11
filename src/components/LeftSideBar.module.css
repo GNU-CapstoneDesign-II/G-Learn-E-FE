@@ -1,7 +1,7 @@
 /* LeftSidebar.module.css */
 
 .sidebar-filter {
-    margin-top: 60px;
+    margin-top: 30px;
     width: 200px;
     /* ✅ 고정 너비로 변경 */
     height: 100%;
@@ -11,7 +11,7 @@
     box-sizing: border-box;
     font-family: 'Noto Sans KR', sans-serif;
     display: flex;
-    border-right: 1px solid #eee;
+    border-right: 2px solid #E6CEBA;
     /* ✅ 다른 콘텐츠와 구분 */
     position: fixed;
     /* ✅ 왼쪽에 고정 */
@@ -19,6 +19,7 @@
 }
 
 .tab-toggle {
+    margin-top: 50px;
     display: flex;
     flex-direction: column;
     gap: 12px;

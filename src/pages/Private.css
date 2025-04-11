@@ -1,5 +1,5 @@
 .container {
-    margin-top: 80px;
+    margin-top: 50px;
     margin-left: 200px;
     min-height: 100vh;
     background-color: #F9F4ED;
@@ -30,4 +30,9 @@
     align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
+}
+
+.title {
+
+    color: #5F360A;
 }

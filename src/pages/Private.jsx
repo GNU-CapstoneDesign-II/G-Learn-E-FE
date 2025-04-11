@@ -4,7 +4,7 @@ import LeftSideBar from "../components/LeftSideBar.module";
 import FolderCard from "../components/cards/FolderCard.module";
 import DocumentCard from "../components/cards/DocumentCard.module";
 import AddCard from "../components/cards/AddCard.module";
-import "./Private.css"; // ✅ 일반 CSS
+import "./Private.css";
 
 export default function Private() {
     const [selectedFolder, setSelectedFolder] = useState(null);

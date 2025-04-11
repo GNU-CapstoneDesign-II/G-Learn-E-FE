@@ -109,6 +109,7 @@ export default function LeftSidebar() {
                 >
                     <span>👤</span> private
                 </button>
+                <div />
                 <button
                     className={selectedTab === "public" ? styles.active : ""}
                     onClick={() => handleTabClick("public")} // ✅ 변경
