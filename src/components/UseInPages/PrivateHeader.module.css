@@ -39,6 +39,15 @@
     /* 요소 간 간격 */
 }
 
+.checkboxRight {
+    margin-left: auto;
+    /* ✅ 체크박스를 오른쪽 끝으로 밀어줌 */
+}
+
+.checkboxContainer {
+    margin-left: auto;
+}
+
 /* ◀ 뒤로가기 버튼 */
 .backBtn {
     font-size: 1.25rem;

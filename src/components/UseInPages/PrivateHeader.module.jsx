@@ -7,9 +7,14 @@ export default function PrivateHeader({
     selectedItems,
     sortOption,
     onSortChange,
+    isSelectMode, // ✅ 추가
     onClearSelection,
     onBack,
+    onToggleAll
 }) {
+
+    const totalCount = selectedFolder ? 2 : 3; // 예시 값, 실제 값은 props로 받아도 OK
+
     return (
         <div className={styles.header}>
             <div className={styles.left}>
@@ -23,7 +28,6 @@ export default function PrivateHeader({
                 )}
             </div>
 
-            {/* 오른쪽 요소들 순서 그대로! */}
             <div className={styles.right}>
                 <div className={styles["custom-select-wrapper"]}>
                     <select
@@ -37,8 +41,7 @@ export default function PrivateHeader({
                     </select>
                     <span className={styles["custom-arrow"]}>▼</span>
                 </div>
-
-                {selectedItems.length > 0 && (
+                {isSelectMode && (
                     <>
                         <button className={styles.action}>업로드</button>
                         <button className={styles.action}>합치기</button>
@@ -47,15 +50,20 @@ export default function PrivateHeader({
                         <span className={styles.count}>{selectedItems.length}개 선택</span>
                     </>
                 )}
-
-                <Checkbox
-                    checked={selectedItems.length > 0}
-                    onChange={(e) => {
-                        if (!e.target.checked) onClearSelection();
-                    }}
-                />
+                {/* ✅ 전체 선택 체크박스 */}
+                <div className={styles.checkboxContainer}>
+                    <Checkbox
+                        checked={selectedItems.length === totalCount}
+                        onChange={() => {
+                            if (!isSelectMode) {
+                                onToggleAll(); // 초기화하면서 모드 진입
+                            } else {
+                                onToggleAll();
+                            }
+                        }}
+                    />
+                </div>
             </div>
         </div>
-
     );
 }

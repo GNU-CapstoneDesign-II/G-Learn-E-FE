@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./DocumentCard.module.css";
+import Checkbox from "../UseInPages/Checkbox.module";
 
 const DocumentIcon = () => (
     <div className={styles.iconWrapper}>
@@ -17,13 +18,23 @@ const DocumentIcon = () => (
 );
 
 
-export default function DocumentCard({ title, onClick }) {
+export default function DocumentCard({ title, isSelected, isSelectMode, onToggleSelect, onClick }) {
     return (
         <div className={styles.wrapper} onClick={onClick}>
             <div className={styles.card}>
+                {isSelectMode && (
+                    <div className={styles.checkboxWrapper}>
+                        <Checkbox
+                            checked={isSelected}
+                            onChange={onToggleSelect}
+                            className={styles.checkbox}
+                        />
+                    </div>
+                )}
                 <DocumentIcon />
             </div>
             <span className={styles.name}>{title}</span>
         </div>
+
     );
 }

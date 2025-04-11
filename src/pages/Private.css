@@ -6,7 +6,7 @@
     font-family: 'Noto Sans KR', sans-serif;
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: calc(100% - 200px);
 }
 
 .main {
@@ -17,11 +17,4 @@
     display: flex;
     flex-wrap: wrap;
     gap: 1.5rem;
-}
-
-.folderHeader {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
 }

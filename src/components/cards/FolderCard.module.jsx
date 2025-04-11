@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./FolderCard.module.css";
+import Checkbox from "../UseInPages/Checkbox.module";
 
 const FolderIcon = () => (
     <svg
@@ -43,11 +44,19 @@ const FolderIcon = () => (
 );
 
 
-export default function FolderCard({ folder, onClick }) {
+export default function FolderCard({ folder, isSelected, isSelectMode, onToggleSelect, onClick }) {
     return (
         <div className={styles.card} onClick={onClick}>
+            {isSelectMode && (
+                <Checkbox
+                    checked={isSelected}
+                    onChange={onToggleSelect}
+                    className={styles.checkbox} // 이 클래스에 위 스타일 연결
+                />
+            )}
             <FolderIcon />
             <span className={styles.name}>{folder.name}</span>
         </div>
     );
 }
+
