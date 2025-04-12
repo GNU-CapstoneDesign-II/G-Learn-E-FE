@@ -1,23 +1,22 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import DefaultLayout from './layouts/DefaultLayout';
-import SolveLayout from './layouts/SolveLayout';
-import Home from './pages/Home';
+// src/App.jsx
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import Login from "./pages/Login.jsx";
+import SignUp from "./pages/SignUp.jsx";
+import FindPassword from "./pages/FindPassword.jsx";
+import MainPage from "./pages/MainPage.jsx";
+import ProblemGenerator from "./pages/ProblemGenerator.jsx";
 
 function App() {
-
-    return (
-        <Routes>
-            <Route element={<DefaultLayout />}>
-                <Route path="/" element={<Home />} />
-                {/* 공통 레이아웃을 쓰는 페이지들 */}
-            </Route>
-
-            {/* <Route element={<SolveLayout />}>
-                <Route path="/solve" element={<SolvePage />} />
-            </Route> */}
-        </Routes>
-    );
+  return (
+    <Routes>
+      <Route path="/" element={<MainPage />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/find-password" element={<FindPassword />} />
+      <Route path="/generate-problem" element={<ProblemGenerator />} />
+    </Routes>
+  );
 }
 
 export default App;
