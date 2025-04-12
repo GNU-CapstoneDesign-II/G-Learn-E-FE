@@ -3,6 +3,19 @@ import OXChoice from './OXChoice';
 import BlankFill from './BlankFill';
 import DescriptiveAnswer from './DescriptiveAnswer';
 
+/*
+problem: {
+    "id": 1,
+    "problemNumber": 1,
+    "type": "MULTIPLE", MULTIPLE | OX | BLANK | DESCRIPTIVE
+    "title": "문제 제목",
+    "options": ["보기1", "보기2", "보기3", "보기4"], | null
+    "answer": ["정답1"] | null,
+    "explanation": "문제 해설",
+}
+
+*/
+
 export default function ProblemCard({ problem, userAttempt }) {
     const renderProblem = () => {
         switch (problem.type) {

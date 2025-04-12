@@ -9,7 +9,7 @@ export default function WorkbookSolve() {
     const [problems, setProblems] = useState([]);
     const { workbookId } = useParams();
     // 실제로는 로그인 상태에서 가져오기
-    const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwidG9rZW5UeXBlIjoiYWNjZXNzIiwiaWF0IjoxNzQ0MzgyMjMxLCJleHAiOjE3NDQzODU4MzF9.LxmqPUaZKdCWKFfo3USgstU6QylaEs6MdUSaGmOvLq9brvm8Vg8nEGLrJpRheP9ZEv1yxuuxbn9bQmZG-YzmZw';
+    const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwidG9rZW5UeXBlIjoiYWNjZXNzIiwiaWF0IjoxNzQ0NDM3NTUzLCJleHAiOjE3NDQ0NDExNTN9.-fleNaDOHbBK5-XkfQyfK5h5WH9Em6cd1OTg4FQ6lB6UaepIkCI8dj9G41dtfFmvEgcBF4UbrkBbu9welovl-Q';
 
     useEffect(() => {
         fetchWorkbook(workbookId, token).then(({ workbook, problems }) => {
