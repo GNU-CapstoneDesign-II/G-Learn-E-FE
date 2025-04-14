@@ -5,6 +5,7 @@ import Login from "./pages/Login.jsx";
 import SignUp from "./pages/SignUp.jsx";
 import FindPassword from "./pages/FindPassword.jsx";
 import MainPage from "./pages/MainPage.jsx";
+import ProblemGenerator from "./pages/ProblemGenerator.jsx";
 import Private from "./pages/Private.jsx";
 
 
@@ -15,11 +16,10 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/find-password" element={<FindPassword />} />
+      <Route path="/generate-problem" element={<ProblemGenerator />} />
       <Route path="/private" element={<Private />} />
     </Routes>
   );
 }
 
 export default App;
-
-

@@ -1,0 +1,52 @@
+/* dropdown 컴포넌트 전체 컨테이너 */
+.dropdown {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 드롭다운의 레이블 스타일 */
+.dropdown label {
+    font-size: 0.9rem;
+    font-weight: normal;
+    margin-bottom: 0.3rem;
+    color: black;
+}
+
+/* 드롭다운 select 박스 스타일 */
+.dropdown select {
+    padding: 0.3rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+/* 드롭다운 select 박스 hover 시 테두리 색상 변경 */
+.dropdown select:hover,
+.customInput:hover {
+    border-color: #895737;
+}
+
+/* 드롭다운 select 박스에 focus 되었을 때 스타일 */
+.dropdown select:focus,
+.customInput:focus {
+    outline: none;
+    border-color: #895737;
+}
+
+/* 드롭다운 옵션 스타일 (옵션을 눌렀을 때) */
+.dropdown option {
+    padding: 0.8rem;
+    font-size: 1rem;
+}
+
+.customInput {
+    width: 100px;
+    padding: 0.3rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: border-color 0.3s ease;
+    margin-top: 0.3rem;
+}
