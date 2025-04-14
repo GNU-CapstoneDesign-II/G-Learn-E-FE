@@ -1,0 +1,61 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100px;
+}
+
+.card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 90px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 0.8px solid #af9a84;
+    background-color: #fff;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+}
+
+.checkboxWrapper {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+/* ✅ 원 배경 */
+.iconWrapper {
+    background-color: #f7f2ec;
+    border-radius: 50%;
+    width: 44px;
+    /* 원하는 사이즈로 조정 */
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ✅ 문서 아이콘 */
+.icon {
+    width: 24px;
+    /* 실제 문서 아이콘만 더 작게 */
+    height: auto;
+}
+
+.name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #5f360a;
+    text-align: center;
+    line-height: 1.3;
+    margin-top: 8px;
+    /* ✅ 텍스트와 박스 사이 간격 */
+}
