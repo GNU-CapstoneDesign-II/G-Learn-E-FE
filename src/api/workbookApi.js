@@ -1,13 +1,12 @@
-import axios from 'axios';
+// src/api/workbookApi.js
+import axios from "./axiosInstance";
 
-const API_BASE_URL = 'http://localhost:8080/api';
 
-export const fetchWorkbook = async (workbookId, token) => {
-    const res = await axios.get(`${API_BASE_URL}/workbook/${workbookId}/solve`, {
-        headers: { Authorization: `Bearer ${token}` }
-    });
+export const fetchWorkbook = async (workbookId) => {
+    const res = await axios.get(`/api/workbook/${workbookId}/solve`);
     return res.data.data;
 };
+
 
 /**
  * 임시 저장 API
@@ -16,19 +15,12 @@ export const fetchWorkbook = async (workbookId, token) => {
  * @param {string} token - 사용자 인증 토큰
  * @returns {Promise<any>}
  */
-export const saveSolveLog = async (workbookId, userAttempts, token) => {
+export const saveSolveLog = async (workbookId, userAttempts) => {
     const res = await axios.patch(
-        `${API_BASE_URL}/solve-log/workbook/${workbookId}`,
-        { userAttempts },
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        }
+        `/api/solve-log/workbook/${workbookId}`,
+        { userAttempts }
     );
-
-    return res.data; // 필요하면 .data.data 도 가능
+    return res.data;
 };
 
 
@@ -39,11 +31,11 @@ export const saveSolveLog = async (workbookId, userAttempts, token) => {
  * @param {string} token - 사용자 인증 토큰
  * @returns {Promise<any>}
  */
-export const gradeWorkbook = async (workbookId, userAttempts, token) => {
+export const gradeWorkbook = async (workbookId, userAttempts) => {
+    console.log(userAttempts);
     const res = await axios.post(
-        `${API_BASE_URL}/workbook/${workbookId}/grade`,
-        { userAttempts },
-        { headers: { Authorization: `Bearer ${token}` } }
+        `/api/workbook/${workbookId}/grade`,
+        { userAttempts }
     );
     return res.data;
 };
@@ -54,12 +46,7 @@ export const gradeWorkbook = async (workbookId, userAttempts, token) => {
  * @param {string} token - 사용자 인증 토큰
  * @returns {Promise<any>}
  */
-export const resetSolveLog = async (workbookId, token) => {
-    const res = await axios.delete(
-        `${API_BASE_URL}/solve-log/workbook/${workbookId}`,
-        {
-            headers: { Authorization: `Bearer ${token}` },
-        }
-    );
+export const resetSolveLog = async (workbookId) => {
+    const res = await axios.delete(`/api/solve-log/workbook/${workbookId}`);
     return res.data;
 };

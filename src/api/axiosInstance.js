@@ -1,63 +1,67 @@
 // src/api/axiosInstance.js
-import axios from 'axios';
+import axios from "axios";
+import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "../utils/authToken";
 
-const api = axios.create({
-  baseURL: 'https://your-api.com',
-  withCredentials: true, // 리프레시 토큰용 쿠키 포함
+// 백엔드 API 주소 (직접 명시)
+const BASE_URL = "http://localhost:8080";
+
+const instance = axios.create({
+    baseURL: BASE_URL,
+    withCredentials: true,
 });
 
-// 요청 인터셉터: accessToken 자동 삽입
-api.interceptors.request.use(
-  (config) => {
-    const token = sessionStorage.getItem('accessToken');
+const AUTH_REQUIRED_PREFIXES = ["/api/"];
+const AUTH_EXCLUDE_URLS = ["/api/auth/login", "/api/auth/signup", "/api/auth/email-code", "/api/auth/email-code/verify"];
 
-    // 로그인/회원가입/토큰재발급 등은 토큰 없이 요청
-    const isAuthFree =
-      config.url.includes('/auth/login') ||
-      config.url.includes('/auth/register') ||
-      config.url.includes('/auth/reissue');
+instance.interceptors.request.use((config) => {
+  const token = getAccessToken();
+  const url = config.url;
 
-    if (!isAuthFree && token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
+  const needsAuth =
+    AUTH_REQUIRED_PREFIXES.some((prefix) => url.startsWith(prefix)) &&
+    !AUTH_EXCLUDE_URLS.includes(url); // ✅ 예외 처리
 
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// 응답 인터셉터: 401 발생 시 토큰 재발급 → 원래 요청 재시도
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        const res = await axios.post(
-          'https://your-api.com/auth/reissue',
-          {},
-          { withCredentials: true }
-        );
-
-        const newAccessToken = res.data.accessToken;
-        sessionStorage.setItem('accessToken', newAccessToken);
-
-        // 토큰 다시 설정하고 원래 요청 재시도
-        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-        return api(originalRequest);
-      } catch (refreshError) {
-        // 재발급 실패 시 로그아웃 처리
-        sessionStorage.removeItem('accessToken');
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      }
-    }
-
-    return Promise.reject(error);
+  if (token && needsAuth) {
+    config.headers["Authorization"] = `Bearer ${token}`;
   }
+
+  return config;
+});
+
+
+instance.interceptors.response.use(
+    (res) => res,
+    async (error) => {
+        const originalRequest = error.config;
+
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+
+            try {
+                const refreshToken = getRefreshToken();
+                if (!refreshToken) throw new Error("No refresh token");
+
+                const res = await axios.post(`${BASE_URL}/api/auth/reissue`, null, {
+                    headers: {
+                        Authorization: `Bearer ${refreshToken}`,
+                    },
+                });
+
+                const newAccessToken = res.data?.data?.accessToken;
+                if (!newAccessToken) throw new Error("No access token");
+
+                setTokens({ accessToken: newAccessToken, refreshToken });
+                originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+                return instance(originalRequest);
+            } catch (e) {
+                clearTokens();
+                window.location.href = "/login";
+                return Promise.reject(e);
+            }
+        }
+
+        return Promise.reject(error);
+    }
 );
 
-export default api;
+export default instance;

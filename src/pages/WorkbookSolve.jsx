@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+// src/pages/WorkbookSolve.jsx
+import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import {
     fetchWorkbook,
@@ -16,15 +17,15 @@ export default function WorkbookSolve() {
     const [loading, setLoading] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const { workbookId } = useParams();
-    const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwidG9rZW5UeXBlIjoiYWNjZXNzIiwiaWF0IjoxNzQ0NDY4ODMzLCJleHAiOjE3NDQ0NzI0MzN9.I0RpOveslIH8yQgn7K-I4OEC87sdvu6JT-WM04z3UX4C0dfRCVWmNQnZ_um9FAeHpgfKkXFOdEojNhNYW2Dajg';
+    const hasFetched = useRef(false); // 중복 요청 방지용
 
     useEffect(() => {
-        fetchWorkbook(workbookId, token).then(({ workbook, problems }) => {
+        if (hasFetched.current) return;
+        hasFetched.current = true;
+        fetchWorkbook(workbookId).then(({ workbook, problems }) => {
             const initialized = problems.map((p) => {
                 const attempt = p.userAttempt ?? {};
-
-                const hasSubmitAnswer =
-                    Array.isArray(attempt.submitAnswer) && attempt.submitAnswer.length > 0;
+                const hasSubmitAnswer = Array.isArray(attempt.submitAnswer) && attempt.submitAnswer.length > 0;
 
                 if (hasSubmitAnswer) return { ...p, userAttempt: attempt };
 
@@ -67,8 +68,7 @@ export default function WorkbookSolve() {
                 problemId: p.problem.id,
                 submitAnswer: p.userAttempt?.submitAnswer ?? [],
             }));
-
-            await saveSolveLog(workbookId, saveData, token);
+            await saveSolveLog(workbookId, saveData);
             alert('임시 저장 완료!');
         } catch (err) {
             console.error(err);
@@ -83,8 +83,7 @@ export default function WorkbookSolve() {
                 problemId: p.problem.id,
                 submitAnswer: p.userAttempt?.submitAnswer ?? [],
             }));
-
-            await gradeWorkbook(workbookId, attempts, token);
+            await gradeWorkbook(workbookId, attempts);
             window.location.reload();
         } catch (err) {
             console.error(err);
@@ -101,7 +100,7 @@ export default function WorkbookSolve() {
     const confirmReset = async () => {
         try {
             setLoading(true);
-            await resetSolveLog(workbookId, token);
+            await resetSolveLog(workbookId);
             window.location.reload();
         } catch (err) {
             console.error(err);
@@ -161,7 +160,7 @@ export default function WorkbookSolve() {
                                 {pair.map((p, i) => {
                                     const isCorrect = p.userAttempt?.isCorrect;
                                     const borderColor =
-                                        workbook?.isSolved === true
+                                        workbook?.isSolved
                                             ? isCorrect
                                                 ? 'border-green-500 border-2'
                                                 : 'border-red-500 border-2'
