@@ -30,10 +30,10 @@ const ProblemGenerator = () => {
   const [typeOptions, setTypeOptions] = useState({
     '객관식': { optionCount: 5, questionCount: 30, customQuestionCount: '' },
     'O/X 퀴즈': { questionCount: 5, customQuestionCount: '' },
-    '단답형': { questionCount: 5, customQuestionCount: '' },
+    // '단답형': { questionCount: 5, customQuestionCount: '' },
     '주관식': { questionCount: 5, customQuestionCount: '' },
     '빈칸 채우기': { optionCount: 2, questionCount: 5, customQuestionCount: '' },
-    '다중 선택': { optionCount: 5, questionCount: 5, customQuestionCount: '' },
+    // '다중 선택': { optionCount: 5, questionCount: 5, customQuestionCount: '' },
   });
 
   const updateTypeOption = (type, field, value) => {
@@ -49,10 +49,10 @@ const ProblemGenerator = () => {
   const [openDropdowns, setOpenDropdowns] = useState({
     '객관식': false,
     'O/X 퀴즈': false,
-    '단답형': false,
+    // '단답형': false,
     '주관식': false,
     '빈칸 채우기': false,
-    '다중 선택': false,
+    // '다중 선택': false,
   });
 
   const toggleDropdown = (type) => {
@@ -95,15 +95,6 @@ const ProblemGenerator = () => {
 
   const closeModal = () => {
     setActiveButton(null);
-    setSelectedTypes([]);
-    setOpenDropdowns({
-      '객관식': false,
-      'O/X 퀴즈': false,
-      '단답형': false,
-      '주관식': false,
-      '빈칸 채우기': false,
-      '다중 선택': false,
-    });
   };
 
   const handleGenerateClick = () => {
@@ -111,7 +102,16 @@ const ProblemGenerator = () => {
 
     setTimeout(() => {
       setIsLoading(false);
-    //   navigate('/private');
+      setSelectedTypes([]);
+      setOpenDropdowns({
+      '객관식': false,
+      'O/X 퀴즈': false,
+      '단답형': false,
+      '주관식': false,
+      '빈칸 채우기': false,
+      '다중 선택': false,
+      });
+      // navigate('/private');
     }, 3000);
   };
 
@@ -194,7 +194,7 @@ const ProblemGenerator = () => {
                         }}
                       >
                         <span className={styles.typeIcon}>
-                          {['🎯', '❓', '💬', '🗨️', '🧩', '✔️'][index]}
+                          {['🎯', '❓', /*'💬', */'🗨️', '🧩'/*, '✔️'*/][index]}
                         </span>
                         <span className={styles.typeText}>{type}</span>
 
