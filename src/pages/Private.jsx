@@ -43,7 +43,6 @@ export default function Private() {
         }
     };
 
-
     const clearSelection = () => {
         setSelectedItems([]);
         setIsSelectMode(false);
