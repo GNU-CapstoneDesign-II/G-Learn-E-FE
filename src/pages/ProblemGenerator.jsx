@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.module.jsx';
 import Dropdown from '../components/Dropdown.jsx';
-import styles from './ProblemGenerator.module.css';
 import logoImageLight from '../assets/image-logo-light.png';
+import SelectableButton from '../components/SelectableButton.jsx';
 
 const ProblemGenerator = () => {
   const navigate = useNavigate();
@@ -15,25 +15,17 @@ const ProblemGenerator = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (isLoading) {
-        document.body.style.overflow = 'hidden'; // ✅ 스크롤 막기
-    } else {
-        document.body.style.overflow = 'auto';   // ✅ 다시 스크롤 가능
-    }
-
-    // 컴포넌트가 unmount되거나 리렌더될 때 정리
+    document.body.style.overflow = isLoading ? 'hidden' : 'auto';
     return () => {
-        document.body.style.overflow = 'auto';
+      document.body.style.overflow = 'auto';
     };
   }, [isLoading]);
 
   const [typeOptions, setTypeOptions] = useState({
     '객관식': { optionCount: 5, questionCount: 30, customQuestionCount: '' },
     'O/X 퀴즈': { questionCount: 5, customQuestionCount: '' },
-    // '단답형': { questionCount: 5, customQuestionCount: '' },
     '주관식': { questionCount: 5, customQuestionCount: '' },
     '빈칸 채우기': { optionCount: 2, questionCount: 5, customQuestionCount: '' },
-    // '다중 선택': { optionCount: 5, questionCount: 5, customQuestionCount: '' },
   });
 
   const updateTypeOption = (type, field, value) => {
@@ -49,10 +41,8 @@ const ProblemGenerator = () => {
   const [openDropdowns, setOpenDropdowns] = useState({
     '객관식': false,
     'O/X 퀴즈': false,
-    // '단답형': false,
     '주관식': false,
     '빈칸 채우기': false,
-    // '다중 선택': false,
   });
 
   const toggleDropdown = (type) => {
@@ -99,17 +89,14 @@ const ProblemGenerator = () => {
 
   const handleGenerateClick = () => {
     setIsLoading(true);
-
     setTimeout(() => {
       setIsLoading(false);
       setSelectedTypes([]);
       setOpenDropdowns({
-      '객관식': false,
-      'O/X 퀴즈': false,
-      '단답형': false,
-      '주관식': false,
-      '빈칸 채우기': false,
-      '다중 선택': false,
+        '객관식': false,
+        'O/X 퀴즈': false,
+        '주관식': false,
+        '빈칸 채우기': false,
       });
       // navigate('/private');
     }, 3000);
@@ -120,86 +107,93 @@ const ProblemGenerator = () => {
       <Navbar />
 
       {isLoading && (
-        <div className={styles.loadingOverlay}>
-          <div className={styles.loadingBox}>
-            <img src={logoImageLight} alt="G-Learn-E Logo" className={styles.loadingImage} />
-            <p className={styles.loadingText}>문제를 생성하고 있어요!<br />잠시만 기다려주세요 . . .</p>
+        <div className="fixed top-20 left-0 w-screen h-[calc(100vh-80px)] bg-[#F3E9DC] z-[9999] flex items-center justify-center">
+          <div className="text-center">
+            <img src={logoImageLight} alt="G-Learn-E Logo" className="w-[350px] h-auto" />
+            <p className="mt-6 text-xl text-[#B3977B] leading-relaxed font-[\'Noto Sans KR\']">
+              문제를 생성하고 있어요!<br />잠시만 기다려주세요 <span className="dots"></span>
+            </p>
           </div>
         </div>
       )}
 
-      <div className={styles.pageContainer}>
-        <div className={styles.sectionIntro}>
-          <h2>내용 입력 및 문제 유형을 선택한 후 문제를 생성해보세요!</h2>
+      {/* ✅ 페이지 전체를 감싸는 컨테이너 */}
+      <div className="mt-20 font-[\'Noto Sans KR\'] box-border">
+        {/* ✅ 안내 메시지 + 입력 타입 버튼 섹션 */}
+        <div className="bg-[rgba(243,233,220,0.5)] h-[260px] flex flex-col items-center justify-center gap-10 text-center">
+          <h2 className="text-xl text-brown m-0">내용 입력 및 문제 유형을 선택한 후 문제를 생성해보세요!</h2>
 
-          <div className={styles.inputTypeContainer}>
+          {/* ✅ 입력 타입 버튼 묶음 */}
+          <div className="flex gap-[22px]">
             {['text', 'pdf', 'voice'].map((type) => (
-              <button
+              <SelectableButton
                 key={type}
-                className={`${styles.inputTypeButton} ${inputType === type ? styles.inputTypeButtonActive : ''}`}
+                label={
+                  type === 'text' ? 'T Text' : type === 'pdf' ? '📄 PDF' : '🎙️ 음성파일'
+                }
+                isActive={inputType === type}
                 onClick={() => setInputType(type)}
-              >
-                {type === 'text' ? 'T Text' : type === 'pdf' ? '📄 PDF' : '🎙️ 음성파일'}
-              </button>
+              />
             ))}
           </div>
         </div>
 
-        <div className={styles.sectionInput}>
-          <div className={styles.textareaWrapper}>
+        {/* ✅ 텍스트 입력 영역 */}
+        <div className="flex justify-center p-12">
+          <div className="relative">
             <textarea
-              className={styles.textareaBox}
+              className="w-[90vw] max-w-[1360px] min-w-[320px] h-[60vh] max-h-[600px] border-[1.5px] border-lightbrown rounded-[1.5rem] p-5 text-base resize-none outline-none box-border shadow-[0_8px_30px_rgba(192,133,82,0.2)] font-[\'Noto Sans KR\']"
               placeholder="문제를 생성할 내용을 입력하세요..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
               maxLength={1000}
             />
-            <div className={styles.charCount}>{content.length} / 1000</div>
-            <div className={styles.bottomControls}>
-              <button
-                className={`${styles.controlButton} ${activeButton === 'type' ? styles.controlButtonActive : ''}`}
+            {/* ✅ 글자 수 카운터 */}
+            <div className="absolute bottom-20 right-5 text-sm text-gray-500 font-normal">{content.length} / 1000</div>
+            {/* ✅ 하단의 컨트롤 버튼 */}
+            <div className="absolute bottom-5 right-5 flex gap-[22px]">
+              <SelectableButton
+                label="문제 유형"
+                isActive={activeButton === 'type'}
                 onClick={() => setActiveButton(activeButton === 'type' ? null : 'type')}
-              >
-                문제 유형
-              </button>
-              <button
-                className={`${styles.controlButton} ${activeButton === 'generate' ? styles.controlButtonActive : ''}`}
+              />
+
+              <SelectableButton
+                label="문제 생성"
+                isActive={activeButton === 'generate'}
                 onClick={handleGenerateClick}
-              >
-                문제 생성
-              </button>
+              />
             </div>
           </div>
         </div>
 
+        {/* ✅ 모달 전체 감싸는 영역 */}
         {activeButton === 'type' && (
-          <div className={styles.sectionModal} onClick={closeModal}>
-            <div className={styles.modalBox} onClick={(e) => e.stopPropagation()}>
-              <div className={styles.modalHeader}>
+          <div className="fixed top-0 left-0 w-screen h-screen bg-[rgba(60,60,60,0.5)] flex justify-center items-center z-[999]" onClick={closeModal}>
+            <div className="w-[380px] bg-white rounded-[1.5rem] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative z-[1000]" onClick={(e) => e.stopPropagation()}>
+              <div className="flex justify-between items-center text-[1.2rem]">
                 <span>문제 유형</span>
-                <button onClick={closeModal} className={styles.closeButton}>✖</button>
+                <button onClick={closeModal} className="bg-none border-none text-[1.2rem] cursor-pointer">✖</button>
               </div>
 
-              <div className={styles.modalContent}>
-                <ul className={styles.typeList}>
+              {/* ✅ 모달 안쪽 내용 */}
+              <div className="py-4">
+                <ul className="list-none p-0 m-0">
                   {Object.keys(typeOptions).map((type, index) => {
                     const isActive = selectedTypes.includes(type);
                     return (
                       <li
                         key={type}
-                        className={`${styles.typeItem} ${isActive ? styles.active : ''}`}
+                        className={`flex items-center p-[0.6rem] rounded-[12px] cursor-pointer transition-colors duration-300 ${isActive ? 'bg-[rgba(243,233,220,0.5)] text-brown font-bold' : 'hover:bg-[#f5f5f5]'}`}
                         onClick={() => {
                           toggleTypeSelection(type);
                           toggleDropdown(type);
                         }}
                       >
-                        <span className={styles.typeIcon}>
-                          {['🎯', '❓', /*'💬', */'🗨️', '🧩'/*, '✔️'*/][index]}
-                        </span>
-                        <span className={styles.typeText}>{type}</span>
-
+                        <span className="w-6">{['🎯', '❓', '🗨️', '🧩'][index]}</span>
+                        <span className="flex-1 ml-2">{type}</span>
                         {openDropdowns[type] && (
-                          <div className={styles.dropdownContainer} onClick={(e) => e.stopPropagation()}>
+                          <div className="flex justify-between gap-4 my-2" onClick={(e) => e.stopPropagation()}>
                             {'optionCount' in typeOptions[type] && (
                               <Dropdown
                                 label={type === '빈칸 채우기' ? '빈칸 수' : '선지 수'}
@@ -218,19 +212,19 @@ const ProblemGenerator = () => {
                             />
                           </div>
                         )}
-
-                        {isActive && <span className={styles.check}>✓</span>}
+                        {isActive && <span className="font-bold ml-5">✓</span>}
                       </li>
                     );
                   })}
                 </ul>
 
-                <div className={styles.difficulty}>
+                {/* 난이도 드롭다운 */}
+                <div className="flex justify-between items-center py-6 my-6 border-t border-[#ccc]">
                   <span>난이도</span>
                   <select
                     value={selectedDifficulty}
                     onChange={handleDifficultyChange}
-                    className={styles.difficultySelect}
+                    className="p-2 text-base border border-[#ccc] rounded-md cursor-pointer focus:outline-none focus:border-[#3ADBFF] hover:border-[#3ADBFF]"
                   >
                     <option value="상">상</option>
                     <option value="중">중</option>
@@ -238,7 +232,12 @@ const ProblemGenerator = () => {
                   </select>
                 </div>
 
-                <button className={styles.saveButton} onClick={handleSave}>저장</button>
+                <button
+                  className="w-full p-3 bg-brown text-white border-none rounded-full text-base font-bold cursor-pointer"
+                  onClick={handleSave}
+                >
+                  저장
+                </button>
               </div>
             </div>
           </div>
