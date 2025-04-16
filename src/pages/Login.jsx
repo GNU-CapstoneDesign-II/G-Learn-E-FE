@@ -1,42 +1,66 @@
-// src/pages/Login.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar.module.jsx";
-import "../pages/Login.css";
+import Navbar from "../components/Navbar.jsx";
+
 
 export default function Login() {
   const navigate = useNavigate();
 
-
   return (
     <>
       <Navbar />
-      <div className="login-page">
-        <div className="login-wrapper">
-          <div className="login-container">
-            <h1 className="login-title">로그인</h1>
-            <p className="login-description">
+      <div className="min-h-screen bg-[#f8f1e7] font-['Noto_Sans_KR'] text-[#5F360A]">
+        <div className="flex justify-center items-center pt-20">
+          <div className="w-full max-w-md px-4 text-center">
+            {/* 제목 */}
+            <h1 className="text-3xl font-semibold border-b-2 border-[#5F360A] inline-block pb-1 mb-4">
+              로그인
+            </h1>
+
+            {/* 설명 */}
+            <p className="text-sm text-[#9A7E5F] leading-relaxed mb-10">
               로그인 하시면 <strong>지런이</strong>의 서비스를 이용 하실 수 있습니다. <br />
               아직 회원이 아니시라면 회원가입을 해주세요.
             </p>
 
-            <div className="login-form">
-              <label className="login-label" htmlFor="email">email</label>
-              <input id="email" type="email" placeholder="학교 이메일" className="login-input" />
+            {/* 로그인 폼 */}
+            <form className="flex flex-col gap-4 text-left">
+              <div>
+                <label htmlFor="email" className="block text-sm mb-1">email</label>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="학교 이메일"
+                  className="w-full border border-[#5F360A] px-4 py-2 rounded focus:outline-none"
+                />
+              </div>
+              <div>
+                <label htmlFor="password" className="block text-sm mb-1">password</label>
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="비밀번호"
+                  className="w-full border border-[#5F360A] px-4 py-2 rounded focus:outline-none"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-[#5F360A] text-white py-2 mt-2 rounded hover:bg-[#4b2d08] transition-colors"
+              >
+                로그인
+              </button>
+            </form>
 
-              <label className="login-label" htmlFor="password">password</label>
-              <input id="password" type="password" placeholder="비밀번호" className="login-input" />
-
-              <button className="login-button">로그인</button>
-            </div>
-
-            <div className="login-footer">
-              <button className="login-link" onClick={() => navigate("/signup")}>신규 회원가입</button>
+            {/* 로그인 하단 링크 */}
+            <div className="mt-8 flex justify-center items-center gap-3 text-sm text-[#9A7E5F]">
+              <button onClick={() => navigate("/signup")} className="hover:underline">
+                신규 회원가입
+              </button>
               <span>|</span>
-              <button className="login-link" onClick={() => navigate("/find-password")}>비밀번호 찾기</button>
-
+              <button onClick={() => navigate("/find-password")} className="hover:underline">
+                비밀번호 찾기
+              </button>
             </div>
-
           </div>
         </div>
       </div>

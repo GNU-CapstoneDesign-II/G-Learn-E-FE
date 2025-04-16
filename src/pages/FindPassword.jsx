@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar.module.jsx";
-import "../pages/FindPassword.css";
+import Navbar from "../components/Navbar.jsx";
+
 
 export default function FindPassword() {
     const [emailSent, setEmailSent] = useState(false);
@@ -44,63 +43,111 @@ export default function FindPassword() {
 
         setPasswordMatch(true);
         alert("비밀번호가 성공적으로 변경되었습니다!");
-        // navigate("/login");
     };
 
     return (
         <>
             <Navbar />
-            <div className="find-page">
-                <div className="find-wrapper">
-                    <div className="find-container">
-                        <h1 className="find-title">비밀번호 찾기</h1>
+            <div className="min-h-screen bg-[#f8f1e7] font-['Noto_Sans_KR'] text-[#5F360A] py-10">
+                <div className="max-w-md mx-auto px-4">
+                    <h1 className="text-2xl font-semibold text-center border-b-2 border-[#5F360A] inline-block pb-1 mb-10">
+                        비밀번호 찾기
+                    </h1>
 
-                        <form className="find-form" onSubmit={handleSubmit}>
-                            <label className="find-label" htmlFor="name">이름</label>
-                            <input id="name" type="text" placeholder="이름" className="find-input" />
+                    <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+                        {/* 이름 */}
+                        <div>
+                            <label htmlFor="name" className="block text-sm mb-1">이름</label>
+                            <input
+                                id="name"
+                                type="text"
+                                placeholder="이름"
+                                className="w-full border border-[#5F360A] px-4 py-2 rounded focus:outline-none"
+                            />
+                        </div>
 
-                            <label className="find-label" htmlFor="email">email</label>
-                            <div className="email-row">
-                                <input id="email" type="email" placeholder="학교 이메일" className="find-input" />
-                                <button type="button" className="code-button" onClick={handleSendCode}>
+                        {/* 이메일 + 코드 전송 버튼 */}
+                        <div>
+                            <label htmlFor="email" className="block text-sm mb-1">email</label>
+                            <div className="flex gap-2">
+                                <input
+                                    id="email"
+                                    type="email"
+                                    placeholder="학교 이메일"
+                                    className="flex-1 border border-[#5F360A] px-4 py-2 rounded focus:outline-none"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleSendCode}
+                                    className="bg-[#5F360A] text-white px-3 py-2 text-sm rounded hover:bg-[#432707]"
+                                >
                                     인증코드 전송
                                 </button>
                             </div>
-                            <input id="name" type="text" placeholder="인증코드 입력" className="find-input" />
+                        </div>
 
-                            <button type="button" className="verify-button" onClick={handleVerify}>
-                                인증 하기
-                            </button>
+                        {/* 인증코드 입력 */}
+                        <input
+                            type="text"
+                            placeholder="인증코드 입력"
+                            className="w-full border border-[#5F360A] px-4 py-2 rounded focus:outline-none"
+                        />
 
-                            {error && (
-                                <p className="error-message">{error}</p>
-                            )}
+                        {/* 인증하기 버튼 */}
+                        <button
+                            type="button"
+                            onClick={handleVerify}
+                            className="w-full bg-[#5F360A] text-white py-2 rounded hover:bg-[#432707]"
+                        >
+                            인증 하기
+                        </button>
 
-                            <hr />
+                        {/* 인증 실패 메시지 */}
+                        {error && <p className="text-sm text-red-500">{error}</p>}
 
-                            {verified && (
-                                <>
-                                    <label className="find-label" htmlFor="password">password</label>
-                                    <input id="password" type="password" placeholder="비밀번호" className="find-input" value={password} onChange={(e) => setPassword(e.target.value)} />
+                        <hr className="my-4 border-[#ddd]" />
 
+                        {/* 비밀번호 변경 섹션 */}
+                        {verified && (
+                            <>
+                                <div>
+                                    <label htmlFor="password" className="block text-sm mb-1">password</label>
+                                    <input
+                                        id="password"
+                                        type="password"
+                                        placeholder="비밀번호"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full border border-[#5F360A] px-4 py-2 rounded focus:outline-none"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label htmlFor="confirm-password" className="block text-sm mb-1">password</label>
                                     <input
                                         id="confirm-password"
                                         type="password"
                                         placeholder="비밀번호 확인"
-                                        className="find-input"
                                         value={passwordCheck}
                                         onChange={(e) => setPasswordCheck(e.target.value)}
+                                        className={`w-full border px-4 py-2 rounded focus:outline-none ${!passwordMatch ? "border-red-500" : "border-[#5F360A]"
+                                            }`}
                                     />
+                                </div>
 
-                                    {!passwordMatch && (
-                                        <p className="error-message">❗ 비밀번호가 일치하지 않습니다.</p>
-                                    )}
+                                {!passwordMatch && (
+                                    <p className="text-sm text-red-500">❗ 비밀번호가 일치하지 않습니다.</p>
+                                )}
 
-                                    <button className="submit-button" type="submit">비밀번호 변경</button>
-                                </>
-                            )}
-                        </form>
-                    </div>
+                                <button
+                                    type="submit"
+                                    className="w-full bg-[#5F360A] text-white py-2 rounded hover:bg-[#432707] mt-2"
+                                >
+                                    비밀번호 변경
+                                </button>
+                            </>
+                        )}
+                    </form>
                 </div>
             </div>
         </>

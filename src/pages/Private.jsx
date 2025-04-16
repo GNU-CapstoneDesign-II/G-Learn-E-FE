@@ -1,22 +1,21 @@
 import React, { useState } from "react";
-import Navbar from "../components/Navbar.module";
-import LeftSideBar from "../components/LeftSideBar.module";
-import FolderCard from "../components/cards/FolderCard.module";
-import DocumentCard from "../components/cards/DocumentCard.module";
-import AddCard from "../components/cards/AddCard.module";
-import "./Private.css";
-import PrivateHeader from "../components/UseInPages/PrivateHeader.module";
+import Navbar from "../components/Navbar.jsx";
+import LeftSideBar from "../components/LeftSideBar.jsx";
+import FolderCard from "../components/cards/FolderCard.jsx";
+import DocumentCard from "../components/cards/DocumentCard.jsx";
+import AddCard from "../components/cards/AddCard.jsx";
+import PrivateHeader from "../components/UseInPages/PrivateHeader.jsx";
 
 export default function Private() {
     const [selectedFolder, setSelectedFolder] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
     const [isSelectMode, setIsSelectMode] = useState(false);
 
-
     const folders = [
         { id: 1, name: "운영체제" },
         { id: 2, name: "컴시개" },
         { id: 3, name: "인공지능" },
+        { id: 4, name: "알고리즘" },
     ];
 
     const documents = [
@@ -34,10 +33,8 @@ export default function Private() {
 
     const handleToggleAll = () => {
         if (!isSelectMode) {
-            // 체크 모드 진입
             setIsSelectMode(true);
         } else {
-            // 체크 모드 종료 + 선택 해제
             setIsSelectMode(false);
             setSelectedItems([]);
         }
@@ -48,51 +45,49 @@ export default function Private() {
         setIsSelectMode(false);
     };
 
-
-
     return (
         <>
             <Navbar />
-            <LeftSideBar />
-            <PrivateHeader
-                selectedFolder={selectedFolder}
-                selectedItems={selectedItems}
-                isSelectMode={isSelectMode}
-                onBack={() => {
-                    setSelectedFolder(null);
-                    clearSelection();
-                }}
-                sortOption="최신순"
-                onSortChange={(v) => console.log(v)}
-                onClearSelection={clearSelection}
-                onToggleAll={handleToggleAll}
-            />
 
-            <div className="container">
-                <main className="main">
-                    {!selectedFolder && (
-                        <div className="grid">
-                            {folders.map((folder) => (
-                                <FolderCard
-                                    key={folder.id}
-                                    folder={folder}
-                                    isSelected={isSelected(folder.id)}
-                                    isSelectMode={isSelectMode}
-                                    onToggleSelect={() => handleToggleSelect(folder.id)}
-                                    onClick={() => {
-                                        if (!isSelectMode) setSelectedFolder(folder);
-                                        else handleToggleSelect(folder.id);
-                                    }}
-                                />
-                            ))}
-                            <AddCard onClick={() => alert("폴더 추가")} />
-                        </div>
-                    )}
+            {/* 전체 화면 레이아웃 */}
+            <div className="pt-[64px] min-h-screen flex bg-[#f8f1e7] text-[#5F360A]">
+                {/* 고정 사이드바 */}
+                <LeftSideBar />
 
-                    {selectedFolder && (
-                        <>
-                            <div className="grid">
-                                {documents.map((doc) => (
+                {/* 오른쪽 컨텐츠 - 사이드바 고려해서 margin-left 줌 */}
+                <div className="flex-1 ml-[200px] p-6">
+                    <PrivateHeader
+                        selectedFolder={selectedFolder}
+                        selectedItems={selectedItems}
+                        isSelectMode={isSelectMode}
+                        onBack={() => {
+                            setSelectedFolder(null);
+                            clearSelection();
+                        }}
+                        sortOption="최신순"
+                        onSortChange={(v) => console.log(v)}
+                        onClearSelection={clearSelection}
+                        onToggleAll={handleToggleAll}
+                    />
+
+                    <main className="mt-10">
+                        <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-6">
+                            {!selectedFolder &&
+                                folders.map((folder) => (
+                                    <FolderCard
+                                        key={folder.id}
+                                        folder={folder}
+                                        isSelected={isSelected(folder.id)}
+                                        isSelectMode={isSelectMode}
+                                        onToggleSelect={() => handleToggleSelect(folder.id)}
+                                        onClick={() => {
+                                            if (!isSelectMode) setSelectedFolder(folder);
+                                            else handleToggleSelect(folder.id);
+                                        }}
+                                    />
+                                ))}
+                            {selectedFolder &&
+                                documents.map((doc) => (
                                     <DocumentCard
                                         key={doc.id}
                                         title={doc.title}
@@ -105,11 +100,11 @@ export default function Private() {
                                         }}
                                     />
                                 ))}
-                                <AddCard onClick={() => alert("문서 추가")} />
-                            </div>
-                        </>
-                    )}
-                </main>
+
+                            <AddCard onClick={() => alert("추가하기")} />
+                        </div>
+                    </main>
+                </div>
             </div>
         </>
     );

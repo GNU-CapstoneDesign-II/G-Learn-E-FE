@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Navbar from '../components/Navbar.module';
-import LeftSidebar from '../components/LeftSideBar.module';
+import Navbar from '../components/Navbar.jsx';
+import LeftSidebar from '../components/LeftSideBar';
 import "../pages/Public.css"
 
 const Public = () => {

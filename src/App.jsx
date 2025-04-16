@@ -7,7 +7,6 @@ import FindPassword from "./pages/FindPassword.jsx";
 import MainPage from "./pages/MainPage.jsx";
 import Private from "./pages/Private.jsx";
 
-
 function App() {
   return (
     <Routes>
