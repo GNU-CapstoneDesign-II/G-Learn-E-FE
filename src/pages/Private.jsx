@@ -4,14 +4,13 @@ import LeftSideBar from "../components/LeftSideBar.module";
 import FolderCard from "../components/cards/FolderCard.module";
 import DocumentCard from "../components/cards/DocumentCard.module";
 import AddCard from "../components/cards/AddCard.module";
-import "./Private.css";
+import styles from "./Private.module.css";
 import PrivateHeader from "../components/UseInPages/PrivateHeader.module";
 
 export default function Private() {
     const [selectedFolder, setSelectedFolder] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
     const [isSelectMode, setIsSelectMode] = useState(false);
-
 
     const folders = [
         { id: 1, name: "운영체제" },
@@ -48,8 +47,6 @@ export default function Private() {
         setIsSelectMode(false);
     };
 
-
-
     return (
         <>
             <Navbar />
@@ -68,10 +65,10 @@ export default function Private() {
                 onToggleAll={handleToggleAll}
             />
 
-            <div className="container">
-                <main className="main">
+            <div className={styles.container}>
+                <main className={styles.main}>
                     {!selectedFolder && (
-                        <div className="grid">
+                        <div className={styles.grid}>
                             {folders.map((folder) => (
                                 <FolderCard
                                     key={folder.id}
@@ -90,24 +87,22 @@ export default function Private() {
                     )}
 
                     {selectedFolder && (
-                        <>
-                            <div className="grid">
-                                {documents.map((doc) => (
-                                    <DocumentCard
-                                        key={doc.id}
-                                        title={doc.title}
-                                        isSelected={isSelected(doc.id)}
-                                        isSelectMode={isSelectMode}
-                                        onToggleSelect={() => handleToggleSelect(doc.id)}
-                                        onClick={() => {
-                                            if (!isSelectMode) alert("문서 열기");
-                                            else handleToggleSelect(doc.id);
-                                        }}
-                                    />
-                                ))}
-                                <AddCard onClick={() => alert("문서 추가")} />
-                            </div>
-                        </>
+                        <div className={styles.grid}>
+                            {documents.map((doc) => (
+                                <DocumentCard
+                                    key={doc.id}
+                                    title={doc.title}
+                                    isSelected={isSelected(doc.id)}
+                                    isSelectMode={isSelectMode}
+                                    onToggleSelect={() => handleToggleSelect(doc.id)}
+                                    onClick={() => {
+                                        if (!isSelectMode) alert("문서 열기");
+                                        else handleToggleSelect(doc.id);
+                                    }}
+                                />
+                            ))}
+                            <AddCard onClick={() => alert("문서 추가")} />
+                        </div>
                     )}
                 </main>
             </div>

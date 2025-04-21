@@ -34,3 +34,7 @@ body {
   overflow-x: auto;
   overflow-y: auto;
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
