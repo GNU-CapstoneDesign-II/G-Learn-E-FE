@@ -31,7 +31,7 @@ export default function WorkbookSolve() {
 
                 const blankCount =
                     p.problem.type === 'BLANK'
-                        ? p.problem.title.split('[[$BLANK$]]').length - 1
+                        ? p.problem.title.split('[[BLANK]]').length - 1
                         : 0;
 
                 const defaultAnswer =

@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 
 export default function BlankFill({ problem, userAttempt, onUserAttemptChange, isSolved }) {
-  const blanks = problem.title.split('[[$BLANK$]]');
+  const blanks = problem.title.split('[[BLANK]]');
   const inputRefs = useRef([]);
   const submitAnswer = userAttempt?.submitAnswer ?? [];
 
