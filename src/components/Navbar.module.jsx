@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom"; 
+import { Link } from "react-router-dom";
 import styles from "./Navbar.module.css";
 import logoImage from "../assets/logo.png";
 
@@ -14,9 +14,9 @@ function Navbar() {
               <img src={logoImage} alt="G-Learn-E Logo" className={styles.logo} />
             </Link>
             <nav className={styles.menu}>
-              <Link to="/generate">문제 생성</Link>
+              <Link to="/generate-problem">문제 생성</Link>
               <span>|</span>
-              <Link to="/list">문제집 리스트</Link>
+              <Link to="/private" >문제집 리스트</Link>
               <span>|</span>
               <Link to="/ranking">랭킹</Link>
             </nav>
