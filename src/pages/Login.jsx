@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar.module.jsx";
-import "../pages/Login.css";
+import styles from "../pages/Login.module.css";
 import { login } from "../api/authApi";
 import { setTokens } from "../utils/authToken";
 
@@ -26,45 +26,51 @@ export default function Login() {
   return (
     <>
       <Navbar />
-      <div className="login-page">
-        <div className="login-wrapper">
-          <div className="login-container">
-            <h1 className="login-title">로그인</h1>
-            <p className="login-description">
-              로그인 하시면 <strong>지런이</strong>의 서비스를 이용하실 수 있습니다. <br />
+      <div className={styles.loginPage}>
+        <div className={styles.loginWrapper}>
+          <div className={styles.loginContainer}>
+            <h1 className={styles.loginTitle}>로그인</h1>
+            <p className={styles.loginDescription}>
+              로그인 하시면 <strong className={styles.highlight}>지런이</strong>의 서비스를 이용하실 수 있습니다. <br />
               아직 회원이 아니시라면 회원가입을 해주세요.
             </p>
 
-            <div className="login-form">
-              <label className="login-label" htmlFor="email">email</label>
+            <div className={styles.loginForm}>
+              <label className={styles.loginLabel} htmlFor="email">
+                email
+              </label>
               <input
                 id="email"
                 type="email"
                 placeholder="학교 이메일"
-                className="login-input"
+                className={styles.loginInput}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
 
-              <label className="login-label" htmlFor="password">password</label>
+              <label className={styles.loginLabel} htmlFor="password">
+                password
+              </label>
               <input
                 id="password"
                 type="password"
                 placeholder="비밀번호"
-                className="login-input"
+                className={styles.loginInput}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
 
-              <button className="login-button" onClick={handleLogin}>로그인</button>
+              <button className={styles.loginButton} onClick={handleLogin}>
+                로그인
+              </button>
 
-              {errorMsg && <p className="login-error">{errorMsg}</p>}
+              {errorMsg && <p className={styles.loginError}>{errorMsg}</p>}
             </div>
 
-            <div className="login-footer">
-              <button className="login-link" onClick={() => navigate("/signup")}>신규 회원가입</button>
+            <div className={styles.loginFooter}>
+              <button className={styles.loginLink} onClick={() => navigate("/signup")}>신규 회원가입</button>
               <span>|</span>
-              <button className="login-link" onClick={() => navigate("/find-password")}>비밀번호 찾기</button>
+              <button className={styles.loginLink} onClick={() => navigate("/find-password")}>비밀번호 찾기</button>
             </div>
           </div>
         </div>

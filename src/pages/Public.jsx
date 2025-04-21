@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar.module';
 import LeftSidebar from '../components/LeftSideBar.module';
-import "../pages/Public.css"
+import styles from "../pages/Public.module.css"
 
 const Public = () => {
     const [filters, setFilters] = useState({

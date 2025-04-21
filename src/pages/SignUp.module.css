@@ -1,5 +1,5 @@
 /* ✅ 전체 페이지 */
-.signup-page {
+.signupPage {
   padding-top: 80px;
   min-height: 100vh;
   background-color: #F9F4ED;
@@ -9,15 +9,14 @@
 }
 
 /* ✅ 가운데 정렬된 wrapper */
-.signup-wrapper {
+.signupWrapper {
   display: flex;
   justify-content: center;
   width: 100%;
   box-sizing: border-box;
 }
 
-
-.signup-container {
+.signupContainer {
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -27,7 +26,7 @@
 }
 
 /* 🧾 "회원가입" 제목 텍스트 */
-.signup-title {
+.signupTitle {
   font-size: 36px;
   /* 폰트 크기 */
   font-weight: bold;
@@ -44,7 +43,7 @@
 }
 
 /* ✅ 연한 밑줄 (배경 밑줄 역할) */
-.signup-title::after {
+.signupTitle::after {
   content: '';
   position: absolute;
   left: 0;
@@ -58,7 +57,7 @@
 }
 
 /* ✅ 진한 밑줄 (겹쳐진 강조용) */
-.signup-title::before {
+.signupTitle::before {
   content: '';
   position: absolute;
   left: 0;
@@ -72,7 +71,7 @@
 }
 
 /* ✅ 입력 필드 라벨 */
-.signup-label {
+.signupLabel {
   font-size: 11px;
   color: #5F360A;
   text-align: left;
@@ -81,7 +80,7 @@
 }
 
 /* 📢 설명 문장 스타일 */
-.signup-description {
+.signupDescription {
   color: #9D8265;
   /* 연한 갈색 */
   text-align: center;
@@ -94,7 +93,7 @@
 }
 
 /* 📄 전체 폼 컨테이너 */
-.signup-form {
+.signupForm {
   width: 360px;
   /* 폼 너비 고정 */
   margin: 0 auto;
@@ -106,14 +105,14 @@
 }
 
 /* ⬅️➡️ 2개 input을 나란히 정렬하는 줄 */
-.signup-row {
+.signupRow {
   display: flex;
   gap: 8px;
 }
 
 /* ✍️ 공통 input / select 스타일 */
-.signup-form input,
-.signup-form select {
+.signupForm input,
+.signupForm select {
   padding: 12px;
   font-size: 14px;
   border: 1px solid #6b3f1d;
@@ -124,7 +123,7 @@
 }
 
 /* ✅ 제출 버튼 (회원가입 완료 버튼) */
-.submit-button {
+.submitButton {
   width: 100%;
   height: 50px;
   background-color: #AC957B;
@@ -137,16 +136,16 @@
   margin-top: 12px;
 }
 
-.submit-button:hover {
+.submitButton:hover {
   background-color: #5F360A;
 }
 
-.custom-select-wrapper {
+.customSelectWrapper {
   position: relative;
   width: 100%;
 }
 
-.custom-select {
+.customSelect {
   width: 100%;
   padding: 12px;
   padding-right: 36px;
@@ -166,7 +165,7 @@
 }
 
 /* 아이콘: 오른쪽에 얹기 */
-.custom-arrow {
+.customArrow {
   position: absolute;
   top: 52%;
   right: 10px;
@@ -178,13 +177,13 @@
   color: #9D8265;
 }
 
-.custom-select:invalid {
+.customSelect:invalid {
   color: #aaa;
   /* 연한 회색 */
 }
 
 /* ✅ 인증코드 전송 버튼 */
-.signup-button {
+.signupButton {
   width: 30%;
   height: 48px;
   background-color: #AC957B;
@@ -193,11 +192,12 @@
   font-weight: bold;
   border: none;
   border-radius: 6px;
+  font-size: 14px;
   cursor: pointer;
 }
 
 /* ✅ 인증코드 버튼 hover 효과 */
-.signup-button:hover {
+.signupButton:hover {
   background-color: #5F360A;
   /* 진한 브라운으로 전환 */
 }
