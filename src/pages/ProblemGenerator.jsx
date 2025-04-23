@@ -4,15 +4,21 @@ import Navbar from '../components/Navbar.module.jsx';
 import Dropdown from '../components/Dropdown.jsx';
 import logoImageLight from '../assets/image-logo-light.png';
 import SelectableButton from '../components/SelectableButton.jsx';
+import PdfUploadModal from '../components/PdfUploadModal.jsx';
+import { generateProblems } from '../api/problemApi';
 
 const ProblemGenerator = () => {
   const navigate = useNavigate();
-  const [inputType, setInputType] = useState('text');
-  const [content, setContent] = useState('');
+  const [inputType, setInputType] = useState('text'); // ✅ 현재 선택된 입력 타입
+  const [summaryText, setSummaryText] = useState('');
+  const [pdfFile, setPdfFile] = useState(null);
+  const [isPDFPopupOpen, setIsPDFPopupOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState('중');
-  const [isLoading, setIsLoading] = useState(false);
+
+  const clearPDFFile = () => setPdfFile(null);
 
   useEffect(() => {
     document.body.style.overflow = isLoading ? 'hidden' : 'auto';
@@ -83,47 +89,68 @@ const ProblemGenerator = () => {
     closeModal();
   };
 
-  const closeModal = () => {
-    setActiveButton(null);
-  };
+  const closeModal = () => setActiveButton(null);
 
-  const handleGenerateClick = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      setSelectedTypes([]);
-      setOpenDropdowns({
-        '객관식': false,
-        'O/X 퀴즈': false,
-        '주관식': false,
-        '빈칸 채우기': false,
+  const handleGenerateClick = async () => {
+    // 👉 아무것도 입력하지 않았을 때 막기
+    const isSummaryTextEmpty = !summaryText?.trim();
+    const isPdfEmpty = !pdfFile;
+
+    if (isSummaryTextEmpty && isPdfEmpty) {
+      alert('텍스트를 입력하거나 PDF 파일을 첨부해주세요!');
+      return;
+    }
+
+    setIsLoading(true); // 로딩 애니메이션 ON
+
+    try {
+      const result = await generateProblems({
+        summaryText,
+        pdfFile,
+        audioFile: null,
+        selectedTypes,         // 사용자가 고른 문제 유형들
+        typeOptions,           // 문제 옵션들 (지문 수, 개수 등)
+        selectedDifficulty     // 난이도 ("하", "중", "상")
       });
-      // navigate('/private');
-    }, 3000);
+
+      console.log('✅ 생성된 문제:', result); // 백엔드 응답
+    } catch (error) {
+      console.error('❌ 문제 생성 실패:', error);
+      alert('문제 생성에 실패했습니다.');
+    } finally {
+      setIsLoading(false); // 로딩 끝
+    }
   };
 
   return (
     <>
       <Navbar />
 
+      {isPDFPopupOpen && (
+        <PdfUploadModal
+          onClose={() => setIsPDFPopupOpen(false)}
+          onFileSelect={(file) => setPdfFile(file)}
+        />
+      )}
+
       {isLoading && (
         <div className="fixed top-20 left-0 w-screen h-[calc(100vh-80px)] bg-[#F3E9DC] z-[9999] flex items-center justify-center">
           <div className="text-center">
             <img src={logoImageLight} alt="G-Learn-E Logo" className="w-[350px] h-auto" />
-            <p className="mt-6 text-xl text-[#B3977B] leading-relaxed font-[\'Noto Sans KR\']">
+            <p className="mt-6 text-xl text-[#B3977B] leading-relaxed font-['Noto Sans KR']">
               문제를 생성하고 있어요!<br />잠시만 기다려주세요 <span className="dots"></span>
             </p>
           </div>
         </div>
       )}
 
-      {/* ✅ 페이지 전체를 감싸는 컨테이너 */}
-      <div className="mt-20 font-[\'Noto Sans KR\'] box-border">
-        {/* ✅ 안내 메시지 + 입력 타입 버튼 섹션 */}
+      <div className="mt-20 font-['Noto Sans KR'] box-border">
+        {/* 안내 메시지 + 입력 타입 버튼 */}
         <div className="bg-[rgba(243,233,220,0.5)] h-[260px] flex flex-col items-center justify-center gap-10 text-center">
-          <h2 className="text-xl text-brown m-0">내용 입력 및 문제 유형을 선택한 후 문제를 생성해보세요!</h2>
+          <h2 className="text-xl text-brown m-0">
+            내용 입력 및 문제 유형을 선택한 후 문제를 생성해보세요!
+          </h2>
 
-          {/* ✅ 입력 타입 버튼 묶음 */}
           <div className="flex gap-[22px]">
             {['text', 'pdf', 'voice'].map((type) => (
               <SelectableButton
@@ -132,32 +159,52 @@ const ProblemGenerator = () => {
                   type === 'text' ? 'T Text' : type === 'pdf' ? '📄 PDF' : '🎙️ 음성파일'
                 }
                 isActive={inputType === type}
-                onClick={() => setInputType(type)}
+                onClick={() => {
+                  setInputType(type);
+                  if (type === 'pdf') setIsPDFPopupOpen(true);
+                }}
               />
             ))}
           </div>
         </div>
 
-        {/* ✅ 텍스트 입력 영역 */}
+        {/* 본문 영역 */}
         <div className="flex justify-center p-12">
-          <div className="relative">
+          <div className="relative w-[90vw] max-w-[1360px] min-w-[320px] h-[60vh] max-h-[600px] border-[1.5px] border-lightbrown rounded-[1.5rem] p-5 box-border shadow-[0_8px_30px_rgba(192,133,82,0.2)] bg-white">
+            
+            {/* ✅ PDF 파일 선택 시 이름 표시 */}
+            {pdfFile && (
+              <div className="mb-3 inline-flex items-center bg-[rgba(243,233,220,0.5)] border border-lightbrown rounded-full px-4 py-1 text-darkbrown font-medium text-sm shadow-sm">
+                <span className="truncate max-w-[200px]">{pdfFile.name}</span>
+                <button
+                  onClick={clearPDFFile}
+                  className="ml-2 text-[1rem] text-gray-500 hover:text-red-500 focus:outline-none"
+                >
+                  ✖
+                </button>
+              </div>
+            )}
+
+            {/* ✅ 항상 표시되는 텍스트 입력 */}
             <textarea
-              className="w-[90vw] max-w-[1360px] min-w-[320px] h-[60vh] max-h-[600px] border-[1.5px] border-lightbrown rounded-[1.5rem] p-5 text-base resize-none outline-none box-border shadow-[0_8px_30px_rgba(192,133,82,0.2)] font-[\'Noto Sans KR\']"
+              className="w-full h-[calc(100%-5rem)] text-base resize-none outline-none bg-transparent"
               placeholder="문제를 생성할 내용을 입력하세요..."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
+              value={summaryText}
+              onChange={(e) => setSummaryText(e.target.value)}
               maxLength={1000}
             />
-            {/* ✅ 글자 수 카운터 */}
-            <div className="absolute bottom-20 right-5 text-sm text-gray-500 font-normal">{content.length} / 1000</div>
-            {/* ✅ 하단의 컨트롤 버튼 */}
+
+            <div className="absolute bottom-20 right-8 text-sm text-gray-500 font-normal">
+              {summaryText.length} / 1000
+            </div>
+
+            {/* 하단 버튼 */}
             <div className="absolute bottom-5 right-5 flex gap-[22px]">
               <SelectableButton
                 label="문제 유형"
                 isActive={activeButton === 'type'}
                 onClick={() => setActiveButton(activeButton === 'type' ? null : 'type')}
               />
-
               <SelectableButton
                 label="문제 생성"
                 isActive={activeButton === 'generate'}
@@ -167,16 +214,15 @@ const ProblemGenerator = () => {
           </div>
         </div>
 
-        {/* ✅ 모달 전체 감싸는 영역 */}
+        {/* 모달 */}
         {activeButton === 'type' && (
           <div className="fixed top-0 left-0 w-screen h-screen bg-[rgba(60,60,60,0.5)] flex justify-center items-center z-[999]" onClick={closeModal}>
             <div className="w-[380px] bg-white rounded-[1.5rem] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative z-[1000]" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-between items-center text-[1.2rem]">
                 <span>문제 유형</span>
-                <button onClick={closeModal} className="bg-none border-none text-[1.2rem] cursor-pointer">✖</button>
+                <button onClick={closeModal} className="text-[1.2rem] cursor-pointer">✖</button>
               </div>
 
-              {/* ✅ 모달 안쪽 내용 */}
               <div className="py-4">
                 <ul className="list-none p-0 m-0">
                   {Object.keys(typeOptions).map((type, index) => {
@@ -218,7 +264,7 @@ const ProblemGenerator = () => {
                   })}
                 </ul>
 
-                {/* 난이도 드롭다운 */}
+                {/* 난이도 선택 */}
                 <div className="flex justify-between items-center py-6 my-6 border-t border-[#ccc]">
                   <span>난이도</span>
                   <select
