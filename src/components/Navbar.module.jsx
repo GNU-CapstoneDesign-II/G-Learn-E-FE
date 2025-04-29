@@ -2,8 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import styles from "./Navbar.module.css";
 import logoImage from "../assets/logo.png";
+import { useAuth } from '../contexts/AuthContext';
 
 function Navbar() {
+  const { user, loading, logout } = useAuth();
+
   return (
     <>
       <header className={styles.navbar}>
@@ -37,9 +40,18 @@ function Navbar() {
             </div>
 
             {/* 로그인 버튼 */}
-            <Link to="/login" className={styles.loginButton}>
-              Login / Sign up
-            </Link>
+            {!loading && user ? (
+              <div className={styles.welcomeArea}>
+                <span>{user.nickname}님&nbsp;환영합니다.</span>
+                <button onClick={logout} className={styles.logoutBtn}>
+                  로그아웃
+                </button>
+              </div>
+            ) : (
+              <Link to="/login" className={styles.loginButton}>
+                Login&nbsp;/&nbsp;Sign&nbsp;up
+              </Link>
+            )}
           </div>
         </div>
       </header>
