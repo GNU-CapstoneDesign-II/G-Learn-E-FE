@@ -1,4 +1,4 @@
-// src/components/RequiredTypeModal.jsx
+// src/components/common/InformationPopup.jsx
 import React from 'react';
 
 export default function InformationPopup({ message, onClose }) {

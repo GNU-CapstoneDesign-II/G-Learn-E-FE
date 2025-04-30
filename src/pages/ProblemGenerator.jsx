@@ -10,6 +10,9 @@ import InformationPopup from '../components/common/InformationPopup.jsx'; // 경
 const ProblemGenerator = () => {
   const navigate = useNavigate();
   const submittingRef = useRef(false);
+  // 파일 input refs
+  const pdfInputRef = useRef(null);
+  const audioInputRef = useRef(null);
   const [inputType, setInputType] = useState('text');
   const [content, setContent] = useState('');
   const [activeButton, setActiveButton] = useState(null);
@@ -52,11 +55,13 @@ const ProblemGenerator = () => {
     '빈칸 채우기': false,
   });
 
-  const handlePdfChange = e => {
-    setSelectedPdfFile(e.target.files[0] || null);
+  const handlePdfChange = (e) => {
+    const file = e.target.files[0] || null;
+    setSelectedPdfFile(file);
   };
-  const handleAudioChange = e => {
-    setSelectedAudioFile(e.target.files[0] || null);
+  const handleAudioChange = (e) => {
+    const file = e.target.files[0] || null;
+    setSelectedAudioFile(file);
   };
 
   const toggleDropdown = (type) => {
@@ -120,7 +125,7 @@ const ProblemGenerator = () => {
         typeOptions,
         difficulty: selectedDifficulty
       });
-      navigate(`/solve/${newWorkbookId}`);
+      navigate(`/private`);
     } catch (e) {
       console.error(e);
       // 에러 UI 처리
@@ -159,17 +164,44 @@ const ProblemGenerator = () => {
 
           {/* ✅ 입력 타입 버튼 묶음 */}
           <div className="flex gap-[22px]">
-            {['text', 'pdf', 'voice'].map((type) => (
-              <SelectableButton
-                key={type}
-                label={
-                  type === 'text' ? 'T Text' : type === 'pdf' ? '📄 PDF' : '🎙️ 음성파일'
-                }
-                isActive={inputType === type}
-                onClick={() => setInputType(type)}
-              />
-            ))}
+          <SelectableButton
+              label="T Text"
+              isActive={inputType === 'text'}
+              onClick={() => setInputType('text')}
+            />
+            <SelectableButton
+              label="📄 PDF"
+              isActive={inputType === 'pdf'}
+              onClick={() => {
+                setInputType('pdf');
+                pdfInputRef.current.click();
+              }}
+            />
+            <SelectableButton
+              label="🎙️ 음성파일"
+              isActive={inputType === 'voice'}
+              onClick={() => {
+                setInputType('voice');
+                audioInputRef.current.click();
+              }}
+            />
           </div>
+
+          {/* hidden inputs */}
+          <input
+            ref={pdfInputRef}
+            type="file"
+            accept="application/pdf"
+            className="hidden"
+            onChange={handlePdfChange}
+          />
+          <input
+            ref={audioInputRef}
+            type="file"
+            accept="audio/*"
+            className="hidden"
+            onChange={handleAudioChange}
+          />
         </div>
 
         {/* 파일 미리보기 */}
