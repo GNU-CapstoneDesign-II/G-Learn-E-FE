@@ -1,18 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.module.jsx';
 import Dropdown from '../components/Dropdown.jsx';
 import logoImageLight from '../assets/image-logo-light.png';
 import SelectableButton from '../components/SelectableButton.jsx';
+import { generateWorkbook } from '../api/Workbook.js';
+import InformationPopup from '../components/common/InformationPopup.jsx'; // 경고 모달 컴포넌트
 
 const ProblemGenerator = () => {
   const navigate = useNavigate();
+  const submittingRef = useRef(false);
+  // 파일 input refs
+  const pdfInputRef = useRef(null);
+  const audioInputRef = useRef(null);
   const [inputType, setInputType] = useState('text');
   const [content, setContent] = useState('');
   const [activeButton, setActiveButton] = useState(null);
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState('중');
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedPdfFile, setSelectedPdfFile] = useState(null);
+  const [selectedAudioFile, setSelectedAudioFile] = useState(null);
+  const [showTypeAlert, setShowTypeAlert] = useState(false);
+
 
   useEffect(() => {
     document.body.style.overflow = isLoading ? 'hidden' : 'auto';
@@ -44,6 +54,15 @@ const ProblemGenerator = () => {
     '주관식': false,
     '빈칸 채우기': false,
   });
+
+  const handlePdfChange = (e) => {
+    const file = e.target.files[0] || null;
+    setSelectedPdfFile(file);
+  };
+  const handleAudioChange = (e) => {
+    const file = e.target.files[0] || null;
+    setSelectedAudioFile(file);
+  };
 
   const toggleDropdown = (type) => {
     setOpenDropdowns((prev) => ({
@@ -87,25 +106,45 @@ const ProblemGenerator = () => {
     setActiveButton(null);
   };
 
-  const handleGenerateClick = () => {
+  const handleGenerateClick = async () => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    if (selectedTypes.length === 0) {
+      InformationPopup
+      setShowTypeAlert(true);
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      setSelectedTypes([]);
-      setOpenDropdowns({
-        '객관식': false,
-        'O/X 퀴즈': false,
-        '주관식': false,
-        '빈칸 채우기': false,
+    try {
+      const newWorkbookId = await generateWorkbook({
+        summaryText: content,
+        pdfFile: selectedPdfFile,
+        audioFile: selectedAudioFile,
+        selectedTypes,
+        typeOptions,
+        difficulty: selectedDifficulty
       });
-      // navigate('/private');
-    }, 3000);
+      navigate(`/private`);
+    } catch (e) {
+      console.error(e);
+      // 에러 UI 처리
+    } finally {
+      setIsLoading(false);
+      submittingRef.current = false;
+    }
   };
 
   return (
     <>
       <Navbar />
 
+      {showTypeAlert && (
+        <InformationPopup
+          message="문제 유형을 하나 이상 선택해주세요."
+          onClose={() => setShowTypeAlert(false)}
+        />
+      )}
       {isLoading && (
         <div className="fixed top-20 left-0 w-screen h-[calc(100vh-80px)] bg-[#F3E9DC] z-[9999] flex items-center justify-center">
           <div className="text-center">
@@ -125,17 +164,58 @@ const ProblemGenerator = () => {
 
           {/* ✅ 입력 타입 버튼 묶음 */}
           <div className="flex gap-[22px]">
-            {['text', 'pdf', 'voice'].map((type) => (
-              <SelectableButton
-                key={type}
-                label={
-                  type === 'text' ? 'T Text' : type === 'pdf' ? '📄 PDF' : '🎙️ 음성파일'
-                }
-                isActive={inputType === type}
-                onClick={() => setInputType(type)}
-              />
-            ))}
+          <SelectableButton
+              label="T Text"
+              isActive={inputType === 'text'}
+              onClick={() => setInputType('text')}
+            />
+            <SelectableButton
+              label="📄 PDF"
+              isActive={inputType === 'pdf'}
+              onClick={() => {
+                setInputType('pdf');
+                pdfInputRef.current.click();
+              }}
+            />
+            <SelectableButton
+              label="🎙️ 음성파일"
+              isActive={inputType === 'voice'}
+              onClick={() => {
+                setInputType('voice');
+                audioInputRef.current.click();
+              }}
+            />
           </div>
+
+          {/* hidden inputs */}
+          <input
+            ref={pdfInputRef}
+            type="file"
+            accept="application/pdf"
+            className="hidden"
+            onChange={handlePdfChange}
+          />
+          <input
+            ref={audioInputRef}
+            type="file"
+            accept="audio/*"
+            className="hidden"
+            onChange={handleAudioChange}
+          />
+        </div>
+
+        {/* 파일 미리보기 */}
+        <div className="mt-4 p-4">
+          {selectedPdfFile && (
+            <div className="inline-block bg-[rgba(243,233,220,0.5)] px-3 py-1 rounded mr-2">
+              📄 {selectedPdfFile.name}
+            </div>
+          )}
+          {selectedAudioFile && (
+            <div className="inline-block bg-[rgba(243,233,220,0.5)] px-3 py-1 rounded">
+              🎙️ {selectedAudioFile.name}
+            </div>
+          )}
         </div>
 
         {/* ✅ 텍스트 입력 영역 */}

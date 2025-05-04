@@ -41,7 +41,7 @@ instance.interceptors.response.use(
                 const refreshToken = getRefreshToken();
                 if (!refreshToken) throw new Error("No refresh token");
 
-                const res = await axios.post(`${BASE_URL}/api/auth/reissue`, null, {
+                const res = await axios.patch(`${BASE_URL}/api/auth/reissue`, null, {
                     headers: {
                         Authorization: `Bearer ${refreshToken}`,
                     },

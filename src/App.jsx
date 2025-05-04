@@ -7,7 +7,7 @@ import FindPassword from "./pages/FindPassword.jsx";
 import MainPage from "./pages/MainPage.jsx";
 import WorkbookSolve from "./pages/WorkbookSolve.jsx";
 import ProblemGenerator from "./pages/ProblemGenerator.jsx";
-import Private from "./pages/Private.jsx";
+import FolderPage from "./pages/FolderPage.jsx";
 
 
 function App() {
@@ -19,7 +19,7 @@ function App() {
       <Route path="/find-password" element={<FindPassword />} />
       <Route path="/solve/:workbookId" element={<WorkbookSolve />} />
       <Route path="/generate-problem" element={<ProblemGenerator />} />
-      <Route path="/private" element={<Private />} />
+      <Route path="/folder" element={<FolderPage />} />
     </Routes>
   );
 }

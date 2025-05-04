@@ -113,3 +113,29 @@
 .loginButton:hover {
   color: #5F360A;
 }
+
+/* 사용자 환영 영역 */
+.welcomeArea {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: #774300;
+  /* 닉네임 색상 */
+}
+
+/* 로그아웃 버튼 */
+.logoutBtn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #ae8c6d;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.logoutBtn:hover {
+  background: #faf3ec;
+  color: #5F360A;
+}
