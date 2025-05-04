@@ -19,7 +19,7 @@ function Navbar() {
             <nav className={styles.menu}>
               <Link to="/generate-problem">문제 생성</Link>
               <span>|</span>
-              <Link to="/private" >문제집 리스트</Link>
+              <Link to="/folder" >문제집 리스트</Link>
               <span>|</span>
               <Link to="/ranking">랭킹</Link>
             </nav>
