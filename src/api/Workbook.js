@@ -1,7 +1,5 @@
 import axios from "./axiosInstance";;
 
-axios.defaults.baseURL = "http://localhost:8080"; // or 어디든
-
 // 👉 단과대 목록 가져오기
 export const getColleges = () => {
   return axios.get("/api/folder/public/colleges");
@@ -46,7 +44,7 @@ export async function generateWorkbook({
 
   // content
   formData.append('content.summaryText', summaryText);
-  if (pdfFile)   formData.append('content.pdfFile', pdfFile);
+  if (pdfFile) formData.append('content.pdfFile', pdfFile);
   if (audioFile) formData.append('content.audioFile', audioFile);
 
   // difficulty
