@@ -1,41 +1,51 @@
 import React, { useState, useRef } from 'react';
 
-const PdfUploadModal = ({ onClose, onFileSelect }) => {
+const FileUploadModal = ({ onClose, onFileSelect, fileType = 'pdf' }) => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
+
+  const acceptType =
+    fileType === 'audio' ? 'audio/*' : 'application/pdf';
+
+  const fileCheck = (file) => {
+    if (!file) return false;
+    if (fileType === 'audio') return file.type.startsWith('audio/');
+    if (fileType === 'pdf') return file.type === 'application/pdf';
+    return false;
+  };
 
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
     const file = e.dataTransfer.files[0];
-    if (file && file.type === 'application/pdf') {
+    if (fileCheck(file)) {
       onFileSelect(file);
       onClose();
     } else {
-      alert('PDF 파일만 업로드 가능합니다.');
+      alert(`${fileType.toUpperCase()} 파일만 업로드 가능합니다.`);
     }
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.type === 'application/pdf') {
+    if (fileCheck(file)) {
       onFileSelect(file);
       onClose();
     } else {
-      alert('PDF 파일만 업로드 가능합니다.');
+      alert(`${fileType.toUpperCase()} 파일만 업로드 가능합니다.`);
     }
   };
 
   return (
     <div
       className="fixed top-0 left-0 w-screen h-screen z-[9999] flex items-center justify-center"
-      onClick={onClose} // ✅ 외부 클릭 닫기
+      onClick={onClose}
     >
       <div
         className={`relative w-[400px] h-[300px] bg-white rounded-[1.5rem] p-6 flex flex-col items-center justify-center text-center shadow transition-all duration-300 ${
           isDragging ? 'border-4 border-dashed border-blue-400' : 'border'
         }`}
-        onClick={(e) => e.stopPropagation()} // ✅ 내부 클릭 방지
+        onClick={(e) => e.stopPropagation()}
         onDragOver={(e) => {
           e.preventDefault();
           setIsDragging(true);
@@ -50,13 +60,13 @@ const PdfUploadModal = ({ onClose, onFileSelect }) => {
           ✖
         </button>
 
-        <p className="text-lg mb-4">
-          여기로 PDF 파일을 드래그하거나<br />아래 버튼을 클릭해주세요
+        <p className="text-lg mb-4 leading-relaxed">
+          여기로 {fileType.toUpperCase()} 파일을 드래그하거나<br />아래 버튼을 클릭해주세요
         </p>
 
         <input
           type="file"
-          accept="application/pdf"
+          accept={acceptType}
           style={{ display: 'none' }}
           ref={fileInputRef}
           onChange={handleFileChange}
@@ -73,4 +83,4 @@ const PdfUploadModal = ({ onClose, onFileSelect }) => {
   );
 };
 
-export default PdfUploadModal;
+export default FileUploadModal;
