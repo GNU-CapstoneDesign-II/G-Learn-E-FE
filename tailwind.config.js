@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /** @type {import('tailwindcss').Config} */
 // <<<<<<< HEAD
 // module.exports = {
@@ -25,3 +26,14 @@ export default {
   plugins: [],
 }
 // >>>>>>> develop
+=======
+module.exports = {
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}", // 혹시 src 폴더가 없다면 "./**/*.jsx"로
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+>>>>>>> feat/CSS-Refactor-#14
