@@ -9,6 +9,7 @@ import WorkbookSolve from "./pages/WorkbookSolve.jsx";
 import ProblemGenerator from "./pages/ProblemGenerator.jsx";
 import FolderPage from "./pages/FolderPage.jsx";
 
+
 function App() {
   return (
     <Routes>
@@ -23,8 +24,4 @@ function App() {
   );
 }
 
-<<<<<<< HEAD
 export default App;
-=======
-export default App;
->>>>>>> feat/CSS-Refactor-#14

@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-<<<<<<< HEAD
-import Navbar from "../components/Navbar.module.jsx";
-import styles from "./SignUp.module.css";
-=======
 import Navbar from "../components/Navbar.jsx";
->>>>>>> feat/CSS-Refactor-#14
 
 export default function SignUp() {
   const [emailSent, setEmailSent] = useState(false);
@@ -52,33 +47,6 @@ export default function SignUp() {
     alert(`닉네임 "${nickname}"은 사용 가능합니다!`);
   };
 
-<<<<<<< HEAD
-  return (
-    <>
-      <Navbar />
-      <div className={styles.signupPage}>
-        <div className={styles.signupWrapper}>
-          <div className={styles.signupContainer}>
-            <h1 className={styles.signupTitle}>회원가입</h1>
-            <p className={styles.signupDescription}>
-              회원 가입을 하시면 <strong>지런이</strong>의 서비스를 이용 하실 수 있습니다.<br />
-              지런이는 여러분의 여정을 항상 응원합니다.
-            </p>
-
-            <form className={styles.signupForm}>
-              <label className={styles.signupLabel} htmlFor="name">이름</label>
-              <div className={styles.signupRow}>
-                <input type="text" placeholder="이름" />
-              </div>
-
-              <label className={styles.signupLabel} htmlFor="nickname">닉네임</label>
-              <div className={styles.signupRow}>
-                <input id="nickname" type="text" placeholder="닉네임" />
-                <button
-                  type="button"
-                  className={styles.signupButton}
-                  onClick={handleCheckNickname}
-=======
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!college || !department) {
@@ -121,34 +89,10 @@ export default function SignUp() {
                   type="button"
                   onClick={handleCheckNickname}
                   className="bg-[#AC957B] text-white text-sm px-3 py-2 rounded hover:bg-[#5F360A]"
->>>>>>> feat/CSS-Refactor-#14
                 >
                   중복 확인
                 </button>
               </div>
-<<<<<<< HEAD
-
-              <label className={styles.signupLabel} htmlFor="affiliation">소속 대학 및 학과</label>
-              <div className={styles.signupRow}>
-                <div className={styles.customSelectWrapper}>
-                  <select className={styles.customSelect} defaultValue="" required>
-                    <option value="" disabled>단과대학</option>
-                    <option value="공대">공과대학</option>
-                    <option value="인문대학">인문대학</option>
-                    <option value="자연대학">자연대학</option>
-                    <option value="IT공과대학">IT 공과대학</option>
-                  </select>
-                  <span className={styles.customArrow}>▼</span>
-                </div>
-
-                <div className={styles.customSelectWrapper}>
-                  <select className={styles.customSelect} defaultValue="" required>
-                    <option value="" disabled>학과</option>
-                    <option value="컴퓨터">컴퓨터공학과</option>
-                    <option value="경영">경영학과</option>
-                  </select>
-                  <span className={styles.customArrow}>▼</span>
-=======
             </div>
 
             {/* 단과대학 & 학과 */}
@@ -185,45 +129,10 @@ export default function SignUp() {
                     <option>경영학과</option>
                   </select>
                   <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#5F360A]">▼</div>
->>>>>>> feat/CSS-Refactor-#14
                 </div>
               </div>
             </div>
 
-<<<<<<< HEAD
-              <label className={styles.signupLabel} htmlFor="email">email</label>
-              <div className={styles.signupRow}>
-                <input id="email" type="email" placeholder="학교 이메일" />
-                <button
-                  type="button"
-                  className={styles.signupButton}
-                  onClick={handleSendCode}
-                >
-                  인증코드<br />전송
-                </button>
-              </div>
-
-              <div className={styles.signupRow}>
-                <input type="text" placeholder="인증코드 입력" />
-                <button
-                  type="button"
-                  className={styles.signupButton}
-                  onClick={handleVerify}
-                >
-                  인증 확인
-                </button>
-              </div>
-
-              <label className={styles.signupLabel} htmlFor="password">비밀번호</label>
-              <input type="password" placeholder="비밀번호" />
-              <input type="password" placeholder="비밀번호 확인" />
-
-              <button type="submit" className={styles.submitButton}>
-                회원가입
-              </button>
-            </form>
-          </div>
-=======
             {/* 이메일 */}
             <div>
               <label htmlFor="email" className="block text-sm mb-1">email</label>
@@ -276,7 +185,6 @@ export default function SignUp() {
               회원가입
             </button>
           </form>
->>>>>>> feat/CSS-Refactor-#14
         </div>
       </div>
     </>

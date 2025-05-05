@@ -1,18 +1,9 @@
-<<<<<<< HEAD
-// src/pages/Login.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar.module.jsx";
-import styles from "../pages/Login.module.css";
+import Navbar from "../components/Navbar.jsx";
 import { login as loginApi } from "../api/authApi";
 import { setTokens } from "../utils/authToken";
 import { useAuth } from "../contexts/AuthContext";
-=======
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar.jsx";
-
->>>>>>> feat/CSS-Refactor-#14
 
 export default function Login() {
   const navigate = useNavigate();
@@ -21,7 +12,6 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-<<<<<<< HEAD
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -36,54 +26,6 @@ export default function Login() {
   };
 
   return (
-    <><Navbar />
-      <div className={styles.loginPage}>
-        <div className={styles.loginWrapper}>
-          <div className={styles.loginContainer}>
-            <h1 className={styles.loginTitle}>로그인</h1>
-            <p className={styles.loginDescription}>
-              로그인 하시면 <strong className={styles.highlight}>지런이</strong>의 서비스를 이용하실 수 있습니다. <br />
-              아직 회원이 아니시라면 회원가입을 해주세요.
-            </p>
-
-            <form className={styles.loginForm} onSubmit={handleLogin}>
-              <label className={styles.loginLabel} htmlFor="email">
-                email
-              </label>
-              <input
-                id="email"
-                type="email"
-                placeholder="학교 이메일"
-                className={styles.loginInput}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-
-              <label className={styles.loginLabel} htmlFor="password">
-                password
-              </label>
-              <input
-                id="password"
-                type="password"
-                placeholder="비밀번호"
-                className={styles.loginInput}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-
-              <button type="submit" className={styles.loginButton}>
-                로그인
-              </button>
-
-              {errorMsg && <p className={styles.loginError}>{errorMsg}</p>}
-            </form>
-
-            <div className={styles.loginFooter}>
-              <button className={styles.loginLink} onClick={() => navigate("/signup")}>신규 회원가입</button>
-              <span>|</span>
-              <button className={styles.loginLink} onClick={() => navigate("/find-password")}>비밀번호 찾기</button>
-=======
-  return (
     <>
       <Navbar />
       <div className="pt-20 min-h-screen bg-[#f8f1e7] text-[#5F360A]">
@@ -96,12 +38,12 @@ export default function Login() {
 
             {/* 설명 */}
             <p className="text-sm text-[#9A7E5F] leading-relaxed mb-10">
-              로그인 하시면 <strong>지런이</strong>의 서비스를 이용 하실 수 있습니다. <br />
+              로그인 하시면 <strong>지런이</strong>의 서비스를 이용하실 수 있습니다. <br />
               아직 회원이 아니시라면 회원가입을 해주세요.
             </p>
 
             {/* 로그인 폼 */}
-            <form className="flex flex-col gap-4 text-left">
+            <form onSubmit={handleLogin} className="flex flex-col gap-4 text-left">
               <div>
                 <label htmlFor="email" className="block text-sm mb-1">email</label>
                 <input
@@ -109,6 +51,8 @@ export default function Login() {
                   type="email"
                   placeholder="학교 이메일"
                   className="w-full border border-[#5F360A] px-4 py-2 rounded focus:outline-none"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div>
@@ -118,6 +62,8 @@ export default function Login() {
                   type="password"
                   placeholder="비밀번호"
                   className="w-full border border-[#5F360A] px-4 py-2 rounded focus:outline-none"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
               <button
@@ -126,6 +72,10 @@ export default function Login() {
               >
                 로그인
               </button>
+
+              {errorMsg && (
+                <p className="text-sm text-red-500 mt-2 text-center">{errorMsg}</p>
+              )}
             </form>
 
             {/* 로그인 하단 링크 */}
@@ -137,7 +87,6 @@ export default function Login() {
               <button onClick={() => navigate("/find-password")} className="hover:underline">
                 비밀번호 찾기
               </button>
->>>>>>> feat/CSS-Refactor-#14
             </div>
           </div>
         </div>
