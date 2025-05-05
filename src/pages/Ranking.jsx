@@ -35,19 +35,19 @@ const Ranking = () => {
     <div>
       <Navbar />
 
-      <div className="relative min-h-screen w-screen bg-[rgba(243,233,220,0.5)] pt-24 p-10 overflow-hidden">
+      <div className="relative min-h-screen w-screen bg-[rgba(243,233,220,0.5)] pt-24 p-10">
         
         {/* ✅ 배경 로고 */}
         <img
           src={logoImageBack}
           alt="G-Learn-E Background Logo"
-          className="absolute top-1/2 left-1/2 w-[400px] h-auto transform -translate-x-1/2 -translate-y-1/2"
+          className="absolute top-1/2 left-1/2 w-[320px] h-auto transform -translate-x-1/2 -translate-y-1/2"
         />
 
-        <div className="relative z-10">
+        <div className="relative z-10 px-10 py-20">
 
           {/* ✅ 탭 버튼 */}
-          <div className="flex justify-center mb-8 gap-4 flex-wrap">
+          <div className="mb-4 flex gap-4 flex-wrap">
             {[
               { label: '유저별', value: 'user' },
               { label: '일간', value: 'daily' },
@@ -73,7 +73,7 @@ const Ranking = () => {
           <div className="overflow-x-auto">
             <table className="min-w-full border-collapse text-center">
               <thead className="bg-white">
-                <tr>
+                <tr className="border-b border-gray-300">
                   <th className="p-4">등수</th>
                   {/* ✅ 'nickname' 대신 학과명 표시 */}
                   <th className="p-4">
@@ -89,10 +89,22 @@ const Ranking = () => {
                 {rankings.map((user, index) => (
                   <tr
                     key={user.id}
-                    className={`border-b border-[#eee] ${index === 0 ? 'bg-[#FFF8E7] text-lg h-20' : 'h-16'}`}
+                    className={"border-b border-gray-300 h-16"}
                   >
-                    {/* 등수: 오른쪽 정렬 */}
-                    <td className="p-4 text-right font-bold">{index + 1}</td>
+                    {/* ✅ 등수에 금/은/동 색 적용 */}
+                    <td
+                      className={`p-4 text-right font-bold ${
+                        index === 0
+                          ? 'text-yellow-500'
+                          : index === 1
+                          ? 'text-gray-400'
+                          : index === 2
+                          ? 'text-orange-500'
+                          : ''
+                      }`}
+                    >
+                      {index + 1}
+                    </td>
 
                     {/* 닉네임 또는 학과명: 왼쪽 정렬 */}
                     <td className="p-4 flex items-center justify-start gap-2">

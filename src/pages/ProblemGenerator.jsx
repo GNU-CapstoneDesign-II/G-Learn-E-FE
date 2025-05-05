@@ -14,20 +14,9 @@ const ProblemGenerator = () => {
   const pdfInputRef = useRef(null);
   const audioInputRef = useRef(null);
   const [inputType, setInputType] = useState('text');
-  const [summaryText, setSummaryText] = useState('');
-  const [pdfFile, setPdfFile] = useState(null);
-  const [isPDFPopupOpen, setIsPDFPopupOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [content, setContent] = useState('');
   const [activeButton, setActiveButton] = useState(null);
-
-  const [selectedTypes, setSelectedTypes] = useState(DEFAULT_SELECTED_TYPES);
-  const [typeOptions, setTypeOptions] = useState(DEFAULT_TYPE_OPTIONS);
-  const [openDropdowns, setOpenDropdowns] = useState({
-    '객관식': false,
-    'O/X 퀴즈': false,
-    '주관식': false,
-    '빈칸 채우기': false,
-  });
+  const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState('중');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPdfFile, setSelectedPdfFile] = useState(null);
@@ -41,6 +30,13 @@ const ProblemGenerator = () => {
       document.body.style.overflow = 'auto';
     };
   }, [isLoading]);
+
+  const [typeOptions, setTypeOptions] = useState({
+    '객관식': { optionCount: 5, questionCount: 30, customQuestionCount: '' },
+    'O/X 퀴즈': { questionCount: 5, customQuestionCount: '' },
+    '주관식': { questionCount: 5, customQuestionCount: '' },
+    '빈칸 채우기': { optionCount: 2, questionCount: 5, customQuestionCount: '' },
+  });
 
   const updateTypeOption = (type, field, value) => {
     setTypeOptions((prev) => ({
@@ -85,21 +81,27 @@ const ProblemGenerator = () => {
     setSelectedDifficulty(event.target.value);
   };
 
-  // ⭐️ 문제 유형 모달 열 때 무조건 초기화
-  const openTypeModal = () => {
-    setSelectedTypes(DEFAULT_SELECTED_TYPES);
-    setTypeOptions(DEFAULT_TYPE_OPTIONS);
-    setOpenDropdowns({
-      '객관식': false,
-      'O/X 퀴즈': false,
-      '주관식': false,
-      '빈칸 채우기': false,
+  const handleSave = () => {
+    const selectedOptions = selectedTypes.map((type) => {
+      const options = typeOptions[type];
+      const finalQuestionCount =
+        options.questionCount === 'custom'
+          ? Number(options.customQuestionCount) || 0
+          : Number(options.questionCount);
+
+      return {
+        type,
+        questionCount: finalQuestionCount,
+        optionCount: options.optionCount || null,
+      };
     });
-    setSelectedDifficulty('중');
-    setActiveButton('type');
+
+    console.log('선택된 문제 유형:', selectedOptions);
+    console.log('선택된 난이도:', selectedDifficulty);
+
+    closeModal();
   };
 
-  // ⭐️ 모달 닫기 (복원 없이 그냥 닫기)
   const closeModal = () => {
     setActiveButton(null);
   };
@@ -147,19 +149,20 @@ const ProblemGenerator = () => {
         <div className="fixed top-20 left-0 w-screen h-[calc(100vh-80px)] bg-[#F3E9DC] z-[9999] flex items-center justify-center">
           <div className="text-center">
             <img src={logoImageLight} alt="G-Learn-E Logo" className="w-[350px] h-auto" />
-            <p className="mt-6 text-xl text-[#B3977B] leading-relaxed font-['Noto Sans KR']">
+            <p className="mt-6 text-xl text-[#B3977B] leading-relaxed font-[\'Noto Sans KR\']">
               문제를 생성하고 있어요!<br />잠시만 기다려주세요 <span className="dots"></span>
             </p>
           </div>
         </div>
       )}
 
-      <div className="mt-20 font-['Noto Sans KR'] box-border">
+      {/* ✅ 페이지 전체를 감싸는 컨테이너 */}
+      <div className="mt-20 font-[\'Noto Sans KR\'] box-border">
+        {/* ✅ 안내 메시지 + 입력 타입 버튼 섹션 */}
         <div className="bg-[rgba(243,233,220,0.5)] h-[260px] flex flex-col items-center justify-center gap-10 text-center">
-          <h2 className="text-xl text-brown m-0">
-            내용 입력 및 문제 유형을 선택한 후 문제를 생성해보세요!
-          </h2>
+          <h2 className="text-xl text-brown m-0">내용 입력 및 문제 유형을 선택한 후 문제를 생성해보세요!</h2>
 
+          {/* ✅ 입력 타입 버튼 묶음 */}
           <div className="flex gap-[22px]">
           <SelectableButton
               label="T Text"
@@ -215,38 +218,26 @@ const ProblemGenerator = () => {
           )}
         </div>
 
+        {/* ✅ 텍스트 입력 영역 */}
         <div className="flex justify-center p-12">
-          <div className="relative w-[90vw] max-w-[1360px] min-w-[320px] h-[60vh] max-h-[600px] border-[1.5px] border-lightbrown rounded-[1.5rem] p-5 box-border shadow-[0_8px_30px_rgba(192,133,82,0.2)] bg-white">
-            {pdfFile && (
-              <div className="mb-3 inline-flex items-center bg-[rgba(243,233,220,0.5)] border border-lightbrown rounded-full px-4 py-1 text-darkbrown font-medium text-sm shadow-sm">
-                <span className="truncate max-w-[200px]">{pdfFile.name}</span>
-                <button
-                  onClick={clearPDFFile}
-                  className="ml-2 text-[1rem] text-gray-500 hover:text-red-500 focus:outline-none"
-                >
-                  ✖
-                </button>
-              </div>
-            )}
-
+          <div className="relative">
             <textarea
-              className="w-full h-[calc(100%-5rem)] text-base resize-none outline-none bg-transparent"
+              className="w-[90vw] max-w-[1360px] min-w-[320px] h-[60vh] max-h-[600px] border-[1.5px] border-lightbrown rounded-[1.5rem] p-5 text-base resize-none outline-none box-border shadow-[0_8px_30px_rgba(192,133,82,0.2)] font-[\'Noto Sans KR\']"
               placeholder="문제를 생성할 내용을 입력하세요..."
-              value={summaryText}
-              onChange={(e) => setSummaryText(e.target.value)}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
               maxLength={1000}
             />
-
-            <div className="absolute bottom-20 right-8 text-sm text-gray-500 font-normal">
-              {summaryText.length} / 1000
-            </div>
-
+            {/* ✅ 글자 수 카운터 */}
+            <div className="absolute bottom-20 right-5 text-sm text-gray-500 font-normal">{content.length} / 1000</div>
+            {/* ✅ 하단의 컨트롤 버튼 */}
             <div className="absolute bottom-5 right-5 flex gap-[22px]">
               <SelectableButton
                 label="문제 유형"
                 isActive={activeButton === 'type'}
-                onClick={openTypeModal}
+                onClick={() => setActiveButton(activeButton === 'type' ? null : 'type')}
               />
+
               <SelectableButton
                 label="문제 생성"
                 isActive={activeButton === 'generate'}
@@ -256,14 +247,16 @@ const ProblemGenerator = () => {
           </div>
         </div>
 
+        {/* ✅ 모달 전체 감싸는 영역 */}
         {activeButton === 'type' && (
           <div className="fixed top-0 left-0 w-screen h-screen bg-[rgba(60,60,60,0.5)] flex justify-center items-center z-[999]" onClick={closeModal}>
             <div className="w-[380px] bg-white rounded-[1.5rem] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative z-[1000]" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-between items-center text-[1.2rem]">
                 <span>문제 유형</span>
-                <button onClick={closeModal} className="text-[1.2rem] cursor-pointer">✖</button>
+                <button onClick={closeModal} className="bg-none border-none text-[1.2rem] cursor-pointer">✖</button>
               </div>
 
+              {/* ✅ 모달 안쪽 내용 */}
               <div className="py-4">
                 <ul className="list-none p-0 m-0">
                   {Object.keys(typeOptions).map((type, index) => {
@@ -305,6 +298,7 @@ const ProblemGenerator = () => {
                   })}
                 </ul>
 
+                {/* 난이도 드롭다운 */}
                 <div className="flex justify-between items-center py-6 my-6 border-t border-[#ccc]">
                   <span>난이도</span>
                   <select
