@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Navbar from '../components/Navbar.module.jsx';
+import Navbar from '../components/Navbar.jsx';
 import logoImageBack from '../assets/image-logo-background.png';
 
 const Ranking = () => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar.module.jsx';
+import Navbar from '../components/Navbar.jsx';
 import Dropdown from '../components/Dropdown.jsx';
 import logoImageLight from '../assets/image-logo-light.png';
 import SelectableButton from '../components/SelectableButton.jsx';

@@ -1,6 +1,4 @@
-import axios from "./axiosInstance";;
-
-axios.defaults.baseURL = "http://localhost:8080"; // or 어디든
+import axios from './axiosInstance';
 
 // 👉 단과대 목록 가져오기
 export const getColleges = () => {
@@ -20,6 +18,12 @@ export const getSubjects = (departmentId) => {
 // 👉 교양 영역 과목 가져오기 (만약 별도 처리 필요 시)
 export const getGeneralSubjects = (category) => {
   return axios.get(`/api/folder/public/subjects/${category}`);
+};
+
+export const uploadWorkbook = (workbookId, collegeId, departmentId, subjectId) => {
+  return axios.post(`/api/workbook/${workbookId}/upload`,
+    collegeId, departmentId, subjectId
+  )
 };
 
 
@@ -46,7 +50,7 @@ export async function generateWorkbook({
 
   // content
   formData.append('content.summaryText', summaryText);
-  if (pdfFile)   formData.append('content.pdfFile', pdfFile);
+  if (pdfFile) formData.append('content.pdfFile', pdfFile);
   if (audioFile) formData.append('content.audioFile', audioFile);
 
   // difficulty
