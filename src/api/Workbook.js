@@ -1,6 +1,4 @@
-import axios from "./axiosInstance";;
-
-axios.defaults.baseURL = "http://localhost:8080"; // or 어디든
+import axios from "./axiosInstance";
 
 // 👉 단과대 목록 가져오기
 export const getColleges = () => {

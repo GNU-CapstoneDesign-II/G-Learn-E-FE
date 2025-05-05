@@ -19,7 +19,10 @@ export default {
         lightbrown: "#C08552",
         brown: "#895737",
         darkbrown: "#5F360A",
-      }
+      },
+      fontFamily: {
+        namdhinggo: ['"Namdhinggo"', 'serif'],
+      },
     }
   },
   plugins: [],
