@@ -80,28 +80,43 @@ export default function LeftSidebar() {
     };
 
     return (
-        <div className="fixed top-[64px] left-0 w-[200px] h-[calc(100vh-64px)] border-r border-[#e5d5c5] bg-white p-4 flex flex-col gap-4 text-[#5f360a] text-sm z-10">
+        <div className="fixed top-[60px] left-0 w-[200px] h-[calc(100vh-60px)] border-r border-[#E6CEBA] pr-4 bg-white flex flex-col gap-2 text-[#5f360a] text-sm z-10">
             {/* 탭 버튼 */}
-            <div className="flex flex-col gap-2">
+            <div className="pt-12 flex flex-col gap-2 ">
+
+                {/* 👤 Private 버튼 */}
                 <button
                     onClick={() => handleTabClick("private")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-r-full ${selectedTab === "private" ? "bg-[#f8f1e7]" : ""
+                    className={`relative flex items-center gap-2 px-4 py-2 rounded-r-full ${selectedTab === "private" ? "bg-[#f8f1e7]" : ""
                         }`}
                 >
+                    {/* 세로 이중 줄 (버튼 안에 조건부 렌더링) */}
+                    {selectedTab === "private" && (
+                        <div className="absolute left-0 top-0 h-full w-[6px]">
+                            <div className="absolute left-0 top-0 h-full w-[2px] bg-[#5F360A]" />
+                            <div className="absolute left-[2px] top-0 h-full w-[2px] bg-[#CCBEAE]" />
+                        </div>
+                    )}
                     <span role="img" aria-label="private">👤</span> private
                 </button>
 
-                {/* 세로 갈색 줄 */}
-                <div className="h-4 border-l-2 border-[#5f360a] ml-4" />
-
+                {/* 🧑‍🤝‍🧑 Public 버튼 */}
                 <button
                     onClick={() => handleTabClick("public")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-r-full ${selectedTab === "public" ? "bg-[#f8f1e7]" : ""
+                    className={`relative flex items-center gap-2 px-4 py-2 rounded-r-full ${selectedTab === "public" ? "bg-[#f8f1e7]" : ""
                         }`}
                 >
+                    {selectedTab === "public" && (
+                        <div className="absolute left-0 top-0 h-full w-[6px]">
+                            <div className="absolute left-0 top-0 h-full w-[2px] bg-[#5F360A]" />
+                            <div className="absolute left-[2px] top-0 h-full w-[2px] bg-[#CCBEAE]" />
+                        </div>
+                    )}
                     <span role="img" aria-label="public">🧑‍🤝‍🧑</span> public
                 </button>
+
             </div>
+
 
             {/* 필터 영역 (public 전용) */}
             {selectedTab === "public" && (

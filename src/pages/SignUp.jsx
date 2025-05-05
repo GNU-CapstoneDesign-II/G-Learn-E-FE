@@ -6,6 +6,8 @@ export default function SignUp() {
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState("");
   const [nicknameChecked, setNicknameChecked] = useState(false);
+  const [college, setCollege] = useState("");
+  const [department, setDepartment] = useState("");
 
   const handleSendCode = () => {
     const email = document.getElementById("email").value;
@@ -45,32 +47,35 @@ export default function SignUp() {
     alert(`닉네임 "${nickname}"은 사용 가능합니다!`);
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!college || !department) {
+      alert("단과대학과 학과를 모두 선택해주세요.");
+      return;
+    }
+    // 기타 유효성 검사 추가 가능
+    alert("회원가입이 완료되었습니다!");
+  };
+
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-[#f8f1e7] font-['Noto_Sans_KR'] text-[#5F360A] py-10 px-4">
+      <div className="pt-40 pb-40 min-h-screen bg-[#f8f1e7] text-[#5F360A] py-10 px-4">
         <div className="max-w-md mx-auto text-center">
-          <h1 className="text-2xl font-bold border-b-2 border-[#5F360A] inline-block pb-1 mb-4">
-            회원가입
-          </h1>
+          <h1 className="text-3xl font-bold border-b-2 border-[#5F360A] inline-block pb-1 mb-4">회원가입</h1>
           <p className="text-sm text-[#9A7E5F] leading-relaxed mb-10">
             회원 가입을 하시면 <strong>지런이</strong>의 서비스를 이용 하실 수 있습니다.
-            <br />
-            지런이는 여러분의 여정을 항상 응원합니다.
+            <br />지런이는 여러분의 여정을 항상 응원합니다.
           </p>
 
-          <form className="flex flex-col gap-5 text-left">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5 text-left">
             {/* 이름 */}
             <div>
               <label className="block text-sm mb-1">이름</label>
-              <input
-                type="text"
-                placeholder="이름"
-                className="w-full border border-[#5F360A] px-4 py-2 rounded focus:outline-none"
-              />
+              <input type="text" placeholder="이름" className="w-full border border-[#5F360A] px-4 py-2 rounded focus:outline-none" />
             </div>
 
-            {/* 닉네임 + 중복확인 */}
+            {/* 닉네임 */}
             <div>
               <label htmlFor="nickname" className="block text-sm mb-1">닉네임</label>
               <div className="flex gap-2">
@@ -83,22 +88,24 @@ export default function SignUp() {
                 <button
                   type="button"
                   onClick={handleCheckNickname}
-                  className="bg-[#A57C4A] text-white text-sm px-3 py-2 rounded hover:bg-[#86613b]"
+                  className="bg-[#AC957B] text-white text-sm px-3 py-2 rounded hover:bg-[#5F360A]"
                 >
                   중복 확인
                 </button>
               </div>
             </div>
 
-            {/* 소속 대학 및 학과 */}
+            {/* 단과대학 & 학과 */}
             <div>
               <label className="block text-sm mb-1">소속 대학 및 학과</label>
               <div className="flex gap-2">
                 {/* 단과대학 */}
                 <div className="relative flex-1">
                   <select
-                    className="appearance-none w-full border border-[#5F360A] bg-[#f8f1e7] text-[#5F360A] px-4 py-2 pr-10 rounded focus:outline-none"
-                    defaultValue=""
+                    value={college}
+                    onChange={(e) => setCollege(e.target.value)}
+                    className={`appearance-none w-full border border-[#5F360A] bg-white px-4 py-2 pr-10 rounded focus:outline-none
+                    ${college === "" ? "text-gray-400" : "text-[#5F360A]"}`}
                   >
                     <option disabled value="">단과대학</option>
                     <option>공과대학</option>
@@ -106,30 +113,27 @@ export default function SignUp() {
                     <option>자연대학</option>
                     <option>IT 공과대학</option>
                   </select>
-                  <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#5F360A]">
-                    ▼
-                  </div>
+                  <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#5F360A]">▼</div>
                 </div>
 
                 {/* 학과 */}
                 <div className="relative flex-1">
                   <select
-                    className="appearance-none w-full border border-[#5F360A] bg-[#f8f1e7] text-[#5F360A] px-4 py-2 pr-10 rounded focus:outline-none"
-                    defaultValue=""
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    className={`appearance-none w-full border border-[#5F360A] bg-white px-4 py-2 pr-10 rounded focus:outline-none
+                    ${department === "" ? "text-gray-400" : "text-[#5F360A]"}`}
                   >
                     <option disabled value="">학과</option>
                     <option>컴퓨터공학과</option>
                     <option>경영학과</option>
                   </select>
-                  <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#5F360A]">
-                    ▼
-                  </div>
+                  <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#5F360A]">▼</div>
                 </div>
               </div>
             </div>
 
-
-            {/* 이메일 인증 */}
+            {/* 이메일 */}
             <div>
               <label htmlFor="email" className="block text-sm mb-1">email</label>
               <div className="flex gap-2">
@@ -142,7 +146,7 @@ export default function SignUp() {
                 <button
                   type="button"
                   onClick={handleSendCode}
-                  className="bg-[#A57C4A] text-white text-sm px-3 py-2 rounded hover:bg-[#86613b]"
+                  className="bg-[#AC957B] text-white text-sm px-3 py-2 rounded hover:bg-[#5F360A]"
                 >
                   인증코드 전송
                 </button>
@@ -173,9 +177,10 @@ export default function SignUp() {
               />
             </div>
 
+            {/* 제출 */}
             <button
               type="submit"
-              className="w-full bg-[#A57C4A] text-white py-2 rounded mt-2 hover:bg-[#86613b]"
+              className="w-full bg-[#AC957B] text-white py-2 rounded mt-2 hover:bg-[#5F360A]"
             >
               회원가입
             </button>

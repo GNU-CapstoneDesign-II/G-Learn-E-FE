@@ -14,7 +14,7 @@ export default function PrivateHeader({
     const totalCount = selectedFolder ? 3 : 4; // 예시 (props로 전달 가능)
 
     return (
-        <div className="w-full flex items-center justify-between px-6 py-3 border-b border-[#e5d5c5] bg-[#fdf9f4]">
+        <div className="fixed top-[60px] left-[200px] w-[calc(100%-200px)] flex items-center justify-between px-6 py-3 border-b border-[#e5d5c5] bg-[#fdf9f4]">
             {/* 왼쪽 영역 */}
             <div className="flex items-center gap-3">
                 {selectedFolder ? (
@@ -47,7 +47,7 @@ export default function PrivateHeader({
                         <option value="오래된순">오래된순</option>
                         <option value="업로드순">업로드순</option>
                     </select>
-                    <span className="absolute right-2 top-1/2 -translate-y-1 text-xs">▼</span>
+                    <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs">▼</span>
                 </div>
 
                 {/* 선택 모드일 경우 */}

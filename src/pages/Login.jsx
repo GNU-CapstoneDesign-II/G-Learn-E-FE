@@ -9,7 +9,7 @@ export default function Login() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-[#f8f1e7] font-['Noto_Sans_KR'] text-[#5F360A]">
+      <div className="pt-20 min-h-screen bg-[#f8f1e7] text-[#5F360A]">
         <div className="flex justify-center items-center pt-20">
           <div className="w-full max-w-md px-4 text-center">
             {/* 제목 */}
@@ -45,7 +45,7 @@ export default function Login() {
               </div>
               <button
                 type="submit"
-                className="w-full bg-[#5F360A] text-white py-2 mt-2 rounded hover:bg-[#4b2d08] transition-colors"
+                className="w-full bg-[#AC957B] text-white py-2 mt-2 rounded hover:bg-[#5F360A] transition-colors"
               >
                 로그인
               </button>

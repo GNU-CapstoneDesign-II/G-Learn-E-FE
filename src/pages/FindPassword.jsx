@@ -48,11 +48,13 @@ export default function FindPassword() {
     return (
         <>
             <Navbar />
-            <div className="min-h-screen bg-[#f8f1e7] font-['Noto_Sans_KR'] text-[#5F360A] py-10">
+            <div className="pt-40 pb-40 min-h-screen bg-[#f8f1e7] text-[#5F360A] py-10">
                 <div className="max-w-md mx-auto px-4">
-                    <h1 className="text-2xl font-semibold text-center border-b-2 border-[#5F360A] inline-block pb-1 mb-10">
-                        비밀번호 찾기
-                    </h1>
+                    <div className="text-center">
+                        <h1 className="inline-block text-3xl font-semibold border-b-2 border-[#5F360A] pb-1 mb-10">
+                            비밀번호 찾기
+                        </h1>
+                    </div>
 
                     <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
                         {/* 이름 */}
@@ -79,7 +81,7 @@ export default function FindPassword() {
                                 <button
                                     type="button"
                                     onClick={handleSendCode}
-                                    className="bg-[#5F360A] text-white px-3 py-2 text-sm rounded hover:bg-[#432707]"
+                                    className="bg-[#AC957B] text-white px-3 py-2 text-sm rounded hover:bg-[#432707]"
                                 >
                                     인증코드 전송
                                 </button>
@@ -97,7 +99,7 @@ export default function FindPassword() {
                         <button
                             type="button"
                             onClick={handleVerify}
-                            className="w-full bg-[#5F360A] text-white py-2 rounded hover:bg-[#432707]"
+                            className="w-full bg-[#AC957B] text-white py-2 rounded hover:bg-[#432707]"
                         >
                             인증 하기
                         </button>
@@ -141,7 +143,7 @@ export default function FindPassword() {
 
                                 <button
                                     type="submit"
-                                    className="w-full bg-[#5F360A] text-white py-2 rounded hover:bg-[#432707] mt-2"
+                                    className="w-full bg-[#AC957B] text-white py-2 rounded hover:bg-[#432707] mt-2"
                                 >
                                     비밀번호 변경
                                 </button>
