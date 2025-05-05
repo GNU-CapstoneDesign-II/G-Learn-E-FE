@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar.module.jsx';
+import Navbar from '../components/Navbar.jsx';
 import Dropdown from '../components/Dropdown.jsx';
 import logoImageLight from '../assets/image-logo-light.png';
 import SelectableButton from '../components/SelectableButton.jsx';
@@ -164,7 +164,7 @@ const ProblemGenerator = () => {
 
           {/* ✅ 입력 타입 버튼 묶음 */}
           <div className="flex gap-[22px]">
-          <SelectableButton
+            <SelectableButton
               label="T Text"
               isActive={inputType === 'text'}
               onClick={() => setInputType('text')}

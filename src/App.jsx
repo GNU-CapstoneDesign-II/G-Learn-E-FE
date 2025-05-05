@@ -8,7 +8,6 @@ import MainPage from "./pages/MainPage.jsx";
 import WorkbookSolve from "./pages/WorkbookSolve.jsx";
 import ProblemGenerator from "./pages/ProblemGenerator.jsx";
 import FolderPage from "./pages/FolderPage.jsx";
-import Mypage from './pages/MyPage.jsx';
 
 function App() {
   return (
@@ -20,7 +19,6 @@ function App() {
       <Route path="/solve/:workbookId" element={<WorkbookSolve />} />
       <Route path="/generate-problem" element={<ProblemGenerator />} />
       <Route path="/folder" element={<FolderPage />} />
-      <Route path="/mypage" element={<Mypage />} />
     </Routes>
   );
 }
