@@ -28,6 +28,7 @@
   position: fixed;
   top: 0;
   font-family: 'Noto Sans KR', sans-serif;
+  z-index: 20;
 }
 
 .navbarInner {

@@ -7,15 +7,33 @@ import SelectableButton from '../components/SelectableButton.jsx';
 import PdfUploadModal from '../components/PdfUploadModal.jsx';
 import { generateProblems } from '../api/problemApi';
 
+// 🧩 초기값 상수로 분리
+const DEFAULT_SELECTED_TYPES = [];
+const DEFAULT_TYPE_OPTIONS = {
+  '객관식': { optionCount: 5, questionCount: 30, customQuestionCount: '' },
+  'O/X 퀴즈': { questionCount: 5, customQuestionCount: '' },
+  '주관식': { questionCount: 5, customQuestionCount: '' },
+  '빈칸 채우기': { optionCount: 2, questionCount: 5, customQuestionCount: '' },
+};
+
 const ProblemGenerator = () => {
   const navigate = useNavigate();
-  const [inputType, setInputType] = useState('text'); // ✅ 현재 선택된 입력 타입
+
+  const [inputType, setInputType] = useState('text');
   const [summaryText, setSummaryText] = useState('');
   const [pdfFile, setPdfFile] = useState(null);
   const [isPDFPopupOpen, setIsPDFPopupOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
-  const [selectedTypes, setSelectedTypes] = useState([]);
+
+  const [selectedTypes, setSelectedTypes] = useState(DEFAULT_SELECTED_TYPES);
+  const [typeOptions, setTypeOptions] = useState(DEFAULT_TYPE_OPTIONS);
+  const [openDropdowns, setOpenDropdowns] = useState({
+    '객관식': false,
+    'O/X 퀴즈': false,
+    '주관식': false,
+    '빈칸 채우기': false,
+  });
   const [selectedDifficulty, setSelectedDifficulty] = useState('중');
 
   const clearPDFFile = () => setPdfFile(null);
@@ -27,13 +45,6 @@ const ProblemGenerator = () => {
     };
   }, [isLoading]);
 
-  const [typeOptions, setTypeOptions] = useState({
-    '객관식': { optionCount: 5, questionCount: 30, customQuestionCount: '' },
-    'O/X 퀴즈': { questionCount: 5, customQuestionCount: '' },
-    '주관식': { questionCount: 5, customQuestionCount: '' },
-    '빈칸 채우기': { optionCount: 2, questionCount: 5, customQuestionCount: '' },
-  });
-
   const updateTypeOption = (type, field, value) => {
     setTypeOptions((prev) => ({
       ...prev,
@@ -43,13 +54,6 @@ const ProblemGenerator = () => {
       },
     }));
   };
-
-  const [openDropdowns, setOpenDropdowns] = useState({
-    '객관식': false,
-    'O/X 퀴즈': false,
-    '주관식': false,
-    '빈칸 채우기': false,
-  });
 
   const toggleDropdown = (type) => {
     setOpenDropdowns((prev) => ({
@@ -68,57 +72,66 @@ const ProblemGenerator = () => {
     setSelectedDifficulty(event.target.value);
   };
 
-  const handleSave = () => {
-    const selectedOptions = selectedTypes.map((type) => {
-      const options = typeOptions[type];
-      const finalQuestionCount =
-        options.questionCount === 'custom'
-          ? Number(options.customQuestionCount) || 0
-          : Number(options.questionCount);
-
-      return {
-        type,
-        questionCount: finalQuestionCount,
-        optionCount: options.optionCount || null,
-      };
+  // ⭐️ 문제 유형 모달 열 때 무조건 초기화
+  const openTypeModal = () => {
+    setSelectedTypes(DEFAULT_SELECTED_TYPES);
+    setTypeOptions(DEFAULT_TYPE_OPTIONS);
+    setOpenDropdowns({
+      '객관식': false,
+      'O/X 퀴즈': false,
+      '주관식': false,
+      '빈칸 채우기': false,
     });
-
-    console.log('선택된 문제 유형:', selectedOptions);
-    console.log('선택된 난이도:', selectedDifficulty);
-
-    closeModal();
+    setSelectedDifficulty('중');
+    setActiveButton('type');
   };
 
-  const closeModal = () => setActiveButton(null);
+  // ⭐️ 모달 닫기 (복원 없이 그냥 닫기)
+  const closeModal = () => {
+    setActiveButton(null);
+  };
+
+  const handleSave = () => {
+    console.log('✅ 저장된 문제 유형:', selectedTypes);
+    console.log('✅ 저장된 타입 옵션:', typeOptions);
+    console.log('✅ 저장된 난이도:', selectedDifficulty);
+    setActiveButton(null);
+  };
 
   const handleGenerateClick = async () => {
-    // 👉 아무것도 입력하지 않았을 때 막기
     const isSummaryTextEmpty = !summaryText?.trim();
     const isPdfEmpty = !pdfFile;
+    const isTypeNotSelected = selectedTypes.length === 0;
 
     if (isSummaryTextEmpty && isPdfEmpty) {
       alert('텍스트를 입력하거나 PDF 파일을 첨부해주세요!');
       return;
     }
 
-    setIsLoading(true); // 로딩 애니메이션 ON
+    if (isTypeNotSelected) {
+      alert('문제 유형을 선택해주세요!');
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
       const result = await generateProblems({
         summaryText,
         pdfFile,
         audioFile: null,
-        selectedTypes,         // 사용자가 고른 문제 유형들
-        typeOptions,           // 문제 옵션들 (지문 수, 개수 등)
-        selectedDifficulty     // 난이도 ("하", "중", "상")
+        selectedTypes,
+        typeOptions,
+        selectedDifficulty,
       });
 
-      console.log('✅ 생성된 문제:', result); // 백엔드 응답
+      console.log('✅ 생성된 문제:', result);
+      navigate('/private');
     } catch (error) {
       console.error('❌ 문제 생성 실패:', error);
       alert('문제 생성에 실패했습니다.');
     } finally {
-      setIsLoading(false); // 로딩 끝
+      setIsLoading(false);
     }
   };
 
@@ -145,7 +158,6 @@ const ProblemGenerator = () => {
       )}
 
       <div className="mt-20 font-['Noto Sans KR'] box-border">
-        {/* 안내 메시지 + 입력 타입 버튼 */}
         <div className="bg-[rgba(243,233,220,0.5)] h-[260px] flex flex-col items-center justify-center gap-10 text-center">
           <h2 className="text-xl text-brown m-0">
             내용 입력 및 문제 유형을 선택한 후 문제를 생성해보세요!
@@ -155,9 +167,7 @@ const ProblemGenerator = () => {
             {['text', 'pdf', 'voice'].map((type) => (
               <SelectableButton
                 key={type}
-                label={
-                  type === 'text' ? 'T Text' : type === 'pdf' ? '📄 PDF' : '🎙️ 음성파일'
-                }
+                label={type === 'text' ? 'T Text' : type === 'pdf' ? '📄 PDF' : '🎙️ 음성파일'}
                 isActive={inputType === type}
                 onClick={() => {
                   setInputType(type);
@@ -168,11 +178,8 @@ const ProblemGenerator = () => {
           </div>
         </div>
 
-        {/* 본문 영역 */}
         <div className="flex justify-center p-12">
           <div className="relative w-[90vw] max-w-[1360px] min-w-[320px] h-[60vh] max-h-[600px] border-[1.5px] border-lightbrown rounded-[1.5rem] p-5 box-border shadow-[0_8px_30px_rgba(192,133,82,0.2)] bg-white">
-            
-            {/* ✅ PDF 파일 선택 시 이름 표시 */}
             {pdfFile && (
               <div className="mb-3 inline-flex items-center bg-[rgba(243,233,220,0.5)] border border-lightbrown rounded-full px-4 py-1 text-darkbrown font-medium text-sm shadow-sm">
                 <span className="truncate max-w-[200px]">{pdfFile.name}</span>
@@ -185,7 +192,6 @@ const ProblemGenerator = () => {
               </div>
             )}
 
-            {/* ✅ 항상 표시되는 텍스트 입력 */}
             <textarea
               className="w-full h-[calc(100%-5rem)] text-base resize-none outline-none bg-transparent"
               placeholder="문제를 생성할 내용을 입력하세요..."
@@ -198,12 +204,11 @@ const ProblemGenerator = () => {
               {summaryText.length} / 1000
             </div>
 
-            {/* 하단 버튼 */}
             <div className="absolute bottom-5 right-5 flex gap-[22px]">
               <SelectableButton
                 label="문제 유형"
                 isActive={activeButton === 'type'}
-                onClick={() => setActiveButton(activeButton === 'type' ? null : 'type')}
+                onClick={openTypeModal}
               />
               <SelectableButton
                 label="문제 생성"
@@ -214,7 +219,6 @@ const ProblemGenerator = () => {
           </div>
         </div>
 
-        {/* 모달 */}
         {activeButton === 'type' && (
           <div className="fixed top-0 left-0 w-screen h-screen bg-[rgba(60,60,60,0.5)] flex justify-center items-center z-[999]" onClick={closeModal}>
             <div className="w-[380px] bg-white rounded-[1.5rem] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative z-[1000]" onClick={(e) => e.stopPropagation()}>
@@ -264,7 +268,6 @@ const ProblemGenerator = () => {
                   })}
                 </ul>
 
-                {/* 난이도 선택 */}
                 <div className="flex justify-between items-center py-6 my-6 border-t border-[#ccc]">
                   <span>난이도</span>
                   <select

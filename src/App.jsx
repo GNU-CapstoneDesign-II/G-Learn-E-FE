@@ -8,6 +8,7 @@ import MainPage from "./pages/MainPage.jsx";
 import WorkbookSolve from "./pages/WorkbookSolve.jsx";
 import ProblemGenerator from "./pages/ProblemGenerator.jsx";
 import Private from "./pages/Private.jsx";
+import Ranking from "./pages/Ranking.jsx";
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
       <Route path="/solve/:workbookId" element={<WorkbookSolve />} />
       <Route path="/generate-problem" element={<ProblemGenerator />} />
       <Route path="/private" element={<Private />} />
+      <Route path="/ranking" element={<Ranking />} />
     </Routes>
   );
 }
