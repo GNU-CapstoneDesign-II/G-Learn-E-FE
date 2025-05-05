@@ -1,8 +1,9 @@
 import React from "react";
 import { motion } from "framer-motion";
-import Navbar from "../components/Navbar.module.jsx";
 import logoImage from "../assets/image-logo.png";
 import textLogoImage from "../assets/text-logo.png";
+import Navbar from "../components/Navbar.jsx";
+
 
 export default function MainPage() {
   const sectionWrapper = "min-h-[80vh] py-10 w-full flex items-center";

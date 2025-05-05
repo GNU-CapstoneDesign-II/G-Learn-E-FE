@@ -14,18 +14,18 @@ const AUTH_REQUIRED_PREFIXES = ["/api/"];
 const AUTH_EXCLUDE_URLS = ["/api/auth/login", "/api/auth/signup", "/api/auth/email-code", "/api/auth/email-code/verify"];
 
 instance.interceptors.request.use((config) => {
-  const token = getAccessToken();
-  const url = config.url;
+    const token = getAccessToken();
+    const url = config.url;
 
-  const needsAuth =
-    AUTH_REQUIRED_PREFIXES.some((prefix) => url.startsWith(prefix)) &&
-    !AUTH_EXCLUDE_URLS.includes(url); // ✅ 예외 처리
+    const needsAuth =
+        AUTH_REQUIRED_PREFIXES.some((prefix) => url.startsWith(prefix)) &&
+        !AUTH_EXCLUDE_URLS.includes(url); // ✅ 예외 처리
 
-  if (token && needsAuth) {
-    config.headers["Authorization"] = `Bearer ${token}`;
-  }
+    if (token && needsAuth) {
+        config.headers["Authorization"] = `Bearer ${token}`;
+    }
 
-  return config;
+    return config;
 });
 
 
