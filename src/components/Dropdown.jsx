@@ -20,7 +20,7 @@ const Dropdown = ({
       <select
         value={value}
         onChange={onChange}
-        className="p-1 text-base text-black font-normal border border-[#ccc] rounded-lg cursor-pointer transition-colors duration-300 hover:border-brown focus:outline-none focus:border-brown"
+        className="p-1 text-base text-black font-normal border border-[#ccc] rounded-lg cursor-pointer transition-colors duration-300 hover:border-brown focus:outline-none focus:border-brown bg-white"
       >
         {options.map((option) => {
           const optionLabel = option === 'custom' ? '직접입력' : option;
@@ -40,7 +40,7 @@ const Dropdown = ({
       {isCustom && (
         <input
           type="number"
-          className="w-[100px] mt-1 p-1 text-base text-black font-normal border border-[#ccc] rounded-lg transition-colors duration-300 hover:border-brown focus:outline-none focus:border-brown"
+          className="w-[100px] mt-1 p-1 text-base text-black font-normal border border-[#ccc] rounded-lg transition-colors duration-300 hover:border-brown focus:outline-none focus:border-brown bg-white"
           placeholder="숫자 입력"
           value={customValue}
           onChange={onCustomChange}
