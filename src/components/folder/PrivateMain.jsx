@@ -1,6 +1,4 @@
-/* ──────────────────────────────────────────────────────────────
-   src/components/main/PrivateMain.jsx
-────────────────────────────────────────────────────────────── */
+// src/components/main/PrivateMain.jsx
 import React, { useState, useEffect } from "react";
 import { useDrop } from "react-dnd";
 import FolderListWithDnD from "../FolderListWithDnD.jsx";
@@ -80,13 +78,13 @@ export default function PrivateMain() {
   /* ────────── 선택 모드 토글 ────────── */
   const handleToggleAll = () => {
     if (!isSelectMode) {
-      // 선택모드 진입
+      // 선택 모드 진입: 선택 초기화
       setIsSelectMode(true);
       setSelectedIds([]);
     } else {
-      // 이미 선택모드라면 전체 선택/해제
-      const allIds = folderData.childWorkbooks.map((w) => w.id);
-      setSelectedIds(selectedIds.length === allIds.length ? [] : allIds);
+      // 선택 모드 해제: 선택 초기화
+      setIsSelectMode(false);
+      setSelectedIds([]);
     }
   };
 
