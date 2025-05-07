@@ -57,7 +57,7 @@ const FileUploadModal = ({ onClose, onFileSelect, fileType = 'pdf' }) => {
           className="absolute top-3 right-4 text-gray-500 text-xl cursor-pointer"
           onClick={onClose}
         >
-          ✖
+          ✕
         </button>
 
         <p className="text-lg mb-4 leading-relaxed">

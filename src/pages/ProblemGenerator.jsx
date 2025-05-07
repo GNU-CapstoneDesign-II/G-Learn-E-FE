@@ -141,10 +141,10 @@ const ProblemGenerator = () => {
         </div>
       )}
 
-      <div className="mt-20 font-['Noto Sans KR'] box-border">
+      <div className="pt-[60px] font-['Noto Sans KR'] box-border">
         <div className="bg-[rgba(243,233,220,0.5)] h-[280px] flex items-center justify-center text-center">
           <div className="flex flex-col items-center gap-10 px-4 md:px-6">
-            <h2 className="text-2xl text-brown m-0">
+            <h2 className="text-xl md:text-2xl text-brown m-0">
               내용 입력 및 문제 유형을 선택한 후 문제를 생성해보세요!
             </h2>
             <div className="flex gap-[24px]">
@@ -231,7 +231,7 @@ const ProblemGenerator = () => {
           >
             <div className="flex justify-between items-center text-lg md:text-xl">
               <span>문제 유형</span>
-              <button onClick={() => setActiveButton(null)} className="text-lg md:text-xl">✖</button>
+              <button onClick={() => setActiveButton(null)} className="text-lg md:text-xl">✕</button>
             </div>
 
             <div className="py-4">
@@ -284,9 +284,9 @@ const ProblemGenerator = () => {
                   onChange={handleDifficultyChange}
                   className="p-2 text-base border border-[#ccc] rounded-md cursor-pointer focus:outline-none focus:border-[#3ADBFF] hover:border-[#3ADBFF]"
                 >
-                  <option value="상">상</option>
-                  <option value="중">중</option>
-                  <option value="하">하</option>
+                  <option value="상">어려움</option>
+                  <option value="중">보통</option>
+                  <option value="하">쉬움</option>
                 </select>
               </div>
 

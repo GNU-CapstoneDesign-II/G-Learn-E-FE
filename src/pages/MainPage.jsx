@@ -4,7 +4,6 @@ import logoImage from "../assets/image-logo.png";
 import textLogoImage from "../assets/text-logo.png";
 import Navbar from "../components/Navbar.jsx";
 
-
 export default function MainPage() {
   const sectionWrapper = "min-h-[80vh] py-10 w-full flex items-center";
 
@@ -42,7 +41,7 @@ export default function MainPage() {
   return (
     <>
       <Navbar />
-      <div className="font-sans text-darkbrown h-screen">
+      <div className="pt-[60px] font-sans text-darkbrown h-screen">
         {/* Hero Section */}
         <section className={`${sectionWrapper} bg-white`}>
           <div className="max-w-[1200px] mx-auto flex items-center justify-between gap-12 px-4 md:px-6">
@@ -77,11 +76,13 @@ export default function MainPage() {
               </p>
             </div>
 
-            <img
-              src={logoImage}
-              alt="G-Learn-E 로고"
-              className="flex-1 w-3/4 md:w-full max-w-[400px]"
-            />
+            <div className="flex-1 flex justify-center">
+              <img
+                src={logoImage}
+                alt="G-Learn-E 로고"
+                className="w-full max-w-[400px] h-auto"
+              />
+            </div>
           </div>
         </section>
 
@@ -90,7 +91,7 @@ export default function MainPage() {
           className={sectionWrapper}
           style={{
             background:
-              "radial-gradient(circle at center, rgba(225,200,180,0.8) 0%, rgba(243,233,220,0.5) 70%)",
+              "radial-gradient(circle at center, rgba(225,190,160,0.75) 0%, rgba(243,233,220,0.5) 70%)",
           }}
         >
           <div className="max-w-[960px] mx-auto px-4 text-center">
@@ -98,7 +99,7 @@ export default function MainPage() {
               {...fadeWithDelay(0.2)}
               src={textLogoImage}
               alt="G-Learn-E"
-              className="mx-auto mb-6 w-3/4 md:w-auto"
+              className="mx-auto mb-6 w-full max-w-[700px] h-auto"
             />
             <motion.p {...fadeWithDelay(0.3)} className="text-xl md:text-2xl text-darkbrown font-medium mb-4">
               지런이는 경상국립대학교 학생들을 위한 맞춤형 학습 플랫폼입니다.
