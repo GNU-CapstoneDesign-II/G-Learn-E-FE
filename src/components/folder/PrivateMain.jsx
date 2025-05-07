@@ -1,5 +1,5 @@
 // src/components/main/PrivateMain.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useDrop } from "react-dnd";
 import FolderListWithDnD from "../FolderListWithDnD.jsx";
 import UploadPopup from "../common/UploadPopup.jsx";
@@ -14,10 +14,7 @@ import {
   renameWorkbook,
 } from "../../api/privateFolderApi";
 
-const ItemTypes = { FOLDER: "folder", WORKBOOK: "workbook" };
-
 export default function PrivateMain() {
-  /* ────────── 상태 ────────── */
   const [folderData, setFolderData] = useState({
     id: null,
     name: "private",
@@ -27,13 +24,14 @@ export default function PrivateMain() {
   });
   const [loading, setLoading] = useState(true);
 
-  const [isSelectMode, setIsSelectMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState([]);      // ↱ ID 배열
-  const [sortOption, setSortOption] = useState("최신순");
+  // 정렬 기준: name / recentUse / createdAt / modifiedAt
+  const [sortOption, setSortOption] = useState("name");
 
+  const [isSelectMode, setIsSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
   const [showUploadPopup, setShowUploadPopup] = useState(false);
 
-  /* ────────── 폴더 로드 ────────── */
+  // 폴더 데이터 로드
   const loadFolder = async (id = null) => {
     setLoading(true);
     try {
@@ -45,78 +43,115 @@ export default function PrivateMain() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     loadFolder();
   }, []);
 
-  /* ────────── 새 폴더 생성 ────────── */
-  const handleCreateFolder = async () => {
-    const name = prompt("새 폴더 이름");
-    if (!name?.trim()) return;
-    await createPrivateFolder({ name: name.trim(), parentId: folderData.id });
-    loadFolder(folderData.id);
-  };
+  // 정렬된 폴더 리스트
+  const sortedFolders = useMemo(() => {
+    const arr = [...folderData.childFolders];
+    switch (sortOption) {
+      case "name":
+        return arr.sort((a, b) => a.name.localeCompare(b.name));
+      case "recentUse":
+        return arr.sort(
+          (a, b) => new Date(b.lastUsedAt) - new Date(a.lastUsedAt)
+        );
+      case "createdAt":
+        return arr.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+      case "modifiedAt":
+        return arr.sort(
+          (a, b) => new Date(b.modifiedAt) - new Date(a.modifiedAt)
+        );
+      default:
+        return arr;
+    }
+  }, [folderData.childFolders, sortOption]);
 
-  /* ────────── DnD(상위 폴더로 이동) ────────── */
-  useDrop({
-    accept: [ItemTypes.FOLDER, ItemTypes.WORKBOOK],
-    drop: (item, monitor) => {
-      const targetId = folderData.parentId ?? 0;
-      const mover =
-        monitor.getItemType() === ItemTypes.FOLDER ? moveFolder : moveWorkbook;
-      mover(item.id, targetId).then(() => loadFolder(targetId));
-    },
-  });
+  // 정렬된 워크북 리스트
+  const sortedWorkbooks = useMemo(() => {
+    const arr = [...folderData.childWorkbooks];
+    switch (sortOption) {
+      case "name":
+        return arr.sort((a, b) => a.name.localeCompare(b.name));
+      case "recentUse":
+        return arr.sort(
+          (a, b) => new Date(b.lastUsedAt) - new Date(a.lastUsedAt)
+        );
+      case "createdAt":
+        return arr.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+      case "modifiedAt":
+        return arr.sort(
+          (a, b) => new Date(b.modifiedAt) - new Date(a.modifiedAt)
+        );
+      default:
+        return arr;
+    }
+  }, [folderData.childWorkbooks, sortOption]);
 
-  if (loading)
-    return (
-      <div className="flex-1 min-h-screen flex items-center justify-center">
-        로딩 중…
-      </div>
-    );
-
-  /* ────────── 선택 모드 토글 ────────── */
+  // 전체 토글
   const handleToggleAll = () => {
     if (!isSelectMode) {
-      // 선택 모드 진입: 선택 초기화
       setIsSelectMode(true);
       setSelectedIds([]);
     } else {
-      // 선택 모드 해제: 선택 초기화
       setIsSelectMode(false);
       setSelectedIds([]);
     }
   };
 
-  /* 개별 워크북 선택/해제 */
+  // 개별 선택
   const handleSelectItem = (id) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 
-  /* ────────── UploadPopup 에 넘겨줄 [{id,name}] 만들기 ────────── */
+  // 업로드 팝업용 데이터
   const selectedWorkbooks = folderData.childWorkbooks
     .filter((w) => selectedIds.includes(w.id))
     .map((w) => ({ id: w.id, name: w.name }));
 
-  /* ────────── 뷰 ────────── */
+  // DnD 드롭존
+  useDrop({
+    accept: ["folder", "workbook"],
+    drop: (item, monitor) => {
+      const targetId = folderData.parentId ?? 0;
+      const mover =
+        monitor.getItemType() === "folder" ? moveFolder : moveWorkbook;
+      mover(item.id, targetId).then(() => loadFolder(targetId));
+    },
+  });
+
+  if (loading) {
+    return (
+      <div className="flex-1 min-h-screen flex items-center justify-center">
+        로딩 중…
+      </div>
+    );
+  }
+
   return (
     <main className="ml-[200px] mt-[125px] flex-1 p-8 relative">
       <FolderListWithDnD
-        /* 헤더용 props */
+        /* 상단 툴바 */
         selectedFolder={folderData}
         selectedItems={selectedIds}
         sortOption={sortOption}
         onSortChange={setSortOption}
-        onBack={() => loadFolder(folderData.parentId)}
         onToggleAll={handleToggleAll}
         isSelectMode={isSelectMode}
         onUpload={() => setShowUploadPopup(true)}
-        /* 그리드용 props */
+        onBack={() => loadFolder(folderData.parentId)}
+        /* 리스트 */
         currentFolder={folderData}
-        folders={folderData.childFolders}
-        workbooks={folderData.childWorkbooks}
+        folders={sortedFolders}
+        workbooks={sortedWorkbooks}
         onRefresh={() => loadFolder(folderData.id)}
         onFolderClick={(id) => !isSelectMode && loadFolder(id)}
         onRename={async (id) => {
@@ -141,11 +176,18 @@ export default function PrivateMain() {
           await renameWorkbook(wid, newName.trim());
           loadFolder(folderData.id);
         }}
-        onAddFolder={handleCreateFolder}
+        onAddFolder={async () => {
+          const name = prompt("새 폴더 이름");
+          if (!name?.trim()) return;
+          await createPrivateFolder({
+            name: name.trim(),
+            parentId: folderData.id,
+          });
+          loadFolder(folderData.id);
+        }}
         onSelectItem={handleSelectItem}
       />
 
-      {/* 업로드 팝업 */}
       {showUploadPopup && (
         <UploadPopup
           selectedWorkbooks={selectedWorkbooks}
