@@ -25,16 +25,16 @@ function Navbar() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 border-b border-[#e7d6c4] bg-white">
+    <header className="fixed top-0 left-0 w-full z-50 bg-white border-b border-[#e7d6c4]">
       {/* 상단바 컨테이너 */}
-      <div className="max-w-[1280px] mx-auto flex items-center justify-between h-[60px] px-6">
+      <div className="w-full flex justify-between items-center h-[65px] px-[25px]">
         {/* ───────── 왼쪽 영역: 로고 + 메뉴 ───────── */}
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-6">
           <Link to="/">
             <img src={logoImage} alt="G-Learn-E Logo" className="h-10 object-contain" />
           </Link>
 
-          <nav className="flex items-center gap-4 text-[#9A7E5F] text-sm font-medium">
+          <nav className="flex items-center gap-4 font-medium" style={{ fontSize: "13.5px", color: "#9A7E5F" }}>
             <Link to="/generate-problem" className="hover:text-[#5F360A]">문제 생성</Link>
             <span>|</span>
             <Link to="/folder" className="hover:text-[#5F360A]">문제집 리스트</Link>

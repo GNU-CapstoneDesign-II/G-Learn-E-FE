@@ -102,7 +102,7 @@ export default function PrivateMain() {
 
   /* ────────── 뷰 ────────── */
   return (
-    <main className="ml-[200px] mt-[120px] flex-1 p-8 relative">
+    <main className="ml-[200px] mt-[125px] flex-1 p-8 relative">
       <FolderListWithDnD
         /* 헤더용 props */
         selectedFolder={folderData}
