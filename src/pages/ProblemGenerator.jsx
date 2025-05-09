@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
-import Dropdown from '../components/Dropdown.jsx';
+import Dropdown from '../components/ProblemGenerator/Dropdown.jsx';
 import logoImageLight from '../assets/image-logo-light.png';
-import SelectableButton from '../components/SelectableButton.jsx';
+import SelectableButton from '../components/ProblemGenerator/SelectableButton.jsx';
 import { generateWorkbook } from '../api/Workbook.js';
 import InformationPopup from '../components/common/InformationPopup.jsx';
-import FileUploadModal from '../components/FileUploadModal.jsx';
+import FileUploadModal from '../components/ProblemGenerator/FileUploadModal.jsx';
 
 const ProblemGenerator = () => {
   const navigate = useNavigate();
@@ -146,9 +146,9 @@ const ProblemGenerator = () => {
       )}
 
       <div className="pt-[65px] font-['Noto Sans KR'] box-border">
-        <div className="bg-[rgba(243,233,220,0.5)] h-[280px] flex items-center justify-center text-center">
+        <div className="bg-[rgba(243,233,220,0.5)] h-[260px] flex items-center justify-center text-center">
           <div className="flex flex-col items-center gap-10 px-4 md:px-6">
-            <h2 className="text-xl md:text-2xl text-brown m-0">
+            <h2 className="text-lg md:text-xl text-brown m-0">
               내용 입력 및 문제 유형을 선택한 후 문제를 생성해보세요!
             </h2>
             <div className="flex gap-[24px]">
@@ -161,7 +161,7 @@ const ProblemGenerator = () => {
 
         <div className="flex justify-center p-12">
           <div className="w-[90vw] max-w-[1360px] min-w-[320px] h-[60vh] max-h-[600px] border-[1.5px] border-lightbrown rounded-[1.5rem] p-5 box-border shadow-[0_8px_30px_rgba(192,133,82,0.2)] bg-white font-['Noto Sans KR'] flex flex-col">
-            <div className="relative flex-1 p-4 flex flex-col gap-3">
+            <div className="relative flex-1 p-4 pb-28 flex flex-col gap-3">
               {(selectedPdfFile || selectedAudioFile) && (
                 <div className="space-y-2">
                   {selectedPdfFile && (
@@ -169,7 +169,7 @@ const ProblemGenerator = () => {
                       <span className="truncate max-w-[200px]">{selectedPdfFile.name}</span>
                       <button
                         onClick={() => setSelectedPdfFile(null)}
-                        className="ml-1 text-sm text-gray-400 hover:text-red-500 transition"
+                        className="ml-1 text-sm text-gray-500 hover:text-red-500 transition"
                         title="PDF 파일 제거"
                       >
                         ✕
@@ -181,7 +181,7 @@ const ProblemGenerator = () => {
                       <span className="truncate max-w-[200px]">{selectedAudioFile.name}</span>
                       <button
                         onClick={() => setSelectedAudioFile(null)}
-                        className="ml-1 text-sm text-gray-400 hover:text-red-500 transition"
+                        className="ml-1 text-sm text-gray-500 hover:text-red-500 transition"
                         title="음성 파일 제거"
                       >
                         ✕
@@ -192,7 +192,7 @@ const ProblemGenerator = () => {
               )}
 
               <textarea
-                className="w-full h-full text-base leading-relaxed resize-none outline-none rounded-lg"
+                className="w-full flex-1 text-base leading-relaxed resize-none outline-none rounded-lg"
                 placeholder="문제를 생성할 내용을 입력하세요..."
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
@@ -233,55 +233,92 @@ const ProblemGenerator = () => {
             className="w-[380px] bg-white rounded-[1.5rem] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.2)] relative z-[1000]"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* 헤더 */}
             <div className="flex justify-between items-center text-lg md:text-xl">
               <span>문제 유형</span>
-              <button onClick={() => setActiveButton(null)} className="text-lg md:text-xl">✕</button>
+              <button
+                onClick={() => setActiveButton(null)}
+                className="text-gray-500 text-lg md:text-xl hover:text-gray-700"
+              >
+                ✕
+              </button>
             </div>
 
+            {/* 문제 유형 리스트만 감싸기 */}
             <div className="py-4">
-              <ul className="list-none p-0 m-0">
+              <ul className="list-none p-0 m-0 space-y-1">
                 {Object.keys(typeOptions).map((type, index) => {
                   const isActive = selectedTypes.includes(type);
                   return (
                     <li
                       key={type}
                       className={`flex items-center p-[0.6rem] rounded-[12px] cursor-pointer transition-colors duration-300 ${
-                        isActive ? 'bg-[rgba(243,233,220,0.5)] text-brown font-bold' : 'hover:bg-[#f5f5f5]'
+                        isActive
+                          ? 'bg-[rgba(243,233,220,0.5)] text-brown font-bold'
+                          : 'hover:bg-[#f5f5f5]'
                       }`}
                       onClick={() => {
                         toggleTypeSelection(type);
                         toggleDropdown(type);
                       }}
                     >
-                      <span className="w-6">{['🎯', '❓', '🗨️', '🧩'][index]}</span>
-                      <span className="flex-1 ml-2">{type}</span>
+                      <span>{['🎯', '❓', '🗨️', '🧩'][index]}</span>
+                      <span className="flex-1 ml-1">{type}</span>
+
                       {openDropdowns[type] && (
-                        <div className="flex justify-between gap-4 my-2" onClick={(e) => e.stopPropagation()}>
+                        <div
+                          className="flex justify-between gap-4 my-2"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           {'optionCount' in typeOptions[type] && (
                             <Dropdown
-                              label={type === '빈칸 채우기' ? '빈칸 수' : '선지 수'}
+                              label={
+                                type === '빈칸 채우기' ? '빈칸 수' : '선지 수'
+                              }
                               options={[1, 2, 3, 4, 5]}
                               value={typeOptions[type].optionCount}
-                              onChange={(e) => updateTypeOption(type, 'optionCount', e.target.value)}
+                              onChange={(e) =>
+                                updateTypeOption(
+                                  type,
+                                  'optionCount',
+                                  e.target.value
+                                )
+                              }
                             />
                           )}
                           <Dropdown
                             label="질문 수"
                             options={[5, 10, 15, 30, 'custom']}
                             value={typeOptions[type].questionCount}
-                            onChange={(e) => updateTypeOption(type, 'questionCount', e.target.value)}
+                            onChange={(e) =>
+                              updateTypeOption(
+                                type,
+                                'questionCount',
+                                e.target.value
+                              )
+                            }
                             customValue={typeOptions[type].customQuestionCount}
-                            onCustomChange={(e) => updateTypeOption(type, 'customQuestionCount', e.target.value)}
+                            onCustomChange={(e) =>
+                              updateTypeOption(
+                                type,
+                                'customQuestionCount',
+                                e.target.value
+                              )
+                            }
                           />
                         </div>
                       )}
-                      {isActive && <span className="font-bold ml-5">✓</span>}
+
+                      {isActive && <span className="font-bold ml-2">✓</span>}
                     </li>
                   );
                 })}
               </ul>
+            </div>
 
-              <div className="flex justify-between items-center py-6 my-6 border-t border-[#ccc]">
+            {/* 난이도 + 저장 (경계선 유지, 버튼 아래 여백 없음) */}
+            <div className="pt-4 border-t border-[#ccc]">
+              <div className="flex justify-between items-center mb-8">
                 <span>난이도</span>
                 <select
                   value={selectedDifficulty}
@@ -293,9 +330,8 @@ const ProblemGenerator = () => {
                   <option value="하">쉬움</option>
                 </select>
               </div>
-
               <button
-                className="w-full p-3 bg-brown text-white border-none rounded-full text-base font-bold cursor-pointer"
+                className="w-full p-3 bg-brown text-white rounded-full text-base font-bold cursor-pointer"
                 onClick={handleSave}
               >
                 저장

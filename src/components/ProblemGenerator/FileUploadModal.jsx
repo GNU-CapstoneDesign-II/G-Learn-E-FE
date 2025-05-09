@@ -53,14 +53,15 @@ const FileUploadModal = ({ onClose, onFileSelect, fileType = 'pdf' }) => {
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
       >
-        <button
-          className="absolute top-3 right-4 text-gray-500 text-xl cursor-pointer"
-          onClick={onClose}
-        >
-          ✕
-        </button>
-
-        <p className="text-lg mb-4 leading-relaxed">
+        <div className="absolute inset-x-0 top-0 flex justify-end p-4">
+          <button
+            className="text-gray-500 text-xl cursor-pointer hover:text-gray-700"
+            onClick={onClose}
+          >
+            ✕
+          </button>
+        </div>
+        <p className="text-lg mb-6 leading-relaxed">
           여기로 {fileType.toUpperCase()} 파일을 드래그하거나<br />아래 버튼을 클릭해주세요
         </p>
 
@@ -74,7 +75,7 @@ const FileUploadModal = ({ onClose, onFileSelect, fileType = 'pdf' }) => {
 
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="px-4 py-2 bg-brown text-white rounded-full text-base font-semibold cursor-pointer hover:bg-opacity-80"
+          className="px-4 py-2 bg-brown text-white rounded-full text-base font-bold cursor-pointer hover:bg-opacity-80"
         >
           파일 선택
         </button>
