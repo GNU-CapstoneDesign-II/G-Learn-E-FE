@@ -89,7 +89,7 @@ function LeftSidebar({ selectedTab, onTabChange }) {
   return (
     <div className="fixed mt-[65px] left-0 w-[200px] h-[calc(100vh-60px)] border-r border-[#E6CEBA] bg-white text-sm">
       {/* 탭 */}
-      <div className="pt-12 flex flex-col gap-2">
+      <div className="pt-12 flex flex-col gap-2 pr-4">
         {["private", "public"].map(t => (
           <button
             key={t}
@@ -148,7 +148,7 @@ function LeftSidebar({ selectedTab, onTabChange }) {
               <option value="">학년 선택</option>
               {grades.map(g => (
                 <option key={g} value={g}>
-                  {g}학년
+                  {g}
                 </option>
               ))}
             </select>
@@ -165,7 +165,7 @@ function LeftSidebar({ selectedTab, onTabChange }) {
               {filteredSubjects.map(s => (
                 <option key={s.id} value={s.id}>
                   {s.subjectName}
-                  {s.grade && ` (${s.grade}학년)`}
+                  {s.grade && ` (${s.grade})`}
                 </option>
               ))}
             </select>
