@@ -41,7 +41,7 @@ export default function MainPage() {
   return (
     <>
       <Navbar />
-      <div className="pt-[60px] font-sans text-darkbrown h-screen">
+      <div className="pt-[65px] font-sans text-darkbrown h-screen">
         {/* Hero Section */}
         <section className={`${sectionWrapper} bg-white`}>
           <div className="max-w-[1200px] mx-auto flex items-center justify-between gap-12 px-4 md:px-6">

@@ -16,7 +16,7 @@ const ProblemGenerator = () => {
   const [activeButton, setActiveButton] = useState(null);
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState('중');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);  // 로딩
   const [selectedPdfFile, setSelectedPdfFile] = useState(null);
   const [selectedAudioFile, setSelectedAudioFile] = useState(null);
   const [showTypeAlert, setShowTypeAlert] = useState(false);
@@ -131,9 +131,13 @@ const ProblemGenerator = () => {
         />
       )}
       {isLoading && (
-        <div className="fixed top-20 left-0 w-screen h-[calc(100vh-80px)] bg-[#F3E9DC] z-[9999] flex items-center justify-center">
-          <div className="text-center">
-            <img src={logoImageLight} alt="G-Learn-E Logo" className="w-[350px] h-auto" />
+        <div className="fixed inset-x-0 top-[65px] bottom-0 bg-[#F3E9DC] z-[9999] flex items-center justify-center">
+          <div className="text-center px-4">
+            <img
+              src={logoImageLight}
+              alt="G-Learn-E Logo"
+              className="w-full max-w-[350px] h-auto"
+            />
             <p className="mt-6 text-xl text-[#B3977B] leading-relaxed font-['Noto Sans KR']">
               문제를 생성하고 있어요!<br />잠시만 기다려주세요 <span className="dots"></span>
             </p>
@@ -141,7 +145,7 @@ const ProblemGenerator = () => {
         </div>
       )}
 
-      <div className="pt-[60px] font-['Noto Sans KR'] box-border">
+      <div className="pt-[65px] font-['Noto Sans KR'] box-border">
         <div className="bg-[rgba(243,233,220,0.5)] h-[280px] flex items-center justify-center text-center">
           <div className="flex flex-col items-center gap-10 px-4 md:px-6">
             <h2 className="text-xl md:text-2xl text-brown m-0">
