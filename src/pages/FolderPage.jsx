@@ -104,7 +104,7 @@ function LeftSidebar({ selectedTab, onTabChange }) {
 
       {/* Public 필터 */}
       {selectedTab === "public" && (
-        <div className="bg-[#f8f1e7] mt-4 mx-4 p-3 rounded-xl flex flex-col gap-2">
+        <div className="bg-[#f8f1e7] mt-2 mr-4 p-3 rounded-xl flex flex-col gap-2">
           {/* ① 교양/단과대 */}
           <select
             value={state.main}
@@ -156,6 +156,7 @@ function LeftSidebar({ selectedTab, onTabChange }) {
 
           {/* ④ 과목명 */}
           {state.sub && (
+
             <select
               value={state.subject}
               onChange={e => sync("SET_SUBJECT", e.target.value)}
@@ -170,9 +171,14 @@ function LeftSidebar({ selectedTab, onTabChange }) {
               ))}
             </select>
           )}
+          <button className="mt-2 px-4 py-1 bg-[#AC957B] text-white rounded shadow hover:bg-[#5F360A] transition">
+            검색
+          </button>
         </div>
+
       )}
     </div>
+
   );
 }
 
