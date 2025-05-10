@@ -6,7 +6,7 @@ import {
     saveSolveLog,
     gradeWorkbook,
     resetSolveLog,
-} from '../api/workbookApi';
+} from '../api/problemSolveApi';
 import ProblemCard from '../components/problem/ProblemCard';
 import ProblemNavbar from '../components/problem/ProblemNavbar';
 import ConfirmModal from '../components/common/ConfirmModal';

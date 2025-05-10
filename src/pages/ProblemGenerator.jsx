@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar.jsx';
 import Dropdown from '../components/ProblemGenerator/Dropdown.jsx';
 import logoImageLight from '../assets/image-logo-light.png';
 import SelectableButton from '../components/ProblemGenerator/SelectableButton.jsx';
-import { generateWorkbook } from '../api/Workbook.js';
+import { generateWorkbook } from '../api/workbookApi.js';
 import InformationPopup from '../components/common/InformationPopup.jsx';
 import FileUploadModal from '../components/ProblemGenerator/FileUploadModal.jsx';
 
