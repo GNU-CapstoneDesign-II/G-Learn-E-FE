@@ -1,6 +1,8 @@
 // src/App.jsx
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./utils/ProtectedRoute.jsx";
+import PublicRoute from "./utils/PublicRoute.jsx";
 import Login from "./pages/Login.jsx";
 import SignUp from "./pages/SignUp.jsx";
 import FindPassword from "./pages/FindPassword.jsx";
@@ -14,15 +16,25 @@ import Mypage from './pages/MyPage.jsx';
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<MainPage />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/find-password" element={<FindPassword />} />
-      <Route path="/solve/:workbookId" element={<WorkbookSolve />} />
-      <Route path="/generate-problem" element={<ProblemGenerator />} />
-      <Route path="/folder" element={<FolderPage />} />
-      <Route path="/ranking" element={<Ranking />} />
-      <Route path="/mypage" element={<Mypage />} />
+      {/* 토큰 없을 때만 접근 가능한 라우트 */}
+      <Route element={<PublicRoute />}>
+        <Route path="/login"         element={<Login />} />
+        <Route path="/signup"        element={<SignUp />} />
+        <Route path="/find-password" element={<FindPassword />} />
+      </Route>
+
+      {/* 토큰 있어야만 접근 가능한 라우트 */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/solve/:workbookId" element={<WorkbookSolve />} />
+        <Route path="/generate-problem"  element={<ProblemGenerator />} />
+        <Route path="/folder"            element={<FolderPage />} />
+        <Route path="/ranking"           element={<Ranking />} />
+        <Route path="/mypage"            element={<Mypage />} />
+      </Route>
+
+      {/* 그 외 리디렉트 */}
+      <Route path="*" element={<MainPage />} />
+      <Route path="/"                  element={<MainPage />} />
     </Routes>
   );
 }
