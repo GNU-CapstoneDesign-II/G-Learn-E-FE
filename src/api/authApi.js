@@ -1,6 +1,5 @@
 // src/api/authApi.js
 import axios from "./axiosInstance.js";
-import rawAxios from "axios";
 
 export const login = async (email, password) => {
     const res = await axios.post("/api/auth/login", { email, password });

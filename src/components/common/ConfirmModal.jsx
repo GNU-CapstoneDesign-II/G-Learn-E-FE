@@ -15,7 +15,7 @@ export default function ConfirmModal({ message, onConfirm, onCancel }) {
                     </button>
                     <button
                         onClick={onConfirm}
-                        className="px-6 py-1.5 text-sm border border-[#5c4033] text-[#5c4033] rounded-full hover:bg-[#f3e8df]"
+                        className="px-6 py-1.5 text-sm border border-[#5c4033] text-white rounded-full hover:bg-[#d6b498] hover:border-[#d6b498] bg-brown"
                     >
                         확인
                     </button>

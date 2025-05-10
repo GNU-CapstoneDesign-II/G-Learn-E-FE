@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { getCollegesWith, getDepartments } from "../../api/workbookApi.js";
 import { updateUserInfo } from "../../api/userApi";
+import { changePassword } from "../../api/authApi.js";
 import LevelIcon from "../common/LevelIcon.jsx";
 
 import arrow from "../../assets/dropbox_arrow.png";
@@ -191,30 +192,33 @@ export default function MyPageInfo() {
                     </div>
 
                     <form className="space-y-6">
-                        <FormField label="이름" readOnly={!isEditing} value={form.name} name="name" onChange={handleChange} inputClass={inputCommon} labelClass={labelStyle} />
-                        <FormField label="닉네임" readOnly={!isEditing} value={form.nickname} name="nickname" onChange={handleChange} inputClass={inputCommon} labelClass={labelStyle} />
+
+
                         <div className="grid grid-cols-2 gap-6">
-                            <FormSelect
-                                label="단과대학"
-                                readOnly={!isEditing}
-                                value={form.collegeId}
-                                name="collegeId"
-                                options={colleges.map(c => ({ value: c.id, label: c.collegeName }))}
-                                onChange={handleCollegeChange}
-                                inputClass={inputCommon}
-                                labelClass={labelStyle}
-                            />
-                            <FormSelect
-                                label="학과"
-                                readOnly={!isEditing}
-                                value={form.departmentId}
-                                name="departmentId"
-                                options={departments.map(d => ({ value: d.id, label: d.departmentName }))}
-                                onChange={handleChange}
-                                inputClass={inputCommon}
-                                labelClass={labelStyle}
-                            />
+                            <FormField label="이름" readOnly={!isEditing} value={form.name} name="name" onChange={handleChange} inputClass={inputCommon} labelClass={labelStyle} />
+                            <FormField label="닉네임" readOnly={!isEditing} value={form.nickname} name="nickname" onChange={handleChange} inputClass={inputCommon} labelClass={labelStyle} />
                         </div>
+                        <FormSelect
+                            label="단과대학"
+                            readOnly={!isEditing}
+                            value={form.collegeId}
+                            name="collegeId"
+                            options={colleges.map(c => ({ value: c.id, label: c.collegeName }))}
+                            onChange={handleCollegeChange}
+                            inputClass={inputCommon}
+                            labelClass={labelStyle}
+                        />
+                        <FormSelect
+                            label="학과"
+                            readOnly={!isEditing}
+                            value={form.departmentId}
+                            name="departmentId"
+                            options={departments.map(d => ({ value: d.id, label: d.departmentName }))}
+                            onChange={handleChange}
+                            inputClass={inputCommon}
+                            labelClass={labelStyle}
+                        />
+
                         <ReadOnlyField label="email" value={form.email} inputClass={inputCommon} labelClass={labelStyle} />
                     </form>
 
