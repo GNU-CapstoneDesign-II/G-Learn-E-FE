@@ -54,6 +54,7 @@ const ProblemGenerator = () => {
         pdfFile: selectedPdfFile,
         audioFile: selectedAudioFile,
         selectedTypes,
+        typeOptions,
         difficulty: selectedDifficulty,
       });
       navigate(`/private`);
