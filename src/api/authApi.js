@@ -17,6 +17,19 @@ export const verifyEmailAuthCode = async (email, authCode) => {
 };
 
 
+export const signup = async (name, nickname, email, password, collegeId, departmentId, signupToken) => {
+    const res = await axios.post("/api/auth/signup",
+        { name, nickname, email, password, collegeId, departmentId },
+        {
+            headers: {
+                Authorization: `Bearer ${signupToken}`,
+            }
+        }
+    );
+    return res; // { message }
+}
+
+
 
 
 // 비밀번호 초기화 관련
