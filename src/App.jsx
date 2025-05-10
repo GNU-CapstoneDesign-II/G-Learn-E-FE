@@ -34,7 +34,7 @@ function App() {
 
       {/* 그 외 리디렉트 */}
       <Route path="*" element={<MainPage />} />
-      <Route path="/"                  element={<MainPage />} />
+      <Route path="/" element={<MainPage />} />
     </Routes>
   );
 }
