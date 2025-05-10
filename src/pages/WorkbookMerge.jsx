@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import EditNavbar from '../components/EditNavbar.jsx';
 import ProblemCard from '../components/problem/ProblemCard.jsx';
-import MergeConfirmDialog from '../components/MergeConfirmDialog.jsx';
+import MergeConfirmDialog from '../components/workbookmerge/MergeConfirmDialog.jsx';
 import {
     fetchMergeProblems,
     updateWorkbookProblems,
@@ -110,7 +110,7 @@ const WorkbookEdit = () => {
                                         problem={p}
                                         userAttempt={null}
                                         onUserAttemptChange={() => { }}
-                                        isSolved={false}
+                                        isSolved={true}
                                     />
                                 </div>
                             </div>
