@@ -9,6 +9,8 @@ import LevelIcon from '../common/LevelIcon.jsx';
 const MyPageHome = () => {
     const { user } = useAuth();
     const [stats, setStats] = useState(null);
+    const [className, setClassName] = useState(null);
+    const [profileImage, setProfileImage] = useState(null);
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -17,22 +19,23 @@ const MyPageHome = () => {
             .catch(err => setError(err.message));
     }, []);
 
-    const userData = {
-        id: 0,
-        email: 'm11d29v3p@gnu.ac.kr',
-        nickname: 'jjalajak',
-        profileImage: 0,
-        level: 5,
-        exp: 0,
-        className: '흙지렁이',
-        department: 'GNU - IT 공과대학 - 컴퓨터공학부',
-        avatarUrl: '/profile.png',
-        rank: 10,
-        createdCount: 3,
-        solvedCount: 2,
-    };
+    useEffect(() => {
+        if (user.level < 10) setClassName('흙지렁이');
+        else if (user.level < 20) setClassName('실버지렁이');
+        else if (user.level < 30) setClassName('골드지렁이');
+        else if (user.level < 40) setClassName('플래티넘지렁이');
+        else if (user.level < 50) setClassName('다이아몬드지렁이');
+    }, [user.level]);
+
+    useEffect(() => {
+        // 이거 나중에 어떻게 구현할지 의논하기
+        if (user.profileImage === 0) setProfileImage('/profile.png');
+        else setProfileImage('/profile.png');
+    }, [user.profileImage]);
+
 
     if (!stats) return null;
+
 
     return (
         <div className="space-y-8 max-w-6xl mx-auto">
@@ -41,7 +44,7 @@ const MyPageHome = () => {
                 <div className="inline-block rounded-full bg-[#f5f1eb] p-6 mb-6">
                     {/* 원본 비율 유지 */}
                     <img
-                        src={userData.avatarUrl}
+                        src={profileImage}
                         alt="profile emoji"
                         className="w-24 h-auto object-contain"
                     />
@@ -63,9 +66,9 @@ const MyPageHome = () => {
                 <section className="flex-1 bg-white rounded-3xl p-8 flex items-center justify-between shadow-lg">
                     {/* 왼쪽: 아이콘 + 레벨 */}
                     <div className="flex items-center gap-6">
-                        <LevelIcon level={user.level} size={80}/>
+                        <LevelIcon level={user.level} size={80} />
                         <h3 className="text-xl font-bold text-[#5F360A]">
-                            Lv.&nbsp;{user.level}&nbsp;{userData.className}
+                            Lv.&nbsp;{user.level}&nbsp;{className}
                         </h3>
                     </div>
 
@@ -90,7 +93,7 @@ const MyPageHome = () => {
                     {/* ⓑ 만든 문제집 수 */}
                     <div className="px-4">
                         <p className="text-4xl font-bold text-[#5F360A]">
-                            {userData.createdCount}
+                            {stats.createdWorkbooks}
                         </p>
                         <p className="mt-2 text-sm text-[#5F360A]/70">만든 문제 수</p>
                     </div>
@@ -98,7 +101,7 @@ const MyPageHome = () => {
                     {/* ⓒ 푼 문제집 수 */}
                     <div className="px-4">
                         <p className="text-4xl font-bold text-[#5F360A]">
-                            {userData.solvedCount}
+                            {stats.solvedWorkbooks}
                         </p>
                         <p className="mt-2 text-sm text-[#5F360A]/70">푼 문제 수</p>
                     </div>
