@@ -101,16 +101,14 @@ export default function FindPassword() {
           onClose={handleClosePopup}
         />
       )}
-      <div className="pt-40 pb-40 min-h-screen bg-[#f8f1e7] text-[#5F360A]">
-        <div className="max-w-md mx-auto px-4">
-          <h1 className="text-center text-3xl font-semibold border-b-2 border-[#5F360A] pb-1 mb-10">
-            비밀번호 찾기
-          </h1>
+      <div className="pt-40 pb-40 min-h-screen bg-[#f8f1e7] text-[#5F360A] py-10 px-4">
+        <div className="max-w-md mx-auto text-center">
+          <h1 className="text-3xl font-bold border-b-2 border-[#5F360A] inline-block pb-1 mb-4">비밀번호 찾기</h1>
 
           <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
             {/* 이름 */}
             <div>
-              <label htmlFor="name" className="block text-sm mb-1">이름</label>
+              <label htmlFor="name" className="block text-sm mb-1 text-left">이름</label>
               <input
                 id="name"
                 type="text"
@@ -124,7 +122,7 @@ export default function FindPassword() {
 
             {/* 이메일 + 전송 */}
             <div>
-              <label htmlFor="email" className="block text-sm mb-1">Email</label>
+              <label htmlFor="email" className="block text-sm mb-1 text-left">Email</label>
               <div className="flex gap-2">
                 <input
                   id="email"
@@ -168,7 +166,7 @@ export default function FindPassword() {
             {verified && (
               <>
                 <div>
-                  <label htmlFor="password" className="block text-sm mb-1">Password</label>
+                  <label htmlFor="password" className="block text-sm mb-1 text-left">비밀번호</label>
                   <input
                     id="password"
                     type="password"
@@ -180,7 +178,7 @@ export default function FindPassword() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="confirm-password" className="block text-sm mb-1">Password 확인</label>
+                  <label htmlFor="confirm-password" className="block text-sm mb-1 text-left">비밀번호 확인</label>
                   <input
                     id="confirm-password"
                     type="password"
