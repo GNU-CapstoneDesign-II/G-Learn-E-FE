@@ -36,7 +36,7 @@ export default function FolderListWithDnD({
   return (
     <>
       {/* 상단 툴바 영역 */}
-      <header className="fixed top-[66px] left-[200px] w-[calc(100%-200px)] flex items-center justify-between px-6 py-3 border-b border-[#e5d5c5] bg-[#fdf9f4] z-50">
+      <header className="fixed top-[66px] left-[200px] w-[calc(100%-200px)] flex items-center justify-between px-6 py-3 border-b border-[#e5d5c5] bg-[#fdf9f4] z-30">
         <div className="flex items-center gap-3">
           {/* 루트가 아닐 경우 뒤로가기 버튼 */}
           {!isRoot && (

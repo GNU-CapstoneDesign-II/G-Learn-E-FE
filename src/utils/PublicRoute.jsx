@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import InformationPopup from "../components/common/InformationPopup.jsx";
-import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { useAuth } from "../contexts/AuthContext.jsx";
 
 export default function PublicRoute() {
