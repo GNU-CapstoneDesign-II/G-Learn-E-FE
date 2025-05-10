@@ -31,6 +31,12 @@ export default function MyPageInfo() {
     const [loadingCol, setLoadingCol] = useState(true);
     const [loadingDep, setLoadingDep] = useState(false);
 
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+    const [oldPassword, setOldPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+
     const [blockedAccount, setBlockedAccount] = useState(['안유진', '장원영', '카리나', '윈터', '백지헌']);
     const [unblockTarget, setUnblockTarget] = useState(null);
 
@@ -131,6 +137,37 @@ export default function MyPageInfo() {
     };
     const onCancelUnblock = () => setUnblockTarget(null);
 
+
+
+    const handleStartPasswordChange = () => {
+        setIsChangingPassword(true);
+        setPasswordError("");
+    };
+    const handleCancelPasswordChange = () => {
+        setIsChangingPassword(false);
+        setOldPassword("");
+        setNewPassword("");
+        setNewPasswordConfirm("");
+        setPasswordError("");
+    };
+    const handlePasswordSubmit = async () => {
+        if (newPassword !== newPasswordConfirm) {
+            setPasswordError("새 비밀번호가 일치하지 않습니다.");
+            return;
+        }
+        try {
+            await changePassword(oldPassword, newPassword, newPasswordConfirm);
+            setIsChangingPassword(false);
+            setOldPassword("");
+            setNewPassword("");
+            setNewPasswordConfirm("");
+            setInfo({ open: true, msg: "비밀번호가 변경되었습니다." });
+        } catch (err) {
+            setPasswordError(err.response?.data?.message || "비밀번호 변경에 실패했습니다.");
+        }
+    };
+
+
     const border = 'border-2 border-[#b9a997]';
     const labelStyle = 'text-sm text-[#5F360A]/80 mb-1 ml-px';
     const inputCommon = `${border} rounded-xl w-full h-14 px-6 pr-12 flex items-center leading-none text-[#5F360A] placeholder:text-[#b9a997] focus:outline-none`;
@@ -222,13 +259,58 @@ export default function MyPageInfo() {
                         <ReadOnlyField label="email" value={form.email} inputClass={inputCommon} labelClass={labelStyle} />
                     </form>
 
-                    <button
-                        type="button"
-                        onClick={() => navigate('/find-password')}
-                        className="w-full bg-[#b9a997] text-white rounded-xl py-5 mt-14 hover:bg-[#9f8267] transition-colors"
-                    >
-                        비밀번호 변경
-                    </button>
+                    {!isChangingPassword ? (
+                        <button
+                            type="button"
+                            onClick={handleStartPasswordChange}
+                            className="w-full bg-[#b9a997] text-white rounded-xl py-5 mt-14 hover:bg-[#9f8267] transition-colors"
+                        >
+                            비밀번호 변경
+                        </button>
+                    ) : (
+                        <div className="space-y-4 mt-6">
+                            <input
+                                type="password"
+                                placeholder="현재 비밀번호"
+                                value={oldPassword}
+                                onChange={(e) => setOldPassword(e.target.value)}
+                                className="w-full border border-[#5F360A] px-4 py-2 rounded focus:outline-none"
+                            />
+                            <input
+                                type="password"
+                                placeholder="새 비밀번호"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                className="w-full border border-[#5F360A] px-4 py-2 rounded focus:outline-none"
+                            />
+                            <input
+                                type="password"
+                                placeholder="새 비밀번호 확인"
+                                value={newPasswordConfirm}
+                                onChange={(e) => setNewPasswordConfirm(e.target.value)}
+                                className="w-full border border-[#5F360A] px-4 py-2 rounded focus:outline-none"
+                            />
+                            {passwordError && (
+                                <p className="text-sm text-red-500">{passwordError}</p>
+                            )}
+                            <div className="flex gap-4">
+                                <button
+                                    type="button"
+                                    onClick={handlePasswordSubmit}
+                                    className="flex-1 bg-[#b9a997] text-white rounded-xl py-3 hover:bg-[#9f8267]"
+                                >
+                                    저장
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleCancelPasswordChange}
+                                    className="flex-1 border border-[#b9a997] text-[#b9a997] rounded-xl py-3 hover:bg-[#b9a997]/20"
+                                >
+                                    취소
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </section>
 
                 <aside className="md:w-[380px] xl:w-[420px] shrink-0 h-[600px]">
