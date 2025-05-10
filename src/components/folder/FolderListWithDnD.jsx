@@ -3,7 +3,7 @@ import React from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { useNavigate } from "react-router-dom";
 import Checkbox from "./Checkbox.jsx";
-import { moveWorkbook, moveFolder } from "../api/privateFolderApi.js";
+import { moveWorkbook, moveFolder } from "../../api/privateFolderApi.js";
 
 const ItemTypes = { FOLDER: "folder", WORKBOOK: "workbook" };
 

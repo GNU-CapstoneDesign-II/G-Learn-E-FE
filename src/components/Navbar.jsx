@@ -81,7 +81,7 @@ function Navbar() {
                     <p className="mt-2 font-bold text-[#5F360A]">안녕하세요, {user.nickname}님!</p>
                     {/* 학교·학부 정보는 추후 DB 연동 시 교체 */}
                     <span className="block text-xs text-[#9A7E5F] mt-1">
-                      GNU - IT 공과대학 - 컴퓨터공학부
+                      GNU - {user.college.collegeName} - {user.department.departmentName}
                     </span>
                   </div>
 

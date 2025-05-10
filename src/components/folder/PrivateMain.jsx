@@ -1,7 +1,7 @@
 // src/components/main/PrivateMain.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { useDrop } from "react-dnd";
-import FolderListWithDnD from "../FolderListWithDnD.jsx";
+import FolderListWithDnD from "./FolderListWithDnD.jsx";
 import UploadPopup from "../common/UploadPopup.jsx";
 import {
   fetchPrivateFolder,
