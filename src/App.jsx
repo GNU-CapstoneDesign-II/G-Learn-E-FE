@@ -18,18 +18,19 @@ function App() {
     <Routes>
       {/* 토큰 없을 때만 접근 가능한 라우트 */}
       <Route element={<PublicRoute />}>
-        <Route path="/login"         element={<Login />} />
-        <Route path="/signup"        element={<SignUp />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
         <Route path="/find-password" element={<FindPassword />} />
       </Route>
 
       {/* 토큰 있어야만 접근 가능한 라우트 */}
       <Route element={<ProtectedRoute />}>
         <Route path="/solve/:workbookId" element={<WorkbookSolve />} />
-        <Route path="/generate-problem"  element={<ProblemGenerator />} />
-        <Route path="/folder"            element={<FolderPage />} />
-        <Route path="/ranking"           element={<Ranking />} />
-        <Route path="/mypage"            element={<Mypage />} />
+        <Route path="/generate-problem" element={<ProblemGenerator />} />
+        <Route path="/folder" element={<FolderPage />} />
+        <Route path="/ranking" element={<Ranking />} />
+        <Route path="/mypage" element={<Mypage />} />
+      
       </Route>
 
       {/* 그 외 리디렉트 */}
