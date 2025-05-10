@@ -33,6 +33,7 @@ export default function FolderListWithDnD({
   const navigate = useNavigate();
   const isRoot = selectedFolder.parentId == null;
 
+
   return (
     <>
       {/* 상단 툴바 영역 */}
@@ -65,7 +66,15 @@ export default function FolderListWithDnD({
           {isSelectMode && (
             <>
               <button onClick={onUpload} className="bg-[#AC957B] text-white px-3 py-1 rounded hover:bg-[#5F360A] transition-colors">업로드</button>
-              <button onClick={() => navigate("/merge", { state: { ids: selectedItems } })} className="bg-[#AC957B] text-white px-3 py-1 rounded hover:bg-[#5F360A] transition-colors">합치기</button>
+              <button
+                onClick={() =>
+                  navigate('/merge', { state: { ids: selectedItems } })
+                }
+                className="bg-[#AC957B] text-white px-3 py-1 rounded hover:bg-[#5F360A] transition-colors"
+              >
+                합치기
+              </button>
+
               <span>{selectedItems.length}개 선택</span>
             </>
           )}

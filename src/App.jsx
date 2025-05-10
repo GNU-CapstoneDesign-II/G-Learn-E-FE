@@ -10,6 +10,7 @@ import ProblemGenerator from "./pages/ProblemGenerator.jsx";
 import FolderPage from "./pages/FolderPage.jsx";
 import Ranking from "./pages/Ranking.jsx";
 import Mypage from './pages/MyPage.jsx';
+import WorkbookEdit from './pages/WorkbookEdit.jsx';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
       <Route path="/folder" element={<FolderPage />} />
       <Route path="/ranking" element={<Ranking />} />
       <Route path="/mypage" element={<Mypage />} />
+      <Route path="/merge" element={<WorkbookEdit />} />
     </Routes>
   );
 }
