@@ -12,7 +12,16 @@ const instance = axios.create({
 });
 
 const AUTH_REQUIRED_PREFIXES = ["/api/"];
-const AUTH_EXCLUDE_URLS = ["/api/auth/login", "/api/auth/signup", "/api/auth/email-code", "/api/auth/email-code/verify"];
+const AUTH_EXCLUDE_URLS = [
+    "/api/auth/login",
+    "/api/auth/signup",
+    "/api/auth/email-code",
+    "/api/auth/email-code/verify",
+
+    "/api/auth/password-reset-code",
+    "/api/auth/password-reset-code/verify",
+    "/api/auth/password/reset",
+];
 
 instance.interceptors.request.use((config) => {
     const token = getAccessToken();
