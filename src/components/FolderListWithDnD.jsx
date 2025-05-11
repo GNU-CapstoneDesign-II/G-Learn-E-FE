@@ -73,7 +73,9 @@ export default function FolderListWithDnD({
   };
 
   const handleEditContext = () => {
-    navigate(`/edit/${ctxMenu.id}`);
+    if (ctxMenu.type === ItemTypes.WORKBOOK) {
+      navigate(`/edit/${ctxMenu.id}`);
+    }
     closeContextMenu();
   };
 
