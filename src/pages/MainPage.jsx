@@ -4,7 +4,6 @@ import logoImage from "../assets/image-logo.png";
 import textLogoImage from "../assets/text-logo.png";
 import Navbar from "../components/Navbar.jsx";
 
-
 export default function MainPage() {
   const sectionWrapper = "min-h-[80vh] py-10 w-full flex items-center";
 
@@ -42,10 +41,10 @@ export default function MainPage() {
   return (
     <>
       <Navbar />
-      <div className="font-sans text-darkbrown h-screen">
+      <div className="pt-[65px] font-sans text-darkbrown h-screen">
         {/* Hero Section */}
         <section className={`${sectionWrapper} bg-white`}>
-          <div className="max-w-[1200px] mx-auto flex items-center justify-between gap-12 px-4 md:px-6">
+          <div className="max-w-[1200px] mx-auto flex items-center justify-between gap-12 px-4 md:px-8">
             <div className="flex-1 text-left">
               <motion.div
                 initial="hidden"
@@ -77,11 +76,13 @@ export default function MainPage() {
               </p>
             </div>
 
-            <img
-              src={logoImage}
-              alt="G-Learn-E 로고"
-              className="flex-1 w-3/4 md:w-full max-w-[400px]"
-            />
+            <div className="flex-1 flex justify-center">
+              <img
+                src={logoImage}
+                alt="G-Learn-E 로고"
+                className="w-full max-w-[400px] h-auto"
+              />
+            </div>
           </div>
         </section>
 
@@ -90,7 +91,7 @@ export default function MainPage() {
           className={sectionWrapper}
           style={{
             background:
-              "radial-gradient(circle at center, rgba(225,200,180,0.8) 0%, rgba(243,233,220,0.5) 70%)",
+              "radial-gradient(circle at center, rgba(225,190,160,0.75) 0%, rgba(243,233,220,0.5) 70%)",
           }}
         >
           <div className="max-w-[960px] mx-auto px-4 text-center">
@@ -98,7 +99,7 @@ export default function MainPage() {
               {...fadeWithDelay(0.2)}
               src={textLogoImage}
               alt="G-Learn-E"
-              className="mx-auto mb-6 w-3/4 md:w-auto"
+              className="mx-auto mb-6 w-full max-w-[700px] h-auto"
             />
             <motion.p {...fadeWithDelay(0.3)} className="text-xl md:text-2xl text-darkbrown font-medium mb-4">
               지런이는 경상국립대학교 학생들을 위한 맞춤형 학습 플랫폼입니다.
@@ -117,8 +118,8 @@ export default function MainPage() {
         </section>
 
         {/* 인용 섹션 1 */}
-        <section className={`${sectionWrapper} bg-white pl-4 md:pl-16`}>
-          <div className="w-full max-w-[960px] px-4 text-left">
+        <section className={`${sectionWrapper} bg-white px-4 md:px-16`}>
+          <div className="w-full max-w-[960px] text-left">
             <div className="border-l-4 border-darkbrown">
               <div className="border-l-2 border-darkbrown/30 pl-4 mb-8">
                 <motion.p {...fadeWithDelay(0.2)} className="text-3xl md:text-5xl font-semibold text-darkbrown leading-snug md:leading-[4rem]">
@@ -135,8 +136,8 @@ export default function MainPage() {
         </section>
 
         {/* 인용 섹션 2 */}
-        <section className={`${sectionWrapper} bg-[rgba(243,233,220,0.5)] justify-end pr-4 md:pr-16`}>
-          <div className="w-full max-w-[960px] px-4 text-right">
+        <section className={`${sectionWrapper} bg-[rgba(243,233,220,0.5)] justify-end px-4 md:px-16`}>
+          <div className="w-full max-w-[960px] text-right">
             <div className="border-r-4 border-darkbrown">
               <div className="border-r-2 border-darkbrown/30 pr-4 mb-8">
                 <motion.p {...fadeWithDelay(0.2)} className="text-3xl md:text-5xl font-semibold text-darkbrown leading-snug md:leading-[4rem]">
@@ -159,7 +160,7 @@ export default function MainPage() {
             <div className="flex justify-between items-center">
               <p className="text-xs md:text-sm">경상국립대학교 컴퓨터공학과 전공종합설계 PBL</p>
               <button onClick={scrollToTop} type="button" className="flex items-center space-x-1 text-sm md:text-base">
-                <span>Back Top</span><span className="text-lg">︿</span>
+                <span>Back Top ︿</span>
               </button>
             </div>
             <div className="flex justify-between items-center">

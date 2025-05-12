@@ -1,16 +1,24 @@
 import React, { useReducer, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import styles from "./LeftSidebar.module.css";
 import {
     getColleges,
     getDepartments,
     getSubjects,
     getGeneralSubjects,
-} from "../api/Workbook";
+} from "../api/Workbook.js";
 
+// 📌 고정 데이터
 const generalCategories = ["인문", "자연", "사회"];
 const years = ["1학년", "2학년", "3학년", "4학년"];
 
-const initialState = { main: "", sub: "", year: "", subject: "" };
+// 📌 초기 상태
+const initialState = {
+    main: "",
+    sub: "",
+    year: "",
+    subject: "",
+};
 
 function reducer(state, action) {
     switch (action.type) {
@@ -27,43 +35,55 @@ function reducer(state, action) {
     }
 }
 
+
 export default function LeftSidebar() {
     const [state, dispatch] = useReducer(reducer, initialState);
     const [selectedTab, setSelectedTab] = useState("private");
+
     const [colleges, setColleges] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [subjects, setSubjects] = useState([]);
+
     const navigate = useNavigate();
 
     const isGeneral = state.main === "교양";
 
+    // ✅ "교양" 항목 중복 방지를 위해 colleges에서 제거
     const filteredColleges = Array.isArray(colleges)
         ? colleges.filter((college) => college.name !== "교양")
         : [];
 
+    // 👉 단과대학 목록 불러오기
     useEffect(() => {
-        getColleges().then((res) => setColleges(res.data.data)).catch(console.error);
+        getColleges()
+            .then((res) => setColleges(res.data.data))
+            .catch(console.error);
     }, []);
 
+    // 👉 학과 목록 불러오기
     useEffect(() => {
         if (!state.main) return;
-        if (isGeneral) setDepartments([]);
-        else {
+
+        if (isGeneral) {
+            setDepartments([]); // 교양일 경우 영역만 사용
+        } else {
             getDepartments(state.main)
                 .then((res) => setDepartments(res.data.data))
                 .catch(console.error);
         }
     }, [state.main]);
 
+    // 👉 과목 목록 불러오기
     useEffect(() => {
         if (!state.sub) return;
+
         const fetchSubjects = async () => {
             try {
                 if (isGeneral) {
                     const res = await getGeneralSubjects(state.sub);
                     setSubjects(res.data.data);
                 } else {
-                    const res = await getSubjects(state.sub);
+                    const res = await getSubjects(state.sub); // ✅ 학과 id만 넘김
                     setSubjects(res.data.data);
                 }
             } catch (err) {
@@ -71,81 +91,60 @@ export default function LeftSidebar() {
                 setSubjects([]);
             }
         };
+
         fetchSubjects();
     }, [state.sub, state.main]);
 
     const handleTabClick = (tab) => {
         setSelectedTab(tab);
-        navigate(`/${tab}`);
+        navigate(`/${tab}`); // ✅ 페이지 이동 처리
     };
 
     return (
-        <div className="fixed top-[60px] left-0 w-[200px] h-[calc(100vh-60px)] border-r border-[#E6CEBA] pr-4 bg-white flex flex-col gap-2 text-[#5f360a] text-sm z-10">
-            {/* 탭 버튼 */}
-            <div className="pt-12 flex flex-col gap-2 ">
-
-                {/* 👤 Private 버튼 */}
+        <div className={styles["sidebar-filter"]}>
+            <div className={styles["tab-toggle"]}>
                 <button
-                    onClick={() => handleTabClick("private")}
-                    className={`relative flex items-center gap-2 px-4 py-2 rounded-r-full ${selectedTab === "private" ? "bg-[#f8f1e7]" : ""
-                        }`}
+                    className={selectedTab === "private" ? styles.active : ""}
+                    onClick={() => handleTabClick("private")} // ✅ 변경
                 >
-                    {/* 세로 이중 줄 (버튼 안에 조건부 렌더링) */}
-                    {selectedTab === "private" && (
-                        <div className="absolute left-0 top-0 h-full w-[6px]">
-                            <div className="absolute left-0 top-0 h-full w-[2px] bg-[#5F360A]" />
-                            <div className="absolute left-[2px] top-0 h-full w-[2px] bg-[#CCBEAE]" />
-                        </div>
-                    )}
-                    <span role="img" aria-label="private">👤</span> private
+                    <span>👤</span> private
                 </button>
-
-                {/* 🧑‍🤝‍🧑 Public 버튼 */}
+                <div />
                 <button
-                    onClick={() => handleTabClick("public")}
-                    className={`relative flex items-center gap-2 px-4 py-2 rounded-r-full ${selectedTab === "public" ? "bg-[#f8f1e7]" : ""
-                        }`}
+                    className={selectedTab === "public" ? styles.active : ""}
+                    onClick={() => handleTabClick("public")} // ✅ 변경
                 >
-                    {selectedTab === "public" && (
-                        <div className="absolute left-0 top-0 h-full w-[6px]">
-                            <div className="absolute left-0 top-0 h-full w-[2px] bg-[#5F360A]" />
-                            <div className="absolute left-[2px] top-0 h-full w-[2px] bg-[#CCBEAE]" />
-                        </div>
-                    )}
-                    <span role="img" aria-label="public">🧑‍🤝‍🧑</span> public
+                    <span>🧑‍🤝‍🧑</span> public
                 </button>
-
             </div>
-
-
-            {/* 필터 영역 (public 전용) */}
             {selectedTab === "public" && (
-                <div className="bg-[#f8f1e7] rounded-xl px-4 py-3 mt-4 flex flex-col gap-2">
-                    {/* 교양/대학 */}
-                    <div className="relative">
+                <>
+                    <h3 className={styles["menu-title"]}>public</h3>
+
+                    <div className={styles["custom-select-wrapper"]}>
                         <select
+                            className={styles["custom-select"]}
                             value={state.main}
                             onChange={(e) => dispatch({ type: "SET_MAIN", value: e.target.value })}
-                            className="w-full border px-3 py-1 rounded text-sm appearance-none"
+                            required
                         >
                             <option value="" disabled>교양/대학</option>
-                            <option value="교양">교양</option>
+                            <option value="교양">교양</option> {/* ✅ 직접 고정 추가 */}
                             {filteredColleges.map((college) => (
                                 <option key={college.id} value={college.id}>
                                     {college.name}
                                 </option>
                             ))}
                         </select>
-                        <span className="absolute right-2 top-1/2 -translate-y-1 text-xs">▾</span>
+                        <span className={styles["custom-arrow"]}>▾</span>
                     </div>
 
-                    {/* 영역/학과 */}
                     {state.main && (
-                        <div className="relative">
+                        <div className={styles["custom-select-wrapper"]}>
                             <select
+                                className={styles["custom-select"]}
                                 value={state.sub}
                                 onChange={(e) => dispatch({ type: "SET_SUB", value: e.target.value })}
-                                className="w-full border px-3 py-1 rounded text-sm appearance-none"
                             >
                                 <option value="" disabled>{isGeneral ? "영역" : "학과"}</option>
                                 {(isGeneral ? generalCategories : departments).map((item) => (
@@ -153,35 +152,34 @@ export default function LeftSidebar() {
                                         {isGeneral ? item : item.departmentName}
                                     </option>
                                 ))}
+
                             </select>
-                            <span className="absolute right-2 top-1/2 -translate-y-1 text-xs">▾</span>
+                            <span className={styles["custom-arrow"]}>▾</span>
                         </div>
                     )}
 
-                    {/* 학년 */}
                     {!isGeneral && state.sub && (
-                        <div className="relative">
+                        <div className={styles["custom-select-wrapper"]}>
                             <select
+                                className={styles["custom-select"]}
                                 value={state.year}
                                 onChange={(e) => dispatch({ type: "SET_YEAR", value: e.target.value })}
-                                className="w-full border px-3 py-1 rounded text-sm appearance-none"
                             >
                                 <option value="" disabled>학년</option>
                                 {years.map((year) => (
                                     <option key={year} value={year}>{year}</option>
                                 ))}
                             </select>
-                            <span className="absolute right-2 top-1/2 -translate-y-1 text-xs">▾</span>
+                            <span className={styles["custom-arrow"]}>▾</span>
                         </div>
                     )}
 
-                    {/* 과목 */}
                     {state.sub && (
-                        <div className="relative">
+                        <div className={styles["custom-select-wrapper"]}>
                             <select
+                                className={styles["custom-select"]}
                                 value={state.subject}
                                 onChange={(e) => dispatch({ type: "SET_SUBJECT", value: e.target.value })}
-                                className="w-full border px-3 py-1 rounded text-sm appearance-none"
                             >
                                 <option value="" disabled>과목명</option>
                                 {subjects.map((subject) => (
@@ -190,15 +188,13 @@ export default function LeftSidebar() {
                                     </option>
                                 ))}
                             </select>
-                            <span className="absolute right-2 top-1/2 -translate-y-1 text-xs">▾</span>
+                            <span className={styles["custom-arrow"]}>▾</span>
                         </div>
                     )}
 
-                    <button className="bg-[#5f360a] text-white text-sm px-4 py-1 rounded mt-2">
-                        검색
-                    </button>
-                </div>
+                    <button className={styles["search-button"]}>검색</button>
+                </>
             )}
         </div>
     );
-}
+};

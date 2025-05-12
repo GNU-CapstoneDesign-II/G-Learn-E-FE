@@ -6,7 +6,7 @@ import {
     saveSolveLog,
     gradeWorkbook,
     resetSolveLog,
-} from '../api/workbookApi';
+} from '../api/problemSolveApi';
 import ProblemCard from '../components/problem/ProblemCard';
 import ProblemNavbar from '../components/problem/ProblemNavbar';
 import ConfirmModal from '../components/common/ConfirmModal';
@@ -18,6 +18,7 @@ export default function WorkbookSolve() {
     const [showConfirm, setShowConfirm] = useState(false);
     const { workbookId } = useParams();
     const hasFetched = useRef(false); // 중복 요청 방지용
+    const [layoutMode, setLayoutMode] = useState('grid'); // 보기 방식
 
     useEffect(() => {
         if (hasFetched.current) return;
@@ -111,9 +112,10 @@ export default function WorkbookSolve() {
         }
     };
 
+    const itemsPerRow = layoutMode === 'grid' ? 2 : 1;
     const chunkedProblems = [];
-    for (let i = 0; i < problems.length; i += 2) {
-        chunkedProblems.push(problems.slice(i, i + 2));
+    for (let i = 0; i < problems.length; i += itemsPerRow) {
+        chunkedProblems.push(problems.slice(i, i + itemsPerRow));
     }
 
     return (
@@ -123,6 +125,8 @@ export default function WorkbookSolve() {
                 onGrade={handleGrade}
                 onReset={handleReset}
                 isSolved={workbook?.isSolved}
+                layoutMode={layoutMode}
+                onLayoutChange={setLayoutMode}
             />
 
             {loading && (
@@ -141,9 +145,9 @@ export default function WorkbookSolve() {
 
             <div className="px-4 py-8">
                 <div className="max-w-6xl mx-auto">
-                    <h1 className="text-2xl font-bold text-[#5c4033] mb-8">
+                    {/* <h1 className="text-2xl font-bold text-[#5c4033] mb-8">
                         문제집: {workbook?.name}
-                    </h1>
+                    </h1> */}
                     {workbook?.isSolved && (
                         <div className="mb-6 text-[#5c4033] text-base font-medium">
                             <span className="text-green-600 font-semibold">정답 {workbook.correctCount}</span>{' '}
@@ -155,9 +159,13 @@ export default function WorkbookSolve() {
                     )}
 
                     <div className="space-y-6">
-                        {chunkedProblems.map((pair, idx) => (
-                            <div key={idx} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {pair.map((p, i) => {
+                        {chunkedProblems.map((row, idx) => (
+                            <div
+                                key={idx}
+                                // list 모드면 1열, grid 모드면 md:2열
+                                className={`grid grid-cols-1 ${layoutMode === 'grid' ? 'md:grid-cols-2' : ''} gap-6`}
+                            >
+                                {row.map((p, i) => {
                                     const isCorrect = p.userAttempt?.isCorrect;
                                     const borderColor =
                                         workbook?.isSolved
@@ -180,7 +188,7 @@ export default function WorkbookSolve() {
                                         </div>
                                     );
                                 })}
-                                {pair.length === 1 && (
+                                {row.length < itemsPerRow && (
                                     <div className="bg-gray-100 rounded-2xl border border-dashed border-gray-300 p-6 h-fit" />
                                 )}
                             </div>

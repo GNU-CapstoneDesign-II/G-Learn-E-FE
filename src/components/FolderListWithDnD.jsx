@@ -53,9 +53,10 @@ export default function FolderListWithDnD({
               onChange={(e) => onSortChange(e.target.value)}
               className="appearance-none border px-3 py-1 pr-6 rounded text-sm"
             >
-              <option value="최신순">최신순</option>
-              <option value="오래된순">오래된순</option>
-              <option value="업로드순">업로드순</option>
+              <option value="name">이름</option>
+              <option value="recentUse">최근 사용일</option>
+              <option value="createdAt">추가된 날짜</option>
+              <option value="modifiedAt">수정일</option>
             </select>
             <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs">▼</span>
           </div>
@@ -87,8 +88,6 @@ export default function FolderListWithDnD({
           />
         ))}
 
-        <AddFolderCard onClick={onAddFolder} />
-
         {workbooks.map((wb) => (
           <WorkbookItem
             key={wb.id}
@@ -102,6 +101,8 @@ export default function FolderListWithDnD({
             onRename={onRenameWorkbook}
           />
         ))}
+
+        <AddFolderCard onClick={onAddFolder} />
       </div>
     </>
   );

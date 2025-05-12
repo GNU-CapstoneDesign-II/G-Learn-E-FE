@@ -1,53 +1,108 @@
-// src/api/workbookApi.js
-// 문제 풀이 aPI
-import axios from "./axiosInstance";
+import axios from './axiosInstance';
 
+// 👉 단과대/교양 목록 가져오기
+export const getColleges = () => {
+  return axios.get("/api/folder/public/colleges");
+};
 
-export const fetchWorkbook = async (workbookId) => {
-    const res = await axios.get(`/api/workbook/${workbookId}/solve`);
-    return res.data.data;
+// 👉 특정 단과대학의 학과 목록 가져오기 or 교양이라면 교양 과목 목록 가져오기
+export const getDepartments = (collegeId) => {
+  return axios.get(`/api/folder/public/departments/${collegeId}`);
+};
+
+// 👉 특정 학과의 과목 목록 가져오기
+export const getSubjects = (departmentId) => {
+  return axios.get(`/api/folder/public/subjects/${departmentId}`);
+};
+
+// 👉 교양 영역 과목 가져오기 (만약 별도 처리 필요 시)
+export const getGeneralSubjects = (category) => {
+  return axios.get(`/api/folder/public/subjects/${category}`);
+};
+
+export const uploadWorkbook = (workbookId, collegeId, departmentId, subjectId) => {
+  return axios.post(
+    `/api/workbook/${workbookId}/upload`,
+    { collegeId, departmentId, subjectId },            // ← 객체 형태로
+  );
 };
 
 
 /**
- * 임시 저장 API
- * @param {string|number} workbookId - 문제집 ID
- * @param {Array} userAttempts - [{ problemId: number, submitAnswer: string[] }]
- * @param {string} token - 사용자 인증 토큰
- * @returns {Promise<any>}
+ * 워크북 생성 요청
+ *
+ * @param {string} summaryText
+ * @param {File|null} pdfFile
+ * @param {File|null} audioFile
+ * @param {string[]} selectedTypes
+ * @param {object} typeOptions
+ * @param {string} difficulty
+ * @returns {Promise<number>} 새로 생성된 workbook ID
  */
-export const saveSolveLog = async (workbookId, userAttempts) => {
-    const res = await axios.patch(
-        `/api/solve-log/workbook/${workbookId}`,
-        { userAttempts }
-    );
-    return res.data;
-};
+export async function generateWorkbook({
+  summaryText,
+  pdfFile = null,
+  audioFile = null,
+  selectedTypes,
+  typeOptions,
+  difficulty
+}) {
+  const formData = new FormData();
 
+  // content
+  formData.append('content.summaryText', summaryText);
+  if (pdfFile) formData.append('content.pdfFile', pdfFile);
+  if (audioFile) formData.append('content.audioFile', audioFile);
 
-/**
- * 채점 API
- * @param {string|number} workbookId - 문제집 ID
- * @param {Array} userAttempts - [{ problemId: number, submitAnswer: string[] }]
- * @param {string} token - 사용자 인증 토큰
- * @returns {Promise<any>}
- */
-export const gradeWorkbook = async (workbookId, userAttempts) => {
-    console.log(userAttempts);
-    const res = await axios.post(
-        `/api/workbook/${workbookId}/grade`,
-        { userAttempts }
-    );
-    return res.data;
-};
+  // difficulty
+  formData.append('difficulty', difficulty);
 
-/**
- * 채점 결과 삭제 API
- * @param {string|number} workbookId - 문제집 ID
- * @param {string} token - 사용자 인증 토큰
- * @returns {Promise<any>}
- */
-export const resetSolveLog = async (workbookId) => {
-    const res = await axios.delete(`/api/solve-log/workbook/${workbookId}`);
-    return res.data;
-};
+  // questionTypes
+  const q = {
+    multipleChoice: {
+      enable: selectedTypes.includes('객관식'),
+      numQuestions:
+        typeOptions['객관식'].questionCount === 'custom'
+          ? Number(typeOptions['객관식'].customQuestionCount) || 0
+          : Number(typeOptions['객관식'].questionCount),
+      numOptions: typeOptions['객관식'].optionCount
+    },
+    ox: {
+      enable: selectedTypes.includes('O/X 퀴즈'),
+      numQuestions:
+        typeOptions['O/X 퀴즈'].questionCount === 'custom'
+          ? Number(typeOptions['O/X 퀴즈'].customQuestionCount) || 0
+          : Number(typeOptions['O/X 퀴즈'].questionCount)
+    },
+    fillInTheBlank: {
+      enable: selectedTypes.includes('빈칸 채우기'),
+      numQuestions:
+        typeOptions['빈칸 채우기'].questionCount === 'custom'
+          ? Number(typeOptions['빈칸 채우기'].customQuestionCount) || 0
+          : Number(typeOptions['빈칸 채우기'].questionCount)
+    },
+    descriptive: {
+      enable: selectedTypes.includes('주관식'),
+      numQuestions:
+        typeOptions['주관식'].questionCount === 'custom'
+          ? Number(typeOptions['주관식'].customQuestionCount) || 0
+          : Number(typeOptions['주관식'].questionCount)
+    }
+  };
+
+  Object.entries(q).forEach(([key, val]) => {
+    formData.append(`questionTypes.${key}.enable`, String(val.enable));
+    formData.append(`questionTypes.${key}.numQuestions`, String(val.numQuestions));
+    if (key === 'multipleChoice') {
+      formData.append(`questionTypes.${key}.numOptions`, String(val.numOptions));
+    }
+  });
+
+  const { data } = await axios.post(
+    '/api/workbook/generate',
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } }
+  );
+  console.log(data);
+  return data.data.id;
+}
