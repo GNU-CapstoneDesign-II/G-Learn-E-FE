@@ -149,7 +149,7 @@ const ProblemGenerator = () => {
       <div className="pt-[65px] font-['Noto Sans KR'] box-border">
         <div className="bg-[rgba(243,233,220,0.5)] h-[260px] flex items-center justify-center text-center">
           <div className="flex flex-col items-center gap-10 px-4 md:px-6">
-            <h2 className="text-lg md:text-xl text-brown m-0">
+            <h2 className="text-xl md:text-2xl text-brown m-0">
               내용 입력 및 문제 유형을 선택한 후 문제를 생성해보세요!
             </h2>
             <div className="flex gap-[24px]">
