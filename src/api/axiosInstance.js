@@ -4,6 +4,7 @@ import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "../util
 
 // 백엔드 API 주소 (직접 명시)
 const BASE_URL = "http://3.39.155.100:8080";
+// const BASE_URL = "http://localhost:8080";
 
 const instance = axios.create({
     baseURL: BASE_URL,
@@ -11,7 +12,16 @@ const instance = axios.create({
 });
 
 const AUTH_REQUIRED_PREFIXES = ["/api/"];
-const AUTH_EXCLUDE_URLS = ["/api/auth/login", "/api/auth/signup", "/api/auth/email-code", "/api/auth/email-code/verify"];
+const AUTH_EXCLUDE_URLS = [
+    "/api/auth/login",
+    "/api/auth/signup",
+    "/api/auth/email-code",
+    "/api/auth/email-code/verify",
+
+    "/api/auth/password-reset-code",
+    "/api/auth/password-reset-code/verify",
+    "/api/auth/password/reset",
+];
 
 instance.interceptors.request.use((config) => {
     const token = getAccessToken();
