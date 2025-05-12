@@ -1,6 +1,3 @@
-/* ──────────────────────────────────────────────────────────────
-   src/components/LeftSidebar.jsx
-────────────────────────────────────────────────────────────── */
 import React, { useReducer, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -83,7 +80,7 @@ export default function LeftSidebar() {
     };
 
     return (
-        <div className="fixed mt-[65px] left-0 w-[200px] h-[calc(100vh-60px)] border-r border-[#E6CEBA] pr-4 bg-white flex flex-col gap-2 text-[#5f360a] text-sm z-10">
+        <div className="fixed top-[60px] left-0 w-[200px] h-[calc(100vh-60px)] border-r border-[#E6CEBA] pr-4 bg-white flex flex-col gap-2 text-[#5f360a] text-sm z-10">
             {/* 탭 버튼 */}
             <div className="pt-12 flex flex-col gap-2 ">
 
