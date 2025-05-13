@@ -9,7 +9,7 @@ import { changePassword } from "../../api/authApi.js";
 import LevelIcon from "../common/LevelIcon.jsx";
 
 import arrow from "../../assets/dropbox_arrow.png";
-import ConfirmModal from "../common/ConfirmModal.jsx";
+import ConfirmPopup from "../common/ConfirmPopup.jsx";
 import InformationPopup from "../common/InformationPopup.jsx";
 
 
@@ -175,7 +175,7 @@ export default function MyPageInfo() {
     return (
         <div className="bg-white rounded-3xl shadow-lg p-8 md:p-12 relative">
             {showConfirm && (
-                <ConfirmModal
+                <ConfirmPopup
                     message="변경 사항을 저장하시겠습니까?"
                     onCancel={() => setShowConfirm(false)}
                     onConfirm={handleConfirmSave}
