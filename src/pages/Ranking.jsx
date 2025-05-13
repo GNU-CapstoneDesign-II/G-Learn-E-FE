@@ -35,7 +35,7 @@ const Ranking = () => {
     <div>
       <Navbar />
 
-      <div className="relative min-h-screen w-screen bg-[rgba(243,233,220,0.5)] pt-24 p-10">
+      <div className="relative min-h-screen w-screen bg-[rgba(243,233,220,0.5)] pt-[65px]">
         
         {/* ✅ 배경 로고 */}
         <img

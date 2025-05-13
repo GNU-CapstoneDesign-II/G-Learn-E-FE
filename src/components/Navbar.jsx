@@ -5,6 +5,7 @@ import logoImage from "../assets/logo.png";
 import statIcon1 from "../assets/statistic1.png";
 import levelIcon from "../assets/Level_Icon/level_0to10.png";
 import { useAuth } from "../contexts/AuthContext";
+import LevelIcon from "./common/LevelIcon";
 
 function Navbar() {
   const { user, loading, logout } = useAuth();
@@ -69,7 +70,7 @@ function Navbar() {
                 onClick={() => setDropdownOpen((prev) => !prev)}
                 className="flex items-center gap-2"
               >
-                <img src={levelIcon} alt="profile" className="w-[50px] h-auto object-contain" />
+                <LevelIcon level={user.level} size={50} />
                 <span className="text-sm text-[#5F360A]">{user.nickname}님</span>
               </button>
 
@@ -77,11 +78,11 @@ function Navbar() {
                 <div className="absolute right-0 mt-3 w-72 bg-white border-4 border-[#e7d6c4] rounded-2xl shadow-lg p-6 z-50">
                   {/* 프로필 헤더 */}
                   <div className="text-center mb-5">
-                    <img src={levelIcon} alt="profile" className="w-[50px] h-auto object-contain mx-auto" />
+                    <LevelIcon level={user.level} size={60}/>
                     <p className="mt-2 font-bold text-[#5F360A]">안녕하세요, {user.nickname}님!</p>
                     {/* 학교·학부 정보는 추후 DB 연동 시 교체 */}
                     <span className="block text-xs text-[#9A7E5F] mt-1">
-                      GNU - IT 공과대학 - 컴퓨터공학부
+                      GNU - {user.college.collegeName} - {user.department.departmentName}
                     </span>
                   </div>
 

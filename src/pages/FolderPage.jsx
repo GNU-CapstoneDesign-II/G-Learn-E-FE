@@ -9,7 +9,7 @@ import {
   getColleges,
   getDepartments,
   getSubjects
-} from "../api/Workbook";
+} from "../api/workbookApi.js";
 
 // ────────────── LeftSidebar (inlined) ──────────────
 const initialFilterState = { main: "", sub: "", year: "", subject: "" };
