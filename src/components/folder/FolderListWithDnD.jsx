@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { useNavigate } from "react-router-dom";
 import Checkbox from "./Checkbox.jsx";
-import { moveWorkbook, moveFolder } from "../api/privateFolderApi.js";
-import ContextMenu from "./common/ContextMenu";
+import { moveWorkbook, moveFolder } from "../../api/privateFolderApi.js";
+import ContextMenu from "../common/ContextMenu";
 
 const ItemTypes = { FOLDER: "folder", WORKBOOK: "workbook" };
 
@@ -34,6 +34,10 @@ export default function FolderListWithDnD({
   const navigate = useNavigate();
   const isRoot = selectedFolder.parentId == null;
 
+  // ⭐️ 공통 높이(1개당 40px)·폭(140px) 기준으로 viewport overflow 방지
+  const MENU_ITEM_HEIGHT = 40;
+  const MENU_WIDTH = 140;
+
   // ContextMenu state
   const [ctxMenu, setCtxMenu] = useState({
     visible: false,
@@ -46,18 +50,27 @@ export default function FolderListWithDnD({
   // 클릭된 카드 바로 위에 메뉴를 띄우도록 위치 계산
   const handleContextMenu = (e, type, id) => {
     e.preventDefault();
-    const rect = e.currentTarget.getBoundingClientRect();
-    const menuHeight = 48; // ContextMenu 높이에 맞춰 조절
-    const offsetX = 0;     // 필요시 조정
-    const offsetY = 4;     // 카드와 메뉴 사이 띄울 간격
 
-    setCtxMenu({
-      visible: true,
-      x: rect.left + offsetX,
-      y: rect.top - menuHeight - offsetY,
-      type,
-      id,
-    });
+    const itemCount = type === ItemTypes.WORKBOOK ? 3 : 2; // 편집 메뉴 유무
+    const menuHeight = itemCount * MENU_ITEM_HEIGHT;
+
+    /* 1) 기본 위치 = 클릭 지점 바로 옆 */
+    let x = e.clientX + 2;   // ↘︎ 살짝 떨어뜨림
+    let y = e.clientY + 2;
+
+    /* 2) 오른쪽·아래쪽으로 넘치면 좌/위쪽으로 보정 */
+    if (x + MENU_WIDTH > window.innerWidth) {
+      x = e.clientX - MENU_WIDTH - 2;
+    }
+    if (y + menuHeight > window.innerHeight) {
+      y = e.clientY - menuHeight - 2;
+    }
+
+    /* 3) 최종 보정 (드물게 음수 좌표 방지) */
+    if (x < 0) x = 8;
+    if (y < 0) y = 8;
+
+    setCtxMenu({ visible: true, x, y, type, id });
   };
 
   const closeContextMenu = () =>
@@ -79,10 +92,37 @@ export default function FolderListWithDnD({
     closeContextMenu();
   };
 
+  const handleDeleteContext = () => {
+    ctxMenu.type === ItemTypes.FOLDER
+      ? onDeleteFolder(ctxMenu.id)
+      : onDeleteWorkbook(ctxMenu.id);
+    closeContextMenu();
+  };
+
+  const [{ isOver, canDrop }, dropToParent] = useDrop({
+    accept: [ItemTypes.FOLDER, ItemTypes.WORKBOOK],
+    drop: (item, monitor) => {
+      // 부모 폴더가 없으면 무시
+      if (selectedFolder.parentId == null) return;
+      // 종류에 따라 API 호출
+      const mover =
+        monitor.getItemType() === ItemTypes.FOLDER
+          ? moveFolder
+          : moveWorkbook;
+      mover(item.id, selectedFolder.parentId).then(onRefresh);
+    },
+    collect: monitor => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop()
+    })
+  });
+
   return (
     <>
       {/* 상단 툴바 영역 */}
-      <header className="fixed top-[66px] left-[200px] w-[calc(100%-200px)] flex items-center justify-between px-6 py-3 border-b border-[#e5d5c5] bg-[#fdf9f4] z-30">
+      <header
+        ref={dropToParent}
+        className="fixed top-[66px] left-[200px] w-[calc(100%-200px)] flex items-center justify-between px-6 py-3 border-b border-[#e5d5c5] bg-[#fdf9f4] z-30 hover:bg-[#f0ede8] transition-colors">
         <div className="flex items-center gap-3">
           {!isRoot && (
             <button onClick={onBack} className="text-xl text-[#5f360a] hover:opacity-70">
@@ -90,8 +130,15 @@ export default function FolderListWithDnD({
             </button>
           )}
           <h2 className="text-lg font-semibold text-[#5f360a]">
-            {selectedFolder.name}
+            <span>{selectedFolder.name}</span>
+
+            { (isOver || canDrop) && (!isRoot) && (
+              <span className="ml-5 px-2 py-1 bg-[#AC957B] text-white text-xs rounded">
+                상위 폴더로 이동
+              </span>
+            )}
           </h2>
+
         </div>
         <div className="flex items-center gap-3 text-sm text-[#5f360a]">
           {/* 정렬 드롭다운 */}
@@ -173,9 +220,13 @@ export default function FolderListWithDnD({
         <ContextMenu
           x={ctxMenu.x}
           y={ctxMenu.y}
+          /* ⭐️ 항목을 종류별로 분기 */
           options={[
-            { label: "파일명 변경", onClick: handleRenameContext },
-            { label: "편집", onClick: handleEditContext },
+            { label: "이름 변경", onClick: handleRenameContext },
+            ...(ctxMenu.type === ItemTypes.WORKBOOK
+              ? [{ label: "문제집 편집", onClick: handleEditContext }]
+              : []),
+            { label: "삭제", onClick: handleDeleteContext },
           ]}
           onClose={closeContextMenu}
         />
@@ -197,6 +248,7 @@ function FolderItem({
   const [, drop] = useDrop({
     accept: [ItemTypes.FOLDER, ItemTypes.WORKBOOK],
     drop: (item, monitor) => {
+      if(item.id === folder.id) return; // 자기 자신으로 드롭 방지
       const mover =
         monitor.getItemType() === ItemTypes.FOLDER ? moveFolder : moveWorkbook;
       mover(item.id, folder.id).then(onRefresh);
@@ -216,17 +268,6 @@ function FolderItem({
       onDoubleClick={handleRename}
       onContextMenu={onContextMenu}
     >
-      <button
-        onClick={e => {
-          e.stopPropagation();
-          onDelete(folder.id);
-        }}
-        className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-        title="삭제"
-      >
-        ×
-      </button>
-
       <div className="relative w-[80px] h-[60px]">
         <div className="absolute top-0 left-0 w-[52px] h-[16px] bg-[#E0CCB3] border border-[#BDA68A] border-b-0 rounded-tl-md rounded-tr-md" />
         <div className="absolute top-[12px] left-0 w-full h-[48px] bg-[#C9A77F] border border-[#BDA68A] rounded-md" />
@@ -300,18 +341,6 @@ function WorkbookItem({
           <Checkbox checked={selected} onChange={() => onSelect(workbook.id)} />
         </div>
       )}
-
-      <button
-        onClick={e => {
-          e.stopPropagation();
-          onDelete(workbook.id);
-        }}
-        className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-        title="삭제"
-      >
-        ×
-      </button>
-
       <div className="relative w-[80px] h-[80px] bg-white border border-[#DACEC0] rounded-lg flex items-center justify-center shadow-sm transition-shadow hover:shadow-md">
         <div className="absolute top-1/2 left-1/2 w-10 h-10 bg-[#F3E9DC] rounded-full transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
           <span className="text-xl text-[#DAC6A6]">📄</span>

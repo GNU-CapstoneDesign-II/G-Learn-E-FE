@@ -9,7 +9,7 @@ import {
 } from '../api/problemSolveApi';
 import ProblemCard from '../components/problem/ProblemCard';
 import ProblemNavbar from '../components/problem/ProblemNavbar';
-import ConfirmModal from '../components/common/ConfirmModal';
+import ConfirmPopup from '../components/common/ConfirmPopup';
 
 export default function WorkbookSolve() {
     const [workbook, setWorkbook] = useState(null);
@@ -136,7 +136,7 @@ export default function WorkbookSolve() {
             )}
 
             {showConfirm && (
-                <ConfirmModal
+                <ConfirmPopup
                     message={'선택한 문제 풀이를 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.'}
                     onCancel={() => setShowConfirm(false)}
                     onConfirm={confirmReset}

@@ -1,4 +1,4 @@
-export default function ConfirmModal({ message, onConfirm, onCancel }) {
+export default function ConfirmPopup({ message, onConfirm, onCancel }) {
     return (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
             <div className="bg-[#fefbf9] border border-[#e9e1d8] rounded-[2rem] shadow-xl px-10 py-8 w-[400px] text-center">
