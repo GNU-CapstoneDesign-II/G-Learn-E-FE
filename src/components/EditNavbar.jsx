@@ -3,21 +3,30 @@ import { useNavigate } from 'react-router-dom';
 import { X, Trash2 } from 'lucide-react';
 import logo from '../assets/logo.png';
 
-const EditNavbar = ({ onSaveClick, onDeleteClick }) => {
+const EditNavbar = ({ onSaveClick, onDeleteClick, isDirty, onNavigateConfirm }) => {
     const navigate = useNavigate();
 
     return (
         <header className="fixed top-0 left-0 w-full h-14 bg-[#FDF8F2] border-b border-[#E9E3DA] z-20 flex items-center justify-between px-4">
             {/* 좌측: 뒤로 가기 */}
             <button
-                onClick={() => navigate(-1)}
+                onClick={() => {
+                    if (!isDirty) navigate(-1);
+                    onNavigateConfirm(() => navigate(-1));
+                }}
                 className="p-2 rounded-full hover:bg-[#E9E3DA] transition"
             >
                 <X size={20} className="text-[#8B623F]" />
             </button>
 
             {/* 중앙: 로고 */}
-            <img src={logo} alt="G-Learn-E" className="h-8 object-contain" />
+            <img
+                src={logo} alt="G-Learn-E" className="h-8 object-contain"
+                onClick={() => {
+                    if (!isDirty) navigate(-1);
+                    onNavigateConfirm(() => navigate(-1));
+                }}
+            />
 
             {/* 우측: 선택 삭제 + 저장 */}
             <div className="flex items-center space-x-3">
