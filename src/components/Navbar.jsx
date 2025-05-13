@@ -2,9 +2,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import logoImage from "../assets/logo.png";
-import statIcon1 from "../assets/statistic1.png";
-import levelIcon from "../assets/Level_Icon/level_0to10.png";
+import statIcon1 from "../assets/statistic.png";
+import FAQ from "../assets/QnA.png"
+import setting from "../assets/setting.png"
+import logoutIcon from "../assets/logout.png"
+import alarm from "../assets/alarm.png"
 import { useAuth } from "../contexts/AuthContext";
+import LevelIcon from "./common/LevelIcon";
 
 function Navbar() {
   const { user, loading, logout } = useAuth();
@@ -57,7 +61,7 @@ function Navbar() {
 
           {/* 🔔 알림 아이콘 */}
           <div className="relative bg-[#f8f1e7] rounded-md p-2 text-[#9A7E5F] text-lg">
-            🔔
+            <img src={alarm} alt="알람 아이콘" className="w-5 h-5 object-contain" />
             <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" />
           </div>
 
@@ -69,7 +73,7 @@ function Navbar() {
                 onClick={() => setDropdownOpen((prev) => !prev)}
                 className="flex items-center gap-2"
               >
-                <img src={levelIcon} alt="profile" className="w-[50px] h-auto object-contain" />
+                <LevelIcon level={user.level} size={45} />
                 <span className="text-sm text-[#5F360A]">{user.nickname}님</span>
               </button>
 
@@ -77,11 +81,11 @@ function Navbar() {
                 <div className="absolute right-0 mt-3 w-72 bg-white border-4 border-[#e7d6c4] rounded-2xl shadow-lg p-6 z-50">
                   {/* 프로필 헤더 */}
                   <div className="text-center mb-5">
-                    <img src={levelIcon} alt="profile" className="w-[50px] h-auto object-contain mx-auto" />
+                    <LevelIcon level={user.level} size={60} />
                     <p className="mt-2 font-bold text-[#5F360A]">안녕하세요, {user.nickname}님!</p>
                     {/* 학교·학부 정보는 추후 DB 연동 시 교체 */}
                     <span className="block text-xs text-[#9A7E5F] mt-1">
-                      GNU - IT 공과대학 - 컴퓨터공학부
+                      GNU - {user.college.collegeName} - {user.department.departmentName}
                     </span>
                   </div>
 
@@ -105,7 +109,8 @@ function Navbar() {
                         className="flex items-center gap-2 hover:bg-[#f8f1e7] rounded-lg p-2"
                         onClick={() => setDropdownOpen(false)}
                       >
-                        ⚙️ Settings
+                        <img src={setting} alt="설정 아이콘" className="w-5 h-5" />
+                        Settings
                       </Link>
                     </li>
                     <li>
@@ -114,15 +119,17 @@ function Navbar() {
                         className="flex items-center gap-2 hover:bg-[#f8f1e7] rounded-lg p-2"
                         onClick={() => setDropdownOpen(false)}
                       >
-                        ❓ FAQ
+                        <img src={FAQ} alt="FAQ 아이콘" className="w-5 h-5" />
+                        FAQ
                       </Link>
                     </li>
                     <li>
                       <button
                         onClick={logout}
-                        className="flex items-center gap-2 text-[#D44747] hover:bg-[#f8f1e7] rounded-lg p-2 w-full"
+                        className="flex items-center gap-2 hover:bg-[#f8f1e7] rounded-lg p-2 w-full"
                       >
-                        🚪 Log Out
+                        <img src={logoutIcon} alt="로그아웃 아이콘" className="w-5 h-5" />
+                        Log Out
                       </button>
                     </li>
                   </ul>

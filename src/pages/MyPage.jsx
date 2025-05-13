@@ -13,12 +13,13 @@ const Mypage = () => {
         // 전체 페이지: 세로 플렉스 & 화면 가득
         <div className="flex flex-col min-h-screen">
             {/* 상단바 */}
-            <header className="h-20 shrink-0 sticky top-0 z-10">
-                <Navbar />
-            </header>
+            <Navbar />
+            {/* <header className="h-20 shrink-0 sticky top-0 z-20">
+                
+            </header> */}
 
             {/* 사이드바 + 메인 */}
-            <div className="flex flex-1"> {/* mt-20 == 80px(상단바 높이) */}
+            <div className="flex flex-1 mt-[65px]"> {/* mt-20 == 80px(상단바 높이) */}
                 <MyPageSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
                 <main className="flex-1 p-8 bg-[#fefbf7] min-h-[calc(100vh-80px)]">

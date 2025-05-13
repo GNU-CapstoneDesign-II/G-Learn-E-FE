@@ -5,6 +5,10 @@ export const getColleges = () => {
   return axios.get("/api/folder/public/colleges");
 };
 
+export const getCollegesWith = (isCollege) => {
+  return axios.get(`/api/folder/public/colleges?isCollege=${isCollege}`);
+};
+
 // 👉 특정 단과대학의 학과 목록 가져오기 or 교양이라면 교양 과목 목록 가져오기
 export const getDepartments = (collegeId) => {
   return axios.get(`/api/folder/public/departments/${collegeId}`);
