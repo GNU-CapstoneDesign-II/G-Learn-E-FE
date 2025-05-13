@@ -1,16 +1,22 @@
 // src/pages/Ranking.jsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import {
+  getUserRanking,
+  getDepartmentRanking,
+  getDepartmentUserRanking,
+  getCollegeRanking,
+  getCollegeUserRanking,
+} from '../api/rankingApi';
 import { useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import logoImageBack from '../assets/image-logo-background.png';
 
 const tabConfig = [
-  { label: '유저별', value: 'user' },
-  { label: '학과별', value: 'department' },
-  { label: '내 학과', value: 'departmentUser' },
-  { label: '단과대별', value: 'college' },
-  { label: '내 단과대', value: 'collegeUser' },
+  { label: '유저별',        value: 'user' },
+  { label: '학과별',        value: 'department' },
+  { label: '내 학과',      value: 'departmentUser' },
+  { label: '단과대별',      value: 'college' },
+  { label: '내 단과대',    value: 'collegeUser' },
 ];
 
 export default function Ranking() {
@@ -21,7 +27,7 @@ export default function Ranking() {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages]   = useState(1);
 
-  const { departmentId, collegeId }   = useParams();
+  const { departmentId, collegeId } = useParams();
   const isUserTab    = ['user','departmentUser','collegeUser'].includes(activeTab);
   const isDeptTab    = activeTab === 'department';
   const isCollegeTab = activeTab === 'college';
@@ -30,48 +36,49 @@ export default function Ranking() {
     window.scrollTo({ top: 0, behavior: "smooth" });
 
   useEffect(() => {
-    const fetchRankings = async () => {
+    async function fetch() {
       setLoading(true);
       setError(null);
-      setTotalPages(1);
-
-      let url = '/api/ranking/';
-      switch (activeTab) {
-        case 'user':           url += 'user'; break;
-        case 'department':     url += 'department'; break;
-        case 'departmentUser': url += `department/${departmentId}`; break;
-        case 'college':        url += 'college'; break;
-        case 'collegeUser':    url += `college/${collegeId}`; break;
-        default:               url += 'user';
-      }
 
       try {
-        const res = await axios.get(url, { params: { page: currentPage } });
-        const raw = res.data?.data ?? res.data;
-        const data = raw && typeof raw === 'object' ? raw : {};
-
-        let list = [];
-        if (isUserTab) {
-          list = Array.isArray(data.rankings) ? data.rankings : [];
-        } else if (isDeptTab) {
-          list = Array.isArray(data.departments) ? data.departments : [];
-        } else if (isCollegeTab) {
-          list = Array.isArray(data.colleges) ? data.colleges : [];
+        let data;
+        switch (activeTab) {
+          case 'user':
+            data = await getUserRanking(currentPage);
+            break;
+          case 'department':
+            data = await getDepartmentRanking(currentPage);
+            break;
+          case 'departmentUser':
+            data = await getDepartmentUserRanking(departmentId, currentPage);
+            break;
+          case 'college':
+            data = await getCollegeRanking(currentPage);
+            break;
+          case 'collegeUser':
+            data = await getCollegeUserRanking(collegeId, currentPage);
+            break;
+          default:
+            data = await getUserRanking(currentPage);
         }
-        const pages = typeof data.totalPages === 'number' ? data.totalPages : 1;
 
+        // service 함수가 { rankings?, departments?, colleges?, totalPages } 형태 리턴
+        const list = data.rankings 
+          ?? data.departments 
+          ?? data.colleges 
+          ?? [];
         setRankings(list);
-        setTotalPages(pages);
+        setTotalPages(data.totalPages ?? 1);
+
       } catch (e) {
         console.error(e);
         setError('랭킹을 불러오는 중 오류가 발생했습니다.');
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchRankings();
-  }, [activeTab, departmentId, collegeId, currentPage]);
+    }
+    fetch();
+  }, [activeTab, currentPage, departmentId, collegeId]);
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-[rgba(243,233,220,0.5)]">
