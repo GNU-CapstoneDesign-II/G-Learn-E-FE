@@ -201,7 +201,7 @@ export default function Ranking() {
         <div className="max-w-[1400px] mx-auto flex flex-col gap-6">
           <div className="flex justify-between items-center">
             <p className="text-xs md:text-sm">경상국립대학교 컴퓨터공학과 전공종합설계 PBL</p>
-            <button onClick={scrollToTop} type="button" className="flex items-center space-x-1 text-sm md:text-base">
+            <button onClick={scrollToTop} type="button" className="flex items-center space-x-1 text-sm md:text-base hover:underline">
               <span>Back Top ︿</span>
             </button>
           </div>

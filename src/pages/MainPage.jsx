@@ -44,8 +44,10 @@ export default function MainPage() {
       <div className="pt-[65px] font-sans text-darkbrown h-screen">
         {/* Hero Section */}
         <section className={`${sectionWrapper} bg-white`}>
-          <div className="max-w-[1200px] mx-auto flex items-center justify-between gap-12 px-4 md:px-8">
-            <div className="flex-1 text-left">
+          <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-12 px-4 md:px-8">
+            
+            {/* 텍스트 영역 */}
+            <div className="space-y-6">
               <motion.div
                 initial="hidden"
                 animate="visible"
@@ -61,7 +63,7 @@ export default function MainPage() {
                 </motion.h1>
 
                 <motion.h2
-                  className="text-2xl md:text-3xl font-namdhinggo mb-6 text-darkbrown"
+                  className="text-2xl md:text-3xl font-namdhinggo text-darkbrown"
                   variants={staggerParent}
                 >
                   <motion.span variants={fadeUpItem}>지식의 여정을 향해, </motion.span>
@@ -76,11 +78,13 @@ export default function MainPage() {
               </p>
             </div>
 
-            <div className="flex-1 flex justify-center">
+            {/* 이미지 영역 */}
+            <div className="w-full max-w-[400px] mx-auto aspect-[148/93]">
               <img
                 src={logoImage}
                 alt="G-Learn-E 로고"
-                className="w-full max-w-[400px] h-auto"
+                className="w-full h-full object-contain"
+                loading="eager"
               />
             </div>
           </div>
@@ -159,7 +163,7 @@ export default function MainPage() {
           <div className="max-w-[1400px] mx-auto flex flex-col gap-6">
             <div className="flex justify-between items-center">
               <p className="text-xs md:text-sm">경상국립대학교 컴퓨터공학과 전공종합설계 PBL</p>
-              <button onClick={scrollToTop} type="button" className="flex items-center space-x-1 text-sm md:text-base">
+              <button onClick={scrollToTop} type="button" className="flex items-center space-x-1 text-sm md:text-base hover:underline">
                 <span>Back Top ︿</span>
               </button>
             </div>
