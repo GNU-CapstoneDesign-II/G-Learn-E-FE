@@ -27,8 +27,15 @@ export default function SearchPage() {
 
         searchWorkbooks(keyword, range, type, page, size, sort, order)
             .then((res) => {
-                setResults(res.data.data || []);
-                setTotalCount(res.data.totalElements ?? 0);
+                const wbList = res.data.data?.publicWorkbooks || [];
+                setResults(wbList.map(entry => ({
+                    id: entry.workbook.id,
+                    name: entry.workbook.name,
+                    createdAt: entry.workbook.createdAt,
+                    description: entry.workbook.description,
+                    authorName: entry.author.nickname,
+                })));
+                setTotalCount(wbList.length);
             })
             .catch((err) => console.error("검색 실패:", err))
             .finally(() => setLoading(false));
