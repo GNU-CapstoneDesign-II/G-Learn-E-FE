@@ -2,28 +2,19 @@
 import axiosInstance from "./axiosInstance";
 
 /**
- * Public 폴더 데이터를 조회합니다.
- * @param {number|null} folderId - null이면 루트 폴더
- * @param {{
- *   main?: string,
- *   sub?: string,
- *   year?: string,
- *   subject?: string
- * }} filter - 필터 조건
+ * 특정 과목(subjectId)의 문제집 목록을 조회합니다.
+ * @param {string|number} subjectId
  * @returns {Promise<{
- *   id: number | null,
+ *   id: number,
  *   name: string,
- *   parentId: number | null,
- *   childFolders: { id: number, name: string }[],
- *   childWorkbooks: { id: number, name: string, createdAt?: string }[]
- * }>}
+ *   createdAt: string,
+ *   isUploaded: boolean
+ * }[]>}
  */
-export function fetchPublicFolder(folderId = null, filter = {}) {
-    const params = { ...filter };
-    const url = folderId != null
-        ? `/api/folder/public/${folderId}`
-        : `/api/folder/public`;
-    return axiosInstance.get(url, { params }).then(res => res.data.data);
+export function fetchPublicWorkbooks(subjectId) {
+    return axiosInstance
+        .get(`/api/folder/public/workbooks/${subjectId}`)
+        .then(res => res.data.data);
 }
 
 /**
@@ -32,5 +23,7 @@ export function fetchPublicFolder(folderId = null, filter = {}) {
  * @returns {Promise<any>}
  */
 export function copyWorkbookToPrivate(workbookId) {
-    return axiosInstance.post(`/api/workbook/${workbookId}/upload`).then(res => res.data);
+    return axiosInstance
+        .post(`/api/workbook/${workbookId}/upload`)
+        .then(res => res.data);
 }

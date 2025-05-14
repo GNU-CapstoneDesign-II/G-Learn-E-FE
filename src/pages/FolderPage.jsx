@@ -2,6 +2,7 @@
 import React, { useState, useReducer, useEffect, useMemo } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 import PrivateMain from "../components/folder/PrivateMain.jsx";
 import PublicMain from "../components/folder/PublicMain.jsx";
@@ -9,7 +10,7 @@ import {
   getColleges,
   getDepartments,
   getSubjects
-} from "../api/workbookApi.js";
+} from "../api/workbookApi";
 
 // ────────────── LeftSidebar (inlined) ──────────────
 const initialFilterState = { main: "", sub: "", year: "", subject: "" };
@@ -28,7 +29,13 @@ function filterReducer(state, action) {
   }
 }
 
-function LeftSidebar({ selectedTab, onTabChange }) {
+function LeftSidebar({
+  selectedTab,
+  onTabChange,
+  onCollegeSelect,
+  onDepartmentSelect,
+  onSubjectSelect
+}) {
   const [state, dispatch] = useReducer(filterReducer, initialFilterState);
   const [colleges, setColleges] = useState([]);
   const [liberal, setLiberal] = useState(null);
@@ -36,8 +43,8 @@ function LeftSidebar({ selectedTab, onTabChange }) {
   const [subjects, setSubjects] = useState([]);
   const [grades, setGrades] = useState([]);
 
-  const isGeneral =
-    liberal && String(state.main) === String(liberal.id);
+  const isGeneral = liberal && String(state.main) === String(liberal.id);
+  const navigate = useNavigate();
 
   // ① 단과대 + 교양 로드
   useEffect(() => {
@@ -84,7 +91,15 @@ function LeftSidebar({ selectedTab, onTabChange }) {
   }, [subjects, isGeneral, state.year]);
 
   const sync = (type, value) => dispatch({ type, value });
-  const handleTab = t => onTabChange(t);
+
+  const handleSearch = () => {
+    const q = new URLSearchParams();
+    if (state.main) q.set("main", state.main);
+    if (state.sub) q.set("sub", state.sub);
+    if (!isGeneral && state.year) q.set("year", state.year);
+    if (state.subject) q.set("subject", state.subject);
+    navigate(`?${q.toString()}`);
+  };
 
   return (
     <div className="fixed mt-[65px] left-0 w-[200px] h-[calc(100vh-60px)] border-r border-[#E6CEBA] bg-white text-sm">
@@ -93,9 +108,8 @@ function LeftSidebar({ selectedTab, onTabChange }) {
         {["private", "public"].map(t => (
           <button
             key={t}
-            onClick={() => handleTab(t)}
-            className={`px-4 py-2 rounded-r-full flex items-center gap-2 ${selectedTab === t ? "bg-[#f8f1e7]" : ""
-              }`}
+            onClick={() => onTabChange(t)}
+            className={`px-4 py-2 rounded-r-full flex items-center gap-2 ${selectedTab === t ? "bg-[#f8f1e7]" : ""}`}
           >
             {t === "private" ? "👤 private" : "🧑‍🤝‍🧑 public"}
           </button>
@@ -105,40 +119,42 @@ function LeftSidebar({ selectedTab, onTabChange }) {
       {/* Public 필터 */}
       {selectedTab === "public" && (
         <div className="bg-[#f8f1e7] mt-2 mr-4 p-3 rounded-xl flex flex-col gap-2">
-          {/* ① 교양/단과대 */}
+          {/* 단과대 선택 */}
           <select
             value={state.main}
-            onChange={e => sync("SET_MAIN", e.target.value)}
+            onChange={e => {
+              sync("SET_MAIN", e.target.value);
+              const sel = colleges.find(c => String(c.id) === e.target.value) || liberal;
+              onCollegeSelect(sel ? { id: sel.id, name: sel.collegeName } : null);
+            }}
             className="border px-3 py-1 rounded"
           >
             <option value="">교양/단과대 선택</option>
-            {liberal && (
-              <option value={liberal.id}>{liberal.collegeName}</option>
-            )}
+            {liberal && <option value={liberal.id}>{liberal.collegeName}</option>}
             {colleges.map(c => (
-              <option key={c.id} value={c.id}>
-                {c.collegeName}
-              </option>
+              <option key={c.id} value={c.id}>{c.collegeName}</option>
             ))}
           </select>
 
-          {/* ② 학과/영역 */}
+          {/* 학과/영역 선택 */}
           {state.main && (
             <select
               value={state.sub}
-              onChange={e => sync("SET_SUB", e.target.value)}
+              onChange={e => {
+                sync("SET_SUB", e.target.value);
+                const sel = lv2.find(d => String(d.id) === e.target.value);
+                onDepartmentSelect(sel ? { id: sel.id, name: isGeneral ? sel : sel.departmentName } : null);
+              }}
               className="border px-3 py-1 rounded"
             >
               <option value="">{isGeneral ? "영역" : "학과"} 선택</option>
               {lv2.map(d => (
-                <option key={d.id} value={d.id}>
-                  {isGeneral ? d : d.departmentName}
-                </option>
+                <option key={d.id} value={d.id}>{isGeneral ? d : d.departmentName}</option>
               ))}
             </select>
           )}
 
-          {/* ③ 학년 (단과대만) */}
+          {/* 학년 선택 */}
           {!isGeneral && state.sub && grades.length > 0 && (
             <select
               value={state.year}
@@ -146,54 +162,74 @@ function LeftSidebar({ selectedTab, onTabChange }) {
               className="border px-3 py-1 rounded"
             >
               <option value="">학년 선택</option>
-              {grades.map(g => (
-                <option key={g} value={g}>
-                  {g}
-                </option>
-              ))}
+              {grades.map(g => <option key={g} value={g}>{g}</option>)}
             </select>
           )}
 
-          {/* ④ 과목명 */}
+          {/* 과목 선택 */}
           {state.sub && (
-
             <select
               value={state.subject}
-              onChange={e => sync("SET_SUBJECT", e.target.value)}
+              onChange={e => {
+                sync("SET_SUBJECT", e.target.value);
+                const sel = filteredSubjects.find(s => String(s.id) === e.target.value);
+                onSubjectSelect(sel ? { id: sel.id, name: sel.subjectName } : null);
+              }}
               className="border px-3 py-1 rounded"
             >
               <option value="">과목명 선택</option>
               {filteredSubjects.map(s => (
                 <option key={s.id} value={s.id}>
-                  {s.subjectName}
-                  {s.grade && ` (${s.grade})`}
+                  {s.subjectName}{s.grade ? ` (${s.grade})` : ""}
                 </option>
               ))}
             </select>
           )}
-          <button className="mt-2 px-4 py-1 bg-[#AC957B] text-white rounded shadow hover:bg-[#5F360A] transition">
+
+          <button
+            onClick={handleSearch}
+            className="mt-2 px-4 py-1 bg-[#AC957B] text-white rounded shadow hover:bg-[#5F360A] transition"
+          >
             검색
           </button>
         </div>
-
       )}
     </div>
-
   );
 }
 
 // ────────────── FolderPage ──────────────
 export default function FolderPage() {
-  const [tab, setTab] = useState("private");
-  const MainComponent = tab === "private" ? PrivateMain : PublicMain;
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  const initialTab = params.get("subject") ? "public" : "private";
+
+  const [tab, setTab] = useState(initialTab);
+  const [selectedCollege, setSelectedCollege] = useState(null);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [selectedSubject, setSelectedSubject] = useState(null);
 
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="min-h-screen bg-[#F9F4ED] font-sans relative">
         <Navbar />
         <div className="flex">
-          <LeftSidebar selectedTab={tab} onTabChange={setTab} />
-          <MainComponent />
+          <LeftSidebar
+            selectedTab={tab}
+            onTabChange={setTab}
+            onCollegeSelect={setSelectedCollege}
+            onDepartmentSelect={setSelectedDepartment}
+            onSubjectSelect={setSelectedSubject}
+          />
+          {tab === "private" ? (
+            <PrivateMain />
+          ) : (
+            <PublicMain
+              selectedCollege={selectedCollege}
+              selectedDepartment={selectedDepartment}
+              selectedSubject={selectedSubject}
+            />
+          )}
         </div>
       </div>
     </DndProvider>

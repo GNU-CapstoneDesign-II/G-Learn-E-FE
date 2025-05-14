@@ -1,113 +1,133 @@
 // src/components/folder/PublicMain.jsx
 import React, { useState, useEffect, useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDrop } from "react-dnd";
 import FolderListWithDnD from "./FolderListWithDnD.jsx";
 import UploadPopup from "../common/UploadPopup.jsx";
+import { copyWorkbookToPrivate } from "../../api/publicFolderApi";
+import axios from "../../api/axiosInstance";
 
-import {
-  fetchPublicFolder,
-  copyWorkbookToPrivate,
-} from "../../api/publicFolderApi";
-
-export default function PublicMain() {
-  // ───────── 쿼리 파라미터 → 필터 상태로 변환
+export default function PublicMain({
+  selectedCollege,
+  selectedDepartment,
+  selectedSubject,
+  filterDepth,
+}) {
   const { search } = useLocation();
+  const navigate = useNavigate();
   const params = new URLSearchParams(search);
-  const filter = {
-    main: params.get("main") ?? "",
-    sub: params.get("sub") ?? "",
-    year: params.get("year") ?? "",
-    subject: params.get("subject") ?? "",
-  };
+  const subjectId = params.get("subject");
 
-  const [folderData, setFolderData] = useState({
-    id: null,
-    name: "public",
-    parentId: null,
-    childFolders: [],
-    childWorkbooks: [],
-  });
+  const [workbooks, setWorkbooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortOption, setSortOption] = useState("name");
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [showCopyPopup, setShowCopyPopup] = useState(false);
 
-  // ───────── API 호출
-  const loadFolder = async (id = null) => {
+  // 문제집 목록 불러오기
+  const loadWorkbooks = async () => {
+    if (!subjectId) {
+      setWorkbooks([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const data = await fetchPublicFolder(id, filter);
-      setFolderData(data);
+      const res = await axios.get(`/api/folder/public/workbooks/${subjectId}`);
+      setWorkbooks(res.data.data || []);
       setIsSelectMode(false);
       setSelectedIds([]);
+    } catch (err) {
+      console.error("문제집 불러오기 실패:", err);
+      setWorkbooks([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadFolder();
-  }, [filter.main, filter.sub, filter.year, filter.subject]);
+    loadWorkbooks();
+  }, [subjectId]);
 
-  const sortedFolders = useMemo(() => {
-    const arr = [...folderData.childFolders];
-    if (sortOption === "name") arr.sort((a, b) => a.name.localeCompare(b.name));
-    return arr;
-  }, [folderData.childFolders, sortOption]);
-
+  // 정렬된 문제집
   const sortedWorkbooks = useMemo(() => {
-    const arr = [...folderData.childWorkbooks];
-    if (sortOption === "name") arr.sort((a, b) => a.name.localeCompare(b.name));
+    const arr = [...workbooks];
+    if (sortOption === "name") {
+      return arr.sort((a, b) => a.name.localeCompare(b.name));
+    }
     return arr;
-  }, [folderData.childWorkbooks, sortOption]);
+  }, [workbooks, sortOption]);
 
   const toggleSelectMode = () => {
-    setIsSelectMode(!isSelectMode);
+    setIsSelectMode((m) => !m);
     if (isSelectMode) setSelectedIds([]);
   };
-
-  const handleSelect = (id) => {
+  const handleSelect = (id) =>
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
+
+  // 상단바에 표시할 타이틀
+  const makeTitle = () => {
+    return (
+      [
+        selectedCollege?.name,
+        selectedDepartment?.name,
+        selectedSubject?.name,
+      ]
+        .filter(Boolean)
+        .join(" - ") || "public"
+    );
   };
 
-  useDrop({
-    accept: ["folder", "workbook"],
-    drop: () => {
-      /* Public은 이동 기능 없음 */
-    },
-  });
+  // 뒤로가기: URL 쿼리에서 depth 에 맞춰 하나씩 삭제
+  const handleBack = () => {
+    const p = new URLSearchParams(search);
+    if (p.has("subject")) p.delete("subject");
+    else if (p.has("department")) p.delete("department");
+    else if (p.has("college")) p.delete("college");
+    navigate(`/folder?${p.toString()}`);
+  };
+
+  // DnD 드롭존 (no-op)
+  useDrop({ accept: ["folder", "workbook"], drop: () => { } });
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        로딩 중…
-      </div>
+      <div className="flex-1 flex items-center justify-center">로딩 중…</div>
     );
   }
 
   return (
     <main className="ml-[200px] mt-[125px] flex-1 p-8 relative">
       <FolderListWithDnD
-        /* 상단 툴바 */
-        selectedFolder={folderData}
+        mode="public"
+        filterDepth={filterDepth}
+        selectedFolder={{
+          id:
+            filterDepth === 3
+              ? selectedSubject.id
+              : filterDepth === 2
+                ? selectedDepartment.id
+                : filterDepth === 1
+                  ? selectedCollege.id
+                  : null,
+          name: makeTitle(),
+          parentId: filterDepth > 0 ? true : null,
+        }}
         selectedItems={selectedIds}
         sortOption={sortOption}
         onSortChange={setSortOption}
-        onBack={() => loadFolder(folderData.parentId)}
+        onBack={handleBack}
         onToggleAll={toggleSelectMode}
         isSelectMode={isSelectMode}
-        onUpload={() => setShowCopyPopup(true)} // “내 문제집 담기”
-        /* 리스트 */
-        currentFolder={folderData}
-        folders={sortedFolders}
+        onUpload={() => setShowCopyPopup(true)}  // 복사(내문제집 담기)
+        currentFolder={{ id: null }}
+        folders={[]}  // public 에선 폴더 개념 없으니 빈 배열
         workbooks={sortedWorkbooks}
-        onRefresh={() => loadFolder(folderData.id)}
-        onFolderClick={(id) => !isSelectMode && loadFolder(id)}
-        /* 읽기 전용 (비활성화) */
+        onRefresh={loadWorkbooks}
+        onFolderClick={() => { }}
         onRename={() => { }}
         onDeleteFolder={() => { }}
         onDeleteWorkbook={() => { }}
@@ -119,7 +139,7 @@ export default function PublicMain() {
       {showCopyPopup && (
         <UploadPopup
           mode="copyToPrivate"
-          selectedWorkbooks={folderData.childWorkbooks.filter((w) =>
+          selectedWorkbooks={workbooks.filter((w) =>
             selectedIds.includes(w.id)
           )}
           onConfirm={async () => {

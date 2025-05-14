@@ -139,6 +139,7 @@ export default function PrivateMain() {
   return (
     <main className="ml-[200px] mt-[125px] flex-1 p-8 relative">
       <FolderListWithDnD
+        mode="private"
         /* 상단 툴바 */
         selectedFolder={folderData}
         selectedItems={selectedIds}
