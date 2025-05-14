@@ -5,18 +5,26 @@ import { useDrop } from "react-dnd";
 import FolderListWithDnD from "./FolderListWithDnD.jsx";
 import UploadPopup from "../common/UploadPopup.jsx";
 import { copyWorkbookToPrivate } from "../../api/publicFolderApi";
-import axios from "../../api/axiosInstance";
+import {
+  getPublicWorkbooks,
+  getPublicWorkbooksByCollege,
+  getPublicWorkbooksByDepartment,
+  getPublicWorkbooksBySubject,
+} from "../../api/publicWorkbooksApi";
 
 export default function PublicMain({
   selectedCollege,
   selectedDepartment,
   selectedSubject,
   filterDepth,
+  page,
+  size,
+  sort,
+  order,
 }) {
   const { search } = useLocation();
   const navigate = useNavigate();
   const params = new URLSearchParams(search);
-  const subjectId = params.get("subject");
 
   const [workbooks, setWorkbooks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,16 +33,45 @@ export default function PublicMain({
   const [selectedIds, setSelectedIds] = useState([]);
   const [showCopyPopup, setShowCopyPopup] = useState(false);
 
-  // 문제집 목록 불러오기
+  // 1) 필터 깊이에 따라 다른 엔드포인트 호출
   const loadWorkbooks = async () => {
-    if (!subjectId) {
-      setWorkbooks([]);
-      setLoading(false);
-      return;
-    }
     setLoading(true);
     try {
-      const res = await axios.get(`/api/folder/public/workbooks/${subjectId}`);
+      let res;
+      switch (filterDepth) {
+        case 0:
+          res = await getPublicWorkbooks(page, size, sort, order);
+          break;
+        case 1:
+          res = await getPublicWorkbooksByCollege(
+            selectedCollege.id,
+            page,
+            size,
+            sort,
+            order
+          );
+          break;
+        case 2:
+          res = await getPublicWorkbooksByDepartment(
+            selectedDepartment.id,
+            page,
+            size,
+            sort,
+            order
+          );
+          break;
+        case 3:
+          res = await getPublicWorkbooksBySubject(
+            selectedSubject.id,
+            page,
+            size,
+            sort,
+            order
+          );
+          break;
+        default:
+          res = { data: { data: [] } };
+      }
       setWorkbooks(res.data.data || []);
       setIsSelectMode(false);
       setSelectedIds([]);
@@ -48,13 +85,17 @@ export default function PublicMain({
 
   useEffect(() => {
     loadWorkbooks();
-  }, [subjectId]);
+  }, [filterDepth, page, size, sort, order]);
 
-  // 정렬된 문제집
+  // 2) 이름 정렬 시 null 안전 처리
   const sortedWorkbooks = useMemo(() => {
     const arr = [...workbooks];
     if (sortOption === "name") {
-      return arr.sort((a, b) => a.name.localeCompare(b.name));
+      return arr.sort((a, b) => {
+        const nameA = a.name ?? "";
+        const nameB = b.name ?? "";
+        return nameA.localeCompare(nameB);
+      });
     }
     return arr;
   }, [workbooks, sortOption]);
@@ -68,29 +109,33 @@ export default function PublicMain({
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
 
-  // 상단바에 표시할 타이틀
   const makeTitle = () => {
-    return (
-      [
-        selectedCollege?.name,
-        selectedDepartment?.name,
-        selectedSubject?.name,
-      ]
-        .filter(Boolean)
-        .join(" - ") || "public"
-    );
+    const parts = [
+      selectedCollege?.name,
+      selectedDepartment?.name,
+      selectedSubject?.name,
+    ].filter(Boolean);
+    return parts.length > 0
+      ? parts.join(" - ")
+      : "Public";    // depth 0일 땐 “Public” 출력
   };
 
-  // 뒤로가기: URL 쿼리에서 depth 에 맞춰 하나씩 삭제
+  // 3) 뒤로가기: 현재 가장 깊은 필터만 삭제해서 한 단계씩 위로 이동
   const handleBack = () => {
     const p = new URLSearchParams(search);
-    if (p.has("subject")) p.delete("subject");
-    else if (p.has("department")) p.delete("department");
-    else if (p.has("college")) p.delete("college");
+    if (p.has("subject")) {
+      p.delete("subject");
+      if (p.has("year")) p.delete("year");     // subject → department로 바로
+    } else if (p.has("year")) {
+      p.delete("year");                         // year → department
+    } else if (p.has("sub")) {
+      p.delete("sub");                          // department → college
+    } else if (p.has("main")) {
+      p.delete("main");                         // college → 루트
+    }
     navigate(`/folder?${p.toString()}`);
   };
 
-  // DnD 드롭존 (no-op)
   useDrop({ accept: ["folder", "workbook"], drop: () => { } });
 
   if (loading) {
@@ -122,9 +167,9 @@ export default function PublicMain({
         onBack={handleBack}
         onToggleAll={toggleSelectMode}
         isSelectMode={isSelectMode}
-        onUpload={() => setShowCopyPopup(true)}  // 복사(내문제집 담기)
+        onUpload={() => setShowCopyPopup(true)}
         currentFolder={{ id: null }}
-        folders={[]}  // public 에선 폴더 개념 없으니 빈 배열
+        folders={[]}
         workbooks={sortedWorkbooks}
         onRefresh={loadWorkbooks}
         onFolderClick={() => { }}

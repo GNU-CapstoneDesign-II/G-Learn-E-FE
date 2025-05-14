@@ -42,7 +42,6 @@ function LeftSidebar({
   const [lv2, setLv2] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [grades, setGrades] = useState([]);
-
   const isGeneral = liberal && String(state.main) === String(liberal.id);
   const navigate = useNavigate();
 
@@ -91,7 +90,6 @@ function LeftSidebar({
   }, [subjects, isGeneral, state.year]);
 
   const sync = (type, value) => dispatch({ type, value });
-
   const handleSearch = () => {
     const q = new URLSearchParams();
     if (state.main) q.set("main", state.main);
@@ -109,7 +107,8 @@ function LeftSidebar({
           <button
             key={t}
             onClick={() => onTabChange(t)}
-            className={`px-4 py-2 rounded-r-full flex items-center gap-2 ${selectedTab === t ? "bg-[#f8f1e7]" : ""}`}
+            className={`px-4 py-2 rounded-r-full flex items-center gap-2 ${selectedTab === t ? "bg-[#f8f1e7]" : ""
+              }`}
           >
             {t === "private" ? "👤 private" : "🧑‍🤝‍🧑 public"}
           </button>
@@ -119,20 +118,27 @@ function LeftSidebar({
       {/* Public 필터 */}
       {selectedTab === "public" && (
         <div className="bg-[#f8f1e7] mt-2 mr-4 p-3 rounded-xl flex flex-col gap-2">
-          {/* 단과대 선택 */}
+          {/* 단과대/교양 선택 */}
           <select
             value={state.main}
             onChange={e => {
               sync("SET_MAIN", e.target.value);
-              const sel = colleges.find(c => String(c.id) === e.target.value) || liberal;
-              onCollegeSelect(sel ? { id: sel.id, name: sel.collegeName } : null);
+              const sel =
+                colleges.find(c => String(c.id) === e.target.value) || liberal;
+              onCollegeSelect(
+                sel ? { id: sel.id, name: sel.collegeName } : null
+              );
             }}
             className="border px-3 py-1 rounded"
           >
             <option value="">교양/단과대 선택</option>
-            {liberal && <option value={liberal.id}>{liberal.collegeName}</option>}
+            {liberal && (
+              <option value={liberal.id}>{liberal.collegeName}</option>
+            )}
             {colleges.map(c => (
-              <option key={c.id} value={c.id}>{c.collegeName}</option>
+              <option key={c.id} value={c.id}>
+                {c.collegeName}
+              </option>
             ))}
           </select>
 
@@ -143,13 +149,26 @@ function LeftSidebar({
               onChange={e => {
                 sync("SET_SUB", e.target.value);
                 const sel = lv2.find(d => String(d.id) === e.target.value);
-                onDepartmentSelect(sel ? { id: sel.id, name: isGeneral ? sel : sel.departmentName } : null);
+                onDepartmentSelect(
+                  sel
+                    ? {
+                      id: sel.id,
+                      name: isGeneral
+                        ? sel
+                        : sel.departmentName
+                    }
+                    : null
+                );
               }}
               className="border px-3 py-1 rounded"
             >
-              <option value="">{isGeneral ? "영역" : "학과"} 선택</option>
+              <option value="">
+                {isGeneral ? "영역" : "학과"} 선택
+              </option>
               {lv2.map(d => (
-                <option key={d.id} value={d.id}>{isGeneral ? d : d.departmentName}</option>
+                <option key={d.id} value={d.id}>
+                  {isGeneral ? d : d.departmentName}
+                </option>
               ))}
             </select>
           )}
@@ -162,7 +181,11 @@ function LeftSidebar({
               className="border px-3 py-1 rounded"
             >
               <option value="">학년 선택</option>
-              {grades.map(g => <option key={g} value={g}>{g}</option>)}
+              {grades.map(g => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
+              ))}
             </select>
           )}
 
@@ -172,15 +195,20 @@ function LeftSidebar({
               value={state.subject}
               onChange={e => {
                 sync("SET_SUBJECT", e.target.value);
-                const sel = filteredSubjects.find(s => String(s.id) === e.target.value);
-                onSubjectSelect(sel ? { id: sel.id, name: sel.subjectName } : null);
+                const sel = filteredSubjects.find(
+                  s => String(s.id) === e.target.value
+                );
+                onSubjectSelect(
+                  sel ? { id: sel.id, name: sel.subjectName } : null
+                );
               }}
               className="border px-3 py-1 rounded"
             >
               <option value="">과목명 선택</option>
               {filteredSubjects.map(s => (
                 <option key={s.id} value={s.id}>
-                  {s.subjectName}{s.grade ? ` (${s.grade})` : ""}
+                  {s.subjectName}
+                  {s.grade ? ` (${s.grade})` : ""}
                 </option>
               ))}
             </select>
@@ -209,6 +237,69 @@ export default function FolderPage() {
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [selectedSubject, setSelectedSubject] = useState(null);
 
+  // 추가된 상태: 페이징/정렬
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(25);
+  const [sort, setSort] = useState("createdAt");
+  const [order, setOrder] = useState("desc");
+
+  // **URL 파라미터에 맞춰 selectedCollege/Department/Subject 초기화**
+  useEffect(() => {
+    if (tab !== "public") return;
+
+    const mainId = params.get("main");
+    const subId = params.get("sub");
+    const subjectId = params.get("subject");
+
+    // 초기화
+    setSelectedCollege(null);
+    setSelectedDepartment(null);
+    setSelectedSubject(null);
+
+    // 단과대/교양 이름 세팅
+    if (mainId) {
+      Promise.all([getColleges(true), getColleges(false)])
+        .then(([cRes, lRes]) => {
+          const all = [...(cRes.data.data || []), ...(lRes.data.data || [])];
+          const col = all.find(c => String(c.id) === mainId);
+          if (col) setSelectedCollege({ id: col.id, name: col.collegeName });
+        })
+        .catch(console.error);
+    }
+
+    // 학과 이름 세팅
+    if (subId && mainId) {
+      getDepartments(mainId)
+        .then(res => {
+          const dept = (res.data.data || []).find(
+            d => String(d.id) === subId
+          );
+          if (dept)
+            setSelectedDepartment({
+              id: dept.id,
+              name: dept.departmentName
+            });
+        })
+        .catch(console.error);
+    }
+
+    // 과목 이름 세팅
+    if (subjectId && subId) {
+      getSubjects(subId)
+        .then(res => {
+          const subj = (res.data.data || []).find(
+            s => String(s.id) === subjectId
+          );
+          if (subj)
+            setSelectedSubject({
+              id: subj.id,
+              name: subj.subjectName
+            });
+        })
+        .catch(console.error);
+    }
+  }, [search, tab]);
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="min-h-screen bg-[#F9F4ED] font-sans relative">
@@ -221,6 +312,7 @@ export default function FolderPage() {
             onDepartmentSelect={setSelectedDepartment}
             onSubjectSelect={setSelectedSubject}
           />
+
           {tab === "private" ? (
             <PrivateMain />
           ) : (
@@ -228,6 +320,19 @@ export default function FolderPage() {
               selectedCollege={selectedCollege}
               selectedDepartment={selectedDepartment}
               selectedSubject={selectedSubject}
+              filterDepth={
+                params.get("subject")
+                  ? 3
+                  : params.get("sub")
+                    ? 2
+                    : params.get("main")
+                      ? 1
+                      : 0
+              }
+              page={page}
+              size={size}
+              sort={sort}
+              order={order}
             />
           )}
         </div>
