@@ -11,6 +11,10 @@ import {
   getSubjects
 } from "../api/workbookApi.js";
 
+// 1) 아이콘 이미지 import
+import privateIcon from "../assets/private.png";
+import publicIcon from "../assets/public.png";
+
 // ────────────── LeftSidebar (inlined) ──────────────
 const initialFilterState = { main: "", sub: "", year: "", subject: "" };
 function filterReducer(state, action) {
@@ -86,18 +90,32 @@ function LeftSidebar({ selectedTab, onTabChange }) {
   const sync = (type, value) => dispatch({ type, value });
   const handleTab = t => onTabChange(t);
 
+  // 2) 탭 정보 배열 정의
+  const tabs = [
+    { key: "private", label: "Private", icon: privateIcon },
+    { key: "public", label: "Public", icon: publicIcon },
+  ];
+
   return (
     <div className="fixed mt-[65px] left-0 w-[200px] h-[calc(100vh-60px)] border-r border-[#E6CEBA] bg-white text-sm">
       {/* 탭 */}
       <div className="pt-12 flex flex-col gap-2">
-        {["private", "public"].map(t => (
+        {tabs.map(({ key, label, icon }) => (
           <button
-            key={t}
-            onClick={() => handleTab(t)}
-            className={`px-4 py-2 rounded-r-full flex items-center gap-2 ${selectedTab === t ? "bg-[#f8f1e7]" : ""
-              }`}
+            key={key}
+            onClick={() => handleTab(key)}
+            className={`
+              px-4 py-2 rounded-r-full flex items-center gap-2
+              ${selectedTab === key ? "bg-[#f8f1e7]" : ""}
+            `}
           >
-            {t === "private" ? "👤 private" : "🧑‍🤝‍🧑 public"}
+            {/* 3) 이모지 대신 이미지 렌더링 */}
+            <img
+              src={icon}
+              alt={label}
+              className="w-5 h-5 flex-shrink-0"
+            />
+            <span>{label}</span>
           </button>
         ))}
       </div>
