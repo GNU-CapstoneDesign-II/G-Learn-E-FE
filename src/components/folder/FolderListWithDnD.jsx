@@ -172,28 +172,30 @@ export default function FolderListWithDnD({
           {isSelectMode && (
             <>
               {isPublic ? (
-              <button
-                onClick={onDownload}
-                className="bg-[#AC957B] text-white px-3 py-1 rounded hover:bg-[#5F360A] transition-colors"
-              >
-                다운로드
-              </button>
-            ) : (
-              <>
                 <button
-                  onClick={onUpload}
+                  onClick={onDownload}
                   className="bg-[#AC957B] text-white px-3 py-1 rounded hover:bg-[#5F360A] transition-colors"
                 >
-                  업로드
+                  다운로드
                 </button>
-                <button
-                  onClick={() => onMerge?.(selectedItems)}
-                  className="bg-[#AC957B] text-white px-3 py-1 rounded hover:bg-[#5F360A] transition-colors"
-                >
-                  합치기
-                </button>
-              </>
-            )}
+              ) : (
+                <>
+                  <button
+                    onClick={onUpload}
+                    className="bg-[#AC957B] text-white px-3 py-1 rounded hover:bg-[#5F360A] transition-colors"
+                  >
+                    업로드
+                  </button>
+                  <button
+                    onClick={() =>
+                      navigate("/merge", { state: { ids: selectedItems, titles: selectedTitles } })
+                    }
+                    className="bg-[#AC957B] text-white px-3 py-1 rounded hover:bg-[#5F360A] transition-colors"
+                  >
+                    합치기
+                  </button>
+                </>
+              )}
               <span>{selectedItems.length}개 선택</span>
             </>
           )}
@@ -263,7 +265,6 @@ function FolderItem({
   onRefresh,
   onFolderClick,
   onRename,
-  onDelete,
   onContextMenu,
   isPublic
 }) {
@@ -272,7 +273,7 @@ function FolderItem({
     accept: [ItemTypes.FOLDER, ItemTypes.WORKBOOK],
     drop: (item, monitor) => {
       if (item.id === folder.id) return; // 자기 자신으로 드롭 방지
-      if(isPublic) return; // 공용 폴더에서는 드래그 앤 드롭 금지
+      if (isPublic) return; // 공용 폴더에서는 드래그 앤 드롭 금지
       const mover =
         monitor.getItemType() === ItemTypes.FOLDER ? moveFolder : moveWorkbook;
       mover(item.id, folder.id).then(onRefresh);
@@ -327,10 +328,8 @@ function WorkbookItem({
   selected,
   onSelect,
   onRefresh,
-  onDelete,
   onRename,
   onContextMenu,
-  isPublic,
 }) {
   const navigate = useNavigate();
   const [, drag] = useDrag({ type: ItemTypes.WORKBOOK, item: { id: workbook.id } });
