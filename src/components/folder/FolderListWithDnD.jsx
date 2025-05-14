@@ -9,6 +9,8 @@ import ContextMenu from "../common/ContextMenu";
 const ItemTypes = { FOLDER: "folder", WORKBOOK: "workbook" };
 
 export default function FolderListWithDnD({
+  mode = "private",
+  filterDepth = 0,
   /* 상단 툴바 props */
   selectedFolder,
   selectedItems,
@@ -30,9 +32,11 @@ export default function FolderListWithDnD({
   onRenameWorkbook,
   onAddFolder,
   onSelectItem,
+  onDownload,
 }) {
   const navigate = useNavigate();
-  const isRoot = selectedFolder.parentId == null;
+  const isPublic = (mode === "public");
+  const isRoot = isPublic ? filterDepth === 0 : selectedFolder?.parentId == null;
 
   // ⭐️ 공통 높이(1개당 40px)·폭(140px) 기준으로 viewport overflow 방지
   const MENU_ITEM_HEIGHT = 40;
@@ -49,6 +53,7 @@ export default function FolderListWithDnD({
 
   // 클릭된 카드 바로 위에 메뉴를 띄우도록 위치 계산
   const handleContextMenu = (e, type, id) => {
+    if (isPublic) return; // 공용 폴더에서는 우클릭 금지
     e.preventDefault();
 
     const itemCount = type === ItemTypes.WORKBOOK ? 3 : 2; // 편집 메뉴 유무
@@ -104,6 +109,7 @@ export default function FolderListWithDnD({
     drop: (item, monitor) => {
       // 부모 폴더가 없으면 무시
       if (selectedFolder.parentId == null) return;
+      if (isPublic) return;
       // 종류에 따라 API 호출
       const mover =
         monitor.getItemType() === ItemTypes.FOLDER
@@ -136,7 +142,7 @@ export default function FolderListWithDnD({
           <h2 className="text-lg font-semibold text-[#5f360a]">
             <span>{selectedFolder.name}</span>
 
-            {(isOver || canDrop) && (!isRoot) && (
+            {(isOver || canDrop) && (!isRoot) && (!isPublic) && (
               <span className="ml-5 px-2 py-1 bg-[#AC957B] text-white text-xs rounded">
                 상위 폴더로 이동
               </span>
@@ -165,24 +171,32 @@ export default function FolderListWithDnD({
           {/* 선택 모드 툴바 */}
           {isSelectMode && (
             <>
+              {isPublic ? (
               <button
-                onClick={onUpload}
+                onClick={onDownload}
                 className="bg-[#AC957B] text-white px-3 py-1 rounded hover:bg-[#5F360A] transition-colors"
               >
-                업로드
+                다운로드
               </button>
-              <button
-                onClick={() =>
-                  navigate("/merge", { state: { ids: selectedItems, titles: selectedTitles } })
-                }
-                className="bg-[#AC957B] text-white px-3 py-1 rounded hover:bg-[#5F360A] transition-colors"
-              >
-                합치기
-              </button>
+            ) : (
+              <>
+                <button
+                  onClick={onUpload}
+                  className="bg-[#AC957B] text-white px-3 py-1 rounded hover:bg-[#5F360A] transition-colors"
+                >
+                  업로드
+                </button>
+                <button
+                  onClick={() => onMerge?.(selectedItems)}
+                  className="bg-[#AC957B] text-white px-3 py-1 rounded hover:bg-[#5F360A] transition-colors"
+                >
+                  합치기
+                </button>
+              </>
+            )}
               <span>{selectedItems.length}개 선택</span>
             </>
           )}
-
           <Checkbox checked={isSelectMode} onChange={onToggleAll} />
         </div>
       </header>
@@ -198,6 +212,7 @@ export default function FolderListWithDnD({
             onRename={onRename}
             onDelete={onDeleteFolder}
             onContextMenu={e => handleContextMenu(e, ItemTypes.FOLDER, f.id)}
+            isPublic={isPublic}
           />
         ))}
 
@@ -213,10 +228,13 @@ export default function FolderListWithDnD({
             onDelete={onDeleteWorkbook}
             onRename={onRenameWorkbook}
             onContextMenu={e => handleContextMenu(e, ItemTypes.WORKBOOK, wb.id)}
+            isPublic={isPublic}
           />
         ))}
-
-        <AddFolderCard onClick={onAddFolder} />
+        {/* 추가하기 카드 */}
+        {!isPublic && (
+          <AddFolderCard onClick={onAddFolder} />
+        )}
       </div>
 
       {/* ContextMenu */}
@@ -247,12 +265,14 @@ function FolderItem({
   onRename,
   onDelete,
   onContextMenu,
+  isPublic
 }) {
   const [, drag] = useDrag({ type: ItemTypes.FOLDER, item: { id: folder.id } });
   const [, drop] = useDrop({
     accept: [ItemTypes.FOLDER, ItemTypes.WORKBOOK],
     drop: (item, monitor) => {
       if (item.id === folder.id) return; // 자기 자신으로 드롭 방지
+      if(isPublic) return; // 공용 폴더에서는 드래그 앤 드롭 금지
       const mover =
         monitor.getItemType() === ItemTypes.FOLDER ? moveFolder : moveWorkbook;
       mover(item.id, folder.id).then(onRefresh);
@@ -310,6 +330,7 @@ function WorkbookItem({
   onDelete,
   onRename,
   onContextMenu,
+  isPublic,
 }) {
   const navigate = useNavigate();
   const [, drag] = useDrag({ type: ItemTypes.WORKBOOK, item: { id: workbook.id } });

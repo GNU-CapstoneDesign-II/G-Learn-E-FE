@@ -1,138 +1,200 @@
-import React, { useState, useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect, useMemo } from "react";
 import { useDrop } from "react-dnd";
 import FolderListWithDnD from "./FolderListWithDnD.jsx";
 import UploadPopup from "../common/UploadPopup.jsx";
+import { copyWorkbookToPrivate } from "../../api/publicFolderApi";
+import {
+  getPublicWorkbooks,
+  getPublicWorkbooksByCollege,
+  getPublicWorkbooksByDepartment,
+  getPublicWorkbooksBySubject,
+} from "../../api/publicWorkbooksApi";
 
-/* ------------------------------------------------------------------ */
-/* ⛔ 아직 API 없다면 주석 유지, 붙일 때 주석 해제 --------------------- */
-// import {
-//   fetchPublicFolder,
-//   movePublicFolder,
-//   movePublicWorkbook,
-//   copyWorkbookToPrivate,
-// } from "../../api/publicFolderApi";
-/* ------------------------------------------------------------------ */
+/**
+ * 완전 제어형 PublicMain
+ *  - college / department / subject를 prop 그대로 사용
+ */
+export default function PublicMain({
+  /* === 필터 값들 (부모가 제어) === */
+  selectedCollege = null,
+  selectedDepartment = null,
+  selectedSubject = null,
 
-export default function PublicMain() {
-  /* ---------------- URL 쿼리 → 필터 ---------------- */
-  const { search } = useLocation();
-  const params = new URLSearchParams(search);
-  const filter = {
-    main: params.get("main") ?? "",
-    sub: params.get("sub") ?? "",
-    year: params.get("year") ?? "",
-    subject: params.get("subject") ?? "",
-  };
-
-  /* ---------------- 더미 데이터 ---------------- */
-  const [folderData /*, setFolderData */] = useState({
-    id: null,
-    name: "public",
-    parentId: null,
-    childFolders: [
-      { id: "f1", name: "자료구조" },
-      { id: "f2", name: "운영체제" },
-    ],
-    childWorkbooks: [
-      { id: "w1", name: "알고리즘 기출" },
-      { id: "w2", name: "컴퓨터네트워크 문제집" },
-    ],
-  });
-
-  /* ------------------------------------------------------------------ */
-  /* ⛔ 로딩 & fetch 로직 – API 붙일 때 활성화 -------------------------- */
-  // const [loading, setLoading] = useState(true);
-  //
-  // const loadFolder = async (id = null) => {
-  //   setLoading(true);
-  //   const data = await fetchPublicFolder(id, filter);
-  //   setFolderData(data);
-  //   setLoading(false);
-  // };
-  //
-  // useEffect(() => {
-  //   loadFolder();
-  // }, [filter.main, filter.sub, filter.year, filter.subject]);
-  /* ------------------------------------------------------------------ */
-
-  const [sortOption, setSortOption] = useState("name");
+  /* === 페이징·정렬 (부모가 제어하거나 초기값만) === */
+  page = 0,
+  size = 20,
+  sort = "name",
+  order = "asc",
+}) {
+  /* ───────── 기타 UI 상태 ───────── */
+  const [workbooks, setWorkbooks]       = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [sortOption, setSortOption]     = useState("name");      // 클라이언트측 이름 정렬
   const [isSelectMode, setIsSelectMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState([]);
+  const [selectedIds, setSelectedIds]   = useState([]);
   const [showCopyPopup, setShowCopyPopup] = useState(false);
 
-  /* ---------------- 정렬 ---------------- */
-  const sortedFolders = useMemo(() => {
-    const arr = [...folderData.childFolders];
-    if (sortOption === "name") arr.sort((a, b) => a.name.localeCompare(b.name));
-    return arr;
-  }, [folderData.childFolders, sortOption]);
+  /* ───────── 필터 깊이 계산 ───────── */
+  const filterDepth = selectedSubject
+    ? 3
+    : selectedDepartment
+    ? 2
+    : selectedCollege
+    ? 1
+    : 0;
 
+  /* ───────── 워크북 로딩 ───────── */
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        let res;
+        switch (filterDepth) {
+          case 0:
+            res = await getPublicWorkbooks(page, size, sort, order);
+            break;
+          case 1:
+            res = await getPublicWorkbooksByCollege(
+              selectedCollege.id,
+              page,
+              size,
+              sort,
+              order
+            );
+            break;
+          case 2:
+            res = await getPublicWorkbooksByDepartment(
+              selectedDepartment.id,
+              page,
+              size,
+              sort,
+              order
+            );
+            break;
+          case 3:
+            res = await getPublicWorkbooksBySubject(
+              selectedSubject.id,
+              page,
+              size,
+              sort,
+              order
+            );
+            break;
+          default:
+            res = { data: { data: [] } };
+        }
+        setWorkbooks(res.data.data || []);
+        setIsSelectMode(false);
+        setSelectedIds([]);
+      } catch (err) {
+        console.error("문제집 불러오기 실패:", err);
+        setWorkbooks([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [
+    selectedCollege,
+    selectedDepartment,
+    selectedSubject,
+    page,
+    size,
+    sort,
+    order,
+    filterDepth,
+  ]);
+
+  /* ───────── 이름 정렬(Null‑safe) ───────── */
   const sortedWorkbooks = useMemo(() => {
-    const arr = [...folderData.childWorkbooks];
-    if (sortOption === "name") arr.sort((a, b) => a.name.localeCompare(b.name));
-    return arr;
-  }, [folderData.childWorkbooks, sortOption]);
+    if (sortOption !== "name") return workbooks;
+    return [...workbooks].sort((a, b) =>
+      (a.name ?? "").localeCompare(b.name ?? "")
+    );
+  }, [workbooks, sortOption]);
 
-  /* ---------------- 선택 모드 ---------------- */
+  /* ───────── 선택 모드 토글 / 선택 관리 ───────── */
   const toggleSelectMode = () => {
-    setIsSelectMode(!isSelectMode);
+    setIsSelectMode((m) => !m);
     if (isSelectMode) setSelectedIds([]);
   };
-
-  const handleSelect = (id) => {
+  const handleSelect = (id) =>
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
+
+  /* ───────── 폴더명 생성 ───────── */
+  const makeTitle = () => {
+    const parts = [
+      selectedCollege?.name,
+      selectedDepartment?.name,
+      selectedSubject?.name,
+    ].filter(Boolean);
+    return parts.length ? parts.join(" - ") : "Public";
   };
 
-  /* ---------------- DnD 드롭(no-op) ---------------- */
-  useDrop({
-    accept: ["folder", "workbook"],
-    drop: () => {
-      /* console.log("DnD drop – API 붙이면 이동 로직 추가"); */
-    },
-  });
+  /* ───────── 뒤로가기(부모 state 조작 필요하면 prop으로 전달하세요) ───────── */
+  // 현재 구조에선 PublicMain이 단독으로 filter를 줄일 방법이 없으므로
+  // handleBack을 부모에서 내려주도록 바꾸거나, 선택 로직을 Sidebar에서만 처리합니다.
+  const handleBack = () => {}; // 필요 시 props로 받아서 사용
 
-  /* ---------------- 렌더 ---------------- */
-  // if (loading) return <div className="flex-1 flex items-center justify-center">로딩 중…</div>;
+  /* ───────── DnD 장애 방지용 빈 drop 영역 ───────── */
+  useDrop({ accept: ["folder", "workbook"], drop: () => {} });
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">로딩 중…</div>
+    );
+  }
 
   return (
     <main className="ml-[200px] mt-[125px] flex-1 p-8 relative">
       <FolderListWithDnD
-        /* 상단 툴바 */
-        selectedFolder={folderData}
+        mode="public"
+        filterDepth={filterDepth}
+        selectedFolder={{
+          id:
+            filterDepth === 3
+              ? selectedSubject?.id
+              : filterDepth === 2
+              ? selectedDepartment?.id
+              : filterDepth === 1
+              ? selectedCollege?.id
+              : null,
+          name: makeTitle(),
+          parentId: filterDepth > 0 ? true : null,
+        }}
         selectedItems={selectedIds}
         sortOption={sortOption}
         onSortChange={setSortOption}
-        onBack={() => {/* loadFolder(folderData.parentId); */ }}
+        onBack={handleBack}
         onToggleAll={toggleSelectMode}
         isSelectMode={isSelectMode}
-        onUpload={() => setShowCopyPopup(true)}  // “담기” 버튼
-        /* 리스트 */
-        currentFolder={folderData}
-        folders={sortedFolders}
+        onDownload={() => setShowCopyPopup(true)}
+        currentFolder={{ id: null }}
+        folders={[]}
         workbooks={sortedWorkbooks}
-        onRefresh={() => {/* loadFolder(folderData.id); */ }}
-        onFolderClick={(id) => !isSelectMode /* && loadFolder(id) */}
-        /* 읽기 전용 → 다음 세 개는 No-op */
-        onRename={() => { }}
-        onDeleteFolder={() => { }}
-        onDeleteWorkbook={() => { }}
-        onRenameWorkbook={() => { }}
+        onRefresh={() => {}}
+        onFolderClick={() => {}}
+        onRename={() => {}}
+        onDeleteFolder={() => {}}
+        onDeleteWorkbook={() => {}}
+        onRenameWorkbook={() => {}}
         onAddFolder={null}
         onSelectItem={handleSelect}
       />
 
-      {/* “내 문제집 담기” 팝업 – UI만 먼저 */}
+      {/* 사본 만들기 팝업 */}
       {showCopyPopup && (
         <UploadPopup
           mode="copyToPrivate"
-          selectedWorkbooks={folderData.childWorkbooks.filter((w) =>
+          selectedWorkbooks={workbooks.filter((w) =>
             selectedIds.includes(w.id)
           )}
           onConfirm={async () => {
-            /* await Promise.all(selectedIds.map(id => copyWorkbookToPrivate(id))); */
+            await Promise.all(
+              selectedIds.map((id) => copyWorkbookToPrivate(id))
+            );
             setShowCopyPopup(false);
             setSelectedIds([]);
           }}
