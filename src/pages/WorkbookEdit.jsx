@@ -2,7 +2,7 @@
 import React, {
   useState, useEffect, useLayoutEffect, useRef, useContext,
 } from "react";
-import { useParams, UNSAFE_NavigationContext as NavigationContext } from "react-router-dom";
+import { useParams, UNSAFE_NavigationContext as NavigationContext, useNavigate } from "react-router-dom";
 import EditNavbar from "../components/EditNavbar.jsx";
 import ProblemCard from "../components/problem/ProblemCard.jsx";
 import UpIcon from "../assets/arrow-up.png";
@@ -10,8 +10,10 @@ import DownIcon from "../assets/arrow-down.png";
 import { fetchProblems, updateProblems } from "../api/workbookEditApi.js";
 import ConfirmPopup from "../components/common/ConfirmPopup.jsx";
 import InformationPopup from "../components/common/InformationPopup.jsx";
+import { nav } from "framer-motion/client";
 
 export default function WorkbookEdit() {
+  const navigate = useNavigate();
   const { ids } = useParams();
   const workbookId = Number(ids);
 
@@ -25,6 +27,7 @@ export default function WorkbookEdit() {
   const [confirm, setConfirm] = useState(null);
   const [isDirty, setIsDirty] = useState(false);
   const [navCallback, setNavCallback] = useState(null);
+  const [navReturn, setNavReturn] = useState(false);
 
 
 
@@ -132,7 +135,7 @@ export default function WorkbookEdit() {
         await updateProblems(workbookId, problems);
         setEditingId(null);
         setIsDirty(false);
-        setInfoMsg("최종 저장되었습니다.");
+        setNavReturn(true);
       },
     });
   };
@@ -140,6 +143,13 @@ export default function WorkbookEdit() {
   /* ─── 7) 렌더링 ───────────────────────────────────────────── */
   return (
     <div className="min-h-screen bg-[#FFFDF9]">
+
+      {navReturn && (
+        <InformationPopup
+          message="최종 저장되었습니다."
+          onClose={() => navigate("/folder")}
+        />
+      )}
 
       {confirm && (
         <ConfirmPopup

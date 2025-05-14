@@ -120,6 +120,7 @@ export default function UploadPopup({ selectedWorkbooks = [], onClose }) {
     /* 업로드 실행                                                          */
     /* ------------------------------------------------------------------ */
     const handleUploadAll = async () => {
+        if (isUploading) return;
         setIsUploading(true);
         const results = [];
         for (let i = 0; i < selections.length; i++) {
