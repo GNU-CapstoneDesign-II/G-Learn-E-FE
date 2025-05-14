@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 const MergeConfirmDialog = ({
     isOpen,
     idList,
+    titleList,
     selectedCount,
     onCancel,
     onConfirm,      // 이제 onConfirm(title)를 호출합니다.
@@ -32,7 +33,7 @@ const MergeConfirmDialog = ({
                         <tbody>
                             {idList.map((id, idx) => (
                                 <tr key={id} className="h-8">
-                                    <td className="text-center">{`문제집 ${id}`}</td>
+                                    <td className="text-center">{`${titleList[idx]}`}</td>
                                     <td className="text-center">
                                         {idx === midIndex ? selectedCount : ''}
                                     </td>
@@ -64,7 +65,7 @@ const MergeConfirmDialog = ({
                         </button>
                         <button
                             onClick={handleConfirm}
-                            className="px-8 py-2 border border-red-500 text-red-500 rounded-full hover:bg-red-50 transition"
+                            className="px-8 py-2 border border-[#5c4033] text-white rounded-full hover:bg-[#d6b498] hover:border-[#d6b498] bg-brown transition"
                         >
                             확인
                         </button>

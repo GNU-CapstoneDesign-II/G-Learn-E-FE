@@ -44,36 +44,7 @@ export const mergeWorkbook = async (title, problems) => {
     return res.data.data.createdWorkbook;
 };
 
-/**
- * 선택된 문제 ID들로 새 문제집을 만듭니다.
- * POST /api/workbook
- * @param {string} title
- * @param {number[]} problemIds
- * @returns {Promise<Object>} createdWorkbook
- */
-export const createMergedWorkbook = async (title, problemIds) => {
-    const payload = { title, problemIds };
-    const res = await axios.post('/api/workbook', payload);
-    // res.data.data 에 새로 생성된 워크북 정보가 들어있다고 가정
-    return res.data.data;
-};
 
-/**
- * 워크북의 문제 리스트를 교체(업데이트)합니다.
- * PATCH /api/workbook/{workbookId}/problems
- * @param {number|string} workbookId
- * @param {number[]} problemIds
- * @returns {Promise<Object>} updatedWorkbook
- */
-export const updateWorkbookProblems = async (workbookId, problemIds) => {
-    const payload = { problemIds };
-    const res = await axios.patch(
-        `/api/workbook/${workbookId}/problems`,
-        payload
-    );
-    // res.data.data 에 업데이트된 워크북 정보
-    return res.data.data;
-};
 
 /**
  * 주어진 workbook id 목록에 해당하는 워크북의 기본 정보를 조회합니다.

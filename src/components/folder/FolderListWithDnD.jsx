@@ -117,6 +117,10 @@ export default function FolderListWithDnD({
     })
   });
 
+  const selectedTitles = workbooks
+    .filter(wb => selectedItems.includes(wb.id))
+    .map(wb => wb.name);
+
   return (
     <>
       {/* 상단 툴바 영역 */}
@@ -132,7 +136,7 @@ export default function FolderListWithDnD({
           <h2 className="text-lg font-semibold text-[#5f360a]">
             <span>{selectedFolder.name}</span>
 
-            { (isOver || canDrop) && (!isRoot) && (
+            {(isOver || canDrop) && (!isRoot) && (
               <span className="ml-5 px-2 py-1 bg-[#AC957B] text-white text-xs rounded">
                 상위 폴더로 이동
               </span>
@@ -169,7 +173,7 @@ export default function FolderListWithDnD({
               </button>
               <button
                 onClick={() =>
-                  navigate("/merge", { state: { ids: selectedItems } })
+                  navigate("/merge", { state: { ids: selectedItems, titles: selectedTitles } })
                 }
                 className="bg-[#AC957B] text-white px-3 py-1 rounded hover:bg-[#5F360A] transition-colors"
               >
@@ -248,7 +252,7 @@ function FolderItem({
   const [, drop] = useDrop({
     accept: [ItemTypes.FOLDER, ItemTypes.WORKBOOK],
     drop: (item, monitor) => {
-      if(item.id === folder.id) return; // 자기 자신으로 드롭 방지
+      if (item.id === folder.id) return; // 자기 자신으로 드롭 방지
       const mover =
         monitor.getItemType() === ItemTypes.FOLDER ? moveFolder : moveWorkbook;
       mover(item.id, folder.id).then(onRefresh);
