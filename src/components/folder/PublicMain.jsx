@@ -1,6 +1,4 @@
-// src/components/folder/PublicMain.jsx
 import React, { useState, useEffect, useMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { useDrop } from "react-dnd";
 import FolderListWithDnD from "./FolderListWithDnD.jsx";
 import UploadPopup from "../common/UploadPopup.jsx";
@@ -12,94 +10,110 @@ import {
   getPublicWorkbooksBySubject,
 } from "../../api/publicWorkbooksApi";
 
+/**
+ * 완전 제어형 PublicMain
+ *  - college / department / subject를 prop 그대로 사용
+ */
 export default function PublicMain({
-  selectedCollege,
-  selectedDepartment,
-  selectedSubject,
-  filterDepth,
-  page,
-  size,
-  sort,
-  order,
-}) {
-  const { search } = useLocation();
-  const navigate = useNavigate();
-  const params = new URLSearchParams(search);
+  /* === 필터 값들 (부모가 제어) === */
+  selectedCollege = null,
+  selectedDepartment = null,
+  selectedSubject = null,
 
-  const [workbooks, setWorkbooks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [sortOption, setSortOption] = useState("name");
+  /* === 페이징·정렬 (부모가 제어하거나 초기값만) === */
+  page = 0,
+  size = 20,
+  sort = "name",
+  order = "asc",
+}) {
+  /* ───────── 기타 UI 상태 ───────── */
+  const [workbooks, setWorkbooks]       = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [sortOption, setSortOption]     = useState("name");      // 클라이언트측 이름 정렬
   const [isSelectMode, setIsSelectMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState([]);
+  const [selectedIds, setSelectedIds]   = useState([]);
   const [showCopyPopup, setShowCopyPopup] = useState(false);
 
-  // 1) 필터 깊이에 따라 다른 엔드포인트 호출
-  const loadWorkbooks = async () => {
-    setLoading(true);
-    try {
-      let res;
-      switch (filterDepth) {
-        case 0:
-          res = await getPublicWorkbooks(page, size, sort, order);
-          break;
-        case 1:
-          res = await getPublicWorkbooksByCollege(
-            selectedCollege.id,
-            page,
-            size,
-            sort,
-            order
-          );
-          break;
-        case 2:
-          res = await getPublicWorkbooksByDepartment(
-            selectedDepartment.id,
-            page,
-            size,
-            sort,
-            order
-          );
-          break;
-        case 3:
-          res = await getPublicWorkbooksBySubject(
-            selectedSubject.id,
-            page,
-            size,
-            sort,
-            order
-          );
-          break;
-        default:
-          res = { data: { data: [] } };
-      }
-      setWorkbooks(res.data.data || []);
-      setIsSelectMode(false);
-      setSelectedIds([]);
-    } catch (err) {
-      console.error("문제집 불러오기 실패:", err);
-      setWorkbooks([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  /* ───────── 필터 깊이 계산 ───────── */
+  const filterDepth = selectedSubject
+    ? 3
+    : selectedDepartment
+    ? 2
+    : selectedCollege
+    ? 1
+    : 0;
 
+  /* ───────── 워크북 로딩 ───────── */
   useEffect(() => {
-    loadWorkbooks();
-  }, [filterDepth, page, size, sort, order]);
+    const load = async () => {
+      setLoading(true);
+      try {
+        let res;
+        switch (filterDepth) {
+          case 0:
+            res = await getPublicWorkbooks(page, size, sort, order);
+            break;
+          case 1:
+            res = await getPublicWorkbooksByCollege(
+              selectedCollege.id,
+              page,
+              size,
+              sort,
+              order
+            );
+            break;
+          case 2:
+            res = await getPublicWorkbooksByDepartment(
+              selectedDepartment.id,
+              page,
+              size,
+              sort,
+              order
+            );
+            break;
+          case 3:
+            res = await getPublicWorkbooksBySubject(
+              selectedSubject.id,
+              page,
+              size,
+              sort,
+              order
+            );
+            break;
+          default:
+            res = { data: { data: [] } };
+        }
+        setWorkbooks(res.data.data || []);
+        setIsSelectMode(false);
+        setSelectedIds([]);
+      } catch (err) {
+        console.error("문제집 불러오기 실패:", err);
+        setWorkbooks([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [
+    selectedCollege,
+    selectedDepartment,
+    selectedSubject,
+    page,
+    size,
+    sort,
+    order,
+    filterDepth,
+  ]);
 
-  // 2) 이름 정렬 시 null 안전 처리
+  /* ───────── 이름 정렬(Null‑safe) ───────── */
   const sortedWorkbooks = useMemo(() => {
-    const arr = [...workbooks];
-    if (sortOption === "name") {
-      return arr.sort((a, b) => {
-        const nameA = a.name ?? "";
-        const nameB = b.name ?? "";
-        return nameA.localeCompare(nameB);
-      });
-    }
-    return arr;
+    if (sortOption !== "name") return workbooks;
+    return [...workbooks].sort((a, b) =>
+      (a.name ?? "").localeCompare(b.name ?? "")
+    );
   }, [workbooks, sortOption]);
 
+  /* ───────── 선택 모드 토글 / 선택 관리 ───────── */
   const toggleSelectMode = () => {
     setIsSelectMode((m) => !m);
     if (isSelectMode) setSelectedIds([]);
@@ -109,34 +123,23 @@ export default function PublicMain({
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
 
+  /* ───────── 폴더명 생성 ───────── */
   const makeTitle = () => {
     const parts = [
       selectedCollege?.name,
       selectedDepartment?.name,
       selectedSubject?.name,
     ].filter(Boolean);
-    return parts.length > 0
-      ? parts.join(" - ")
-      : "Public";    // depth 0일 땐 “Public” 출력
+    return parts.length ? parts.join(" - ") : "Public";
   };
 
-  // 3) 뒤로가기: 현재 가장 깊은 필터만 삭제해서 한 단계씩 위로 이동
-  const handleBack = () => {
-    const p = new URLSearchParams(search);
-    if (p.has("subject")) {
-      p.delete("subject");
-      if (p.has("year")) p.delete("year");     // subject → department로 바로
-    } else if (p.has("year")) {
-      p.delete("year");                         // year → department
-    } else if (p.has("sub")) {
-      p.delete("sub");                          // department → college
-    } else if (p.has("main")) {
-      p.delete("main");                         // college → 루트
-    }
-    navigate(`/folder?${p.toString()}`);
-  };
+  /* ───────── 뒤로가기(부모 state 조작 필요하면 prop으로 전달하세요) ───────── */
+  // 현재 구조에선 PublicMain이 단독으로 filter를 줄일 방법이 없으므로
+  // handleBack을 부모에서 내려주도록 바꾸거나, 선택 로직을 Sidebar에서만 처리합니다.
+  const handleBack = () => {}; // 필요 시 props로 받아서 사용
 
-  useDrop({ accept: ["folder", "workbook"], drop: () => { } });
+  /* ───────── DnD 장애 방지용 빈 drop 영역 ───────── */
+  useDrop({ accept: ["folder", "workbook"], drop: () => {} });
 
   if (loading) {
     return (
@@ -152,12 +155,12 @@ export default function PublicMain({
         selectedFolder={{
           id:
             filterDepth === 3
-              ? selectedSubject.id
+              ? selectedSubject?.id
               : filterDepth === 2
-                ? selectedDepartment.id
-                : filterDepth === 1
-                  ? selectedCollege.id
-                  : null,
+              ? selectedDepartment?.id
+              : filterDepth === 1
+              ? selectedCollege?.id
+              : null,
           name: makeTitle(),
           parentId: filterDepth > 0 ? true : null,
         }}
@@ -167,20 +170,21 @@ export default function PublicMain({
         onBack={handleBack}
         onToggleAll={toggleSelectMode}
         isSelectMode={isSelectMode}
-        onUpload={() => setShowCopyPopup(true)}
+        onDownload={() => setShowCopyPopup(true)}
         currentFolder={{ id: null }}
         folders={[]}
         workbooks={sortedWorkbooks}
-        onRefresh={loadWorkbooks}
-        onFolderClick={() => { }}
-        onRename={() => { }}
-        onDeleteFolder={() => { }}
-        onDeleteWorkbook={() => { }}
-        onRenameWorkbook={() => { }}
+        onRefresh={() => {}}
+        onFolderClick={() => {}}
+        onRename={() => {}}
+        onDeleteFolder={() => {}}
+        onDeleteWorkbook={() => {}}
+        onRenameWorkbook={() => {}}
         onAddFolder={null}
         onSelectItem={handleSelect}
       />
 
+      {/* 사본 만들기 팝업 */}
       {showCopyPopup && (
         <UploadPopup
           mode="copyToPrivate"
