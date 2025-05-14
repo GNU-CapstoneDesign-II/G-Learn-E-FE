@@ -13,6 +13,7 @@ import FolderPage from "./pages/FolderPage.jsx";
 import Ranking from "./pages/Ranking.jsx";
 import Mypage from './pages/MyPage.jsx';
 import WorkbookEdit from './pages/WorkbookEdit.jsx'
+import WorkbookMerge from './pages/WorkbookMerge.jsx';
 
 function App() {
   return (
@@ -37,6 +38,15 @@ function App() {
       {/* 그 외 리디렉트 */}
       <Route path="*" element={<MainPage />} />
       <Route path="/" element={<MainPage />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/find-password" element={<FindPassword />} />
+      <Route path="/solve/:workbookId" element={<WorkbookSolve />} />
+      <Route path="/generate-problem" element={<ProblemGenerator />} />
+      <Route path="/folder" element={<FolderPage />} />
+      <Route path="/ranking" element={<Ranking />} />
+      <Route path="/mypage" element={<Mypage />} />
+      <Route path="/merge" element={<WorkbookMerge />} />
     </Routes>
   );
 }
