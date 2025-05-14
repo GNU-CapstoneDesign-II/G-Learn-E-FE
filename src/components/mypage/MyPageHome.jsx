@@ -64,11 +64,18 @@ const MyPageHome = () => {
             <div className="flex flex-col md:flex-row gap-8">
                 {/* 블럭 ② : 레벨 정보 */}
                 <section className="flex-1 bg-white rounded-3xl p-8 flex items-center justify-between shadow-lg">
+                    {/* 랭킹 */}
+                    <div className="px-4 text-center">
+                        <p className="text-4xl font-bold text-[#5F360A]">{stats.ranking}</p>
+                        <p className="mt-2 text-sm text-[#5F360A]/70">나의 랭킹</p>
+                    </div>
+                    <div className="hidden md:block w-px h-12 bg-[#e0d5c5]" />
                     {/* 왼쪽: 아이콘 + 레벨 */}
                     <div className="flex items-center gap-6">
                         <LevelIcon level={user.level} size={80} />
                         <h3 className="text-xl font-bold text-[#5F360A]">
-                            Lv.&nbsp;{user.level}&nbsp;{className}
+                            {/* Lv.&nbsp;{user.level}&nbsp; */}
+                            {className}
                         </h3>
                     </div>
 
@@ -83,27 +90,28 @@ const MyPageHome = () => {
 
                 {/* 블럭 ③ : 통계(랭킹·문제집) */}
                 <section className="flex-1 bg-white rounded-3xl p-8 flex justify-around items-center shadow-lg text-center">
-                    {/* ⓐ 랭킹 */}
-                    <div className="px-4">
-                        <p className="text-4xl font-bold text-[#5F360A]">{stats.ranking}</p>
-                        <p className="mt-2 text-sm text-[#5F360A]/70">나의 랭킹</p>
-                    </div>
-                    {/* 세로 구분선 */}
-                    <div className="hidden md:block w-px h-12 bg-[#e0d5c5]" />
-                    {/* ⓑ 만든 문제집 수 */}
+                    {/* 만든 문제집 수 */}
                     <div className="px-4">
                         <p className="text-4xl font-bold text-[#5F360A]">
                             {stats.createdWorkbooks}
                         </p>
-                        <p className="mt-2 text-sm text-[#5F360A]/70">만든 문제 수</p>
+                        <p className="mt-2 text-sm text-[#5F360A]/70">만든 문제집</p>
                     </div>
                     <div className="hidden md:block w-px h-12 bg-[#e0d5c5]" />
-                    {/* ⓒ 푼 문제집 수 */}
+                    {/* 업로드 문제집 수 */}
+                    <div className="px-4">
+                        <p className="text-4xl font-bold text-[#5F360A]">
+                            {stats.uploadedWorkbooks}
+                        </p>
+                        <p className="mt-2 text-sm text-[#5F360A]/70">업로드 문제집</p>
+                    </div>
+                    <div className="hidden md:block w-px h-12 bg-[#e0d5c5]" />
+                    {/* 푼 문제집 수 */}
                     <div className="px-4">
                         <p className="text-4xl font-bold text-[#5F360A]">
                             {stats.solvedWorkbooks}
                         </p>
-                        <p className="mt-2 text-sm text-[#5F360A]/70">푼 문제 수</p>
+                        <p className="mt-2 text-sm text-[#5F360A]/70">푼 문제집</p>
                     </div>
                 </section>
             </div>
