@@ -10,6 +10,8 @@ import {
 import { useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import logoImageBack from '../assets/image-logo-background.png';
+import { useAuth } from '../contexts/AuthContext.jsx';
+import LevelIcon from '../components/common/LevelIcon.jsx';
 
 const tabConfig = [
   { label: '유저별',        value: 'user' },
@@ -20,6 +22,8 @@ const tabConfig = [
 ];
 
 export default function Ranking() {
+  const { user } = useAuth();
+
   const [activeTab, setActiveTab]     = useState('user');
   const [rankings, setRankings]       = useState([]);
   const [loading, setLoading]         = useState(false);
@@ -27,7 +31,6 @@ export default function Ranking() {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages]   = useState(1);
 
-  const { departmentId, collegeId } = useParams();
   const isUserTab    = ['user','departmentUser','collegeUser'].includes(activeTab);
   const isDeptTab    = activeTab === 'department';
   const isCollegeTab = activeTab === 'college';
@@ -50,13 +53,13 @@ export default function Ranking() {
             data = await getDepartmentRanking(currentPage);
             break;
           case 'departmentUser':
-            data = await getDepartmentUserRanking(departmentId, currentPage);
+            data = await getDepartmentUserRanking(user.department.id, currentPage);
             break;
           case 'college':
             data = await getCollegeRanking(currentPage);
             break;
           case 'collegeUser':
-            data = await getCollegeUserRanking(collegeId, currentPage);
+            data = await getCollegeUserRanking(user.college.id, currentPage);
             break;
           default:
             data = await getUserRanking(currentPage);
@@ -78,7 +81,7 @@ export default function Ranking() {
       }
     }
     fetch();
-  }, [activeTab, currentPage, departmentId, collegeId]);
+  }, [activeTab, currentPage]);
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-[rgba(243,233,220,0.5)]">
@@ -147,12 +150,14 @@ export default function Ranking() {
                         </td>
                         <td className="p-4 flex items-center justify-start gap-2">
                           {i === 0 && <span className="text-2xl">👑</span>}
-                          {isUserTab && u.profileImage && (
-                            <img
-                              src={`/images/profiles/${u.profileImage}.png`}
-                              alt="프로필"
-                              className="w-6 h-6 rounded-full"
-                            />
+                          {isUserTab && (
+                            // 프로필 이미지 없어서 대체로 유저 레벨 아이콘 사용함
+                            // <img
+                            //   src={`/images/profiles/${u.profileImage}.png`}
+                            //   alt="프로필"
+                            //   className="w-6 h-6 rounded-full"
+                            // />
+                            <LevelIcon level={u.level} size={30} />
                           )}
                           <span className="font-semibold">
                             {isDeptTab && u.name}
@@ -160,9 +165,9 @@ export default function Ranking() {
                             {isUserTab && u.nickname}
                           </span>
                         </td>
-                        <td className="p-4 text-center text-[#3ADBFF]">{u.level}</td>
-                        <td className="p-4 text-right">{u.createdWorkbooks}</td>
-                        <td className="p-4 text-right">{u.solvedWorkbooks}</td>
+                        <td className="p-4 text-center text-[#00b3ff] font-bold">{u.level}</td>
+                        <td className="p-4 text-right font-bold">{u.createdWorkbooks}</td>
+                        <td className="p-4 text-right font-bold">{u.solvedWorkbooks}</td>
                       </tr>
                     ))}
                   </tbody>
