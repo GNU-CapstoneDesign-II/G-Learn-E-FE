@@ -162,11 +162,11 @@ const ProblemGenerator = () => {
               </span>} isActive={inputType === 'text'} onClick={() => setInputType('text')} />
               <SelectableButton label={<span className="flex items-center gap-1">
                 <img src={pdf} alt="pdf" className="w-5 h-5 object-contain" />
-                Text
+                PDF
               </span>} isActive={inputType === 'pdf'} onClick={() => { setInputType('pdf'); setIsPDFPopupOpen(true); }} />
               <SelectableButton label={<span className="flex items-center gap-1">
                 <img src={voice} alt="voice" className="w-5 h-5 object-contain" />
-                Text
+                음성파일
               </span>} isActive={inputType === 'voice'} onClick={() => { setInputType('voice'); setIsAudioPopupOpen(true); }} />
             </div>
           </div>
