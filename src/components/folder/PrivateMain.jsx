@@ -2,7 +2,10 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useDrop } from "react-dnd";
 import FolderListWithDnD from "./FolderListWithDnD.jsx";
+import ConfirmPopup from "../common/ConfirmPopup.jsx";
+import InformationPopup from "../common/InformationPopup.jsx";
 import UploadPopup from "../common/UploadPopup.jsx";
+import InputPopup from "../common/InputPopup.jsx";
 import {
   fetchPrivateFolder,
   createPrivateFolder,
@@ -31,6 +34,28 @@ export default function PrivateMain() {
   const [selectedIds, setSelectedIds] = useState([]);
   const [showUploadPopup, setShowUploadPopup] = useState(false);
 
+  // —— 팝업 관리 state ——
+  const [modal, setModal] = useState({
+    type: null,   // "renameFolder" | "renameWorkbook" | "deleteFolder" | "deleteWorkbook" | "addFolder"
+    id: null,     // 대상 id (rename/delete 시)
+  });
+  const [infoMsg, setInfoMsg] = useState(null);
+
+  // 팝업 핸들러들
+  const openRenameFolder = id =>
+    setModal({ type: "renameFolder", id });
+  const openRenameWorkbook = id =>
+    setModal({ type: "renameWorkbook", id });
+  const openDeleteFolder = id =>
+    setModal({ type: "deleteFolder", id });
+  const openDeleteWorkbook = id =>
+    setModal({ type: "deleteWorkbook", id });
+  const openAddFolder = () =>
+    setModal({ type: "addFolder" });
+
+  const closeModal = () =>
+    setModal({ type: null, id: null });
+
   // 폴더 데이터 로드
   const loadFolder = async (id = null) => {
     setLoading(true);
@@ -41,6 +66,38 @@ export default function PrivateMain() {
       setSelectedIds([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 팝업 확인 액션
+  const handleConfirm = async value => {
+    try {
+      switch (modal.type) {
+        case "renameFolder":
+          await renameFolder(modal.id, value);
+          setInfoMsg("폴더 이름이 변경되었습니다.");
+          break;
+        case "renameWorkbook":
+          await renameWorkbook(modal.id, value);
+          setInfoMsg("문제집 이름이 변경되었습니다.");
+          break;
+        case "addFolder":
+          await createPrivateFolder({ name: value, parentId: folderData.id });
+          setInfoMsg("새 폴더가 생성되었습니다.");
+          break;
+        case "deleteFolder":
+          await deleteFolder(modal.id);
+          setInfoMsg("폴더가 삭제되었습니다.");
+          break;
+        case "deleteWorkbook":
+          await deleteWorkbook(folderData.id, modal.id);
+          setInfoMsg("문제집이 삭제되었습니다.");
+          break;
+      }
+      closeModal();
+      loadFolder(folderData.id);
+    } catch (err) {
+      setInfoMsg("오류가 발생했습니다.");
     }
   };
 
@@ -155,37 +212,11 @@ export default function PrivateMain() {
         workbooks={sortedWorkbooks}
         onRefresh={() => loadFolder(folderData.id)}
         onFolderClick={(id) => !isSelectMode && loadFolder(id)}
-        onRename={async (id) => {
-          const newName = prompt("새 폴더 이름", folderData.name);
-          if (!newName?.trim()) return;
-          await renameFolder(id, newName.trim());
-          loadFolder(folderData.id);
-        }}
-        onDeleteFolder={async (id) => {
-          if (!window.confirm("폴더를 삭제할까요?")) return;
-          await deleteFolder(id);
-          loadFolder(folderData.id);
-        }}
-        onDeleteWorkbook={async (wid) => {
-          if (!window.confirm("문제집을 삭제할까요?")) return;
-          await deleteWorkbook(folderData.id, wid);
-          loadFolder(folderData.id);
-        }}
-        onRenameWorkbook={async (wid) => {
-          const newName = prompt("새 문제집 이름");
-          if (!newName?.trim()) return;
-          await renameWorkbook(wid, newName.trim());
-          loadFolder(folderData.id);
-        }}
-        onAddFolder={async () => {
-          const name = prompt("새 폴더 이름");
-          if (!name?.trim()) return;
-          await createPrivateFolder({
-            name: name.trim(),
-            parentId: folderData.id,
-          });
-          loadFolder(folderData.id);
-        }}
+        onRename={openRenameFolder}
+        onRenameWorkbook={openRenameWorkbook}
+        onDeleteFolder={openDeleteFolder}
+        onDeleteWorkbook={openDeleteWorkbook}
+        onAddFolder={openAddFolder}
         onSelectItem={handleSelectItem}
       />
 
@@ -193,6 +224,52 @@ export default function PrivateMain() {
         <UploadPopup
           selectedWorkbooks={selectedWorkbooks}
           onClose={() => setShowUploadPopup(false)}
+        />
+      )}
+
+      {/* 1) 이름 변경 & 새 폴더용 InputPopup */}
+      {(modal.type === "renameFolder" ||
+        modal.type === "renameWorkbook" ||
+        modal.type === "addFolder") && (
+        <InputPopup
+          title={
+            modal.type === "addFolder"
+              ? "새 폴더 이름"
+              : modal.type === "renameFolder"
+              ? "폴더 이름 변경"
+              : "문제집 이름 변경"
+          }
+          defaultValue={
+            modal.type === "renameFolder"
+              ? folderData.childFolders.find(f => f.id === modal.id)?.name
+              : modal.type === "renameWorkbook"
+              ? folderData.childWorkbooks.find(w => w.id === modal.id)?.name
+              : ""
+          }
+          placeholder="이름을 입력하세요"
+          onConfirm={handleConfirm}
+          onCancel={closeModal}
+        />
+      )}
+
+      {/* 2) 삭제 확인용 ConfirmPopup */}
+      {(modal.type === "deleteFolder" || modal.type === "deleteWorkbook") && (
+        <ConfirmPopup
+          message={
+            modal.type === "deleteFolder"
+              ? "폴더를 정말 삭제하시겠습니까?"
+              : "문제집을 정말 삭제하시겠습니까?"
+          }
+          onConfirm={() => handleConfirm()}
+          onCancel={closeModal}
+        />
+      )}
+
+      {/* 3) 결과 안내용 InformationPopup */}
+      {infoMsg && (
+        <InformationPopup
+          message={infoMsg}
+          onClose={() => setInfoMsg(null)}
         />
       )}
     </main>
