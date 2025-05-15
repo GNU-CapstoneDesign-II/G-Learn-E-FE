@@ -98,7 +98,7 @@ export default function MainPage() {
           className={sectionWrapper}
           style={{
             background:
-              "radial-gradient(circle at center, rgba(210,160,120,0.85) 0%, rgba(243,233,220,0.5) 70%)",
+              "radial-gradient(circle at center, rgba(225,180,140,0.75) 0%, rgba(243,233,220,0.5) 70%)",
           }}
         >
           <div className="max-w-[960px] mx-auto px-4 text-center">
