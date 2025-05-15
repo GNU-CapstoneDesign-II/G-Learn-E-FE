@@ -1,10 +1,13 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import logoImage from "../assets/image-logo.png";
 import textLogoImage from "../assets/text-logo.png";
 import Navbar from "../components/Navbar.jsx";
+import SelectableButton from '../components/ProblemGenerator/SelectableButton.jsx';
 
 export default function MainPage() {
+  const navigate = useNavigate();
   const sectionWrapper = "min-h-[80vh] py-10 w-full flex items-center";
 
   const scrollToTop = () =>
@@ -95,7 +98,7 @@ export default function MainPage() {
           className={sectionWrapper}
           style={{
             background:
-              "radial-gradient(circle at center, rgba(225,190,160,0.75) 0%, rgba(243,233,220,0.5) 70%)",
+              "radial-gradient(circle at center, rgba(210,160,120,0.85) 0%, rgba(243,233,220,0.5) 70%)",
           }}
         >
           <div className="max-w-[960px] mx-auto px-4 text-center">
@@ -108,12 +111,12 @@ export default function MainPage() {
             <motion.p {...fadeWithDelay(0.3)} className="text-xl md:text-2xl text-darkbrown font-medium mb-4">
               지런이는 경상국립대학교 학생들을 위한 맞춤형 학습 플랫폼입니다.
             </motion.p>
-            <motion.p {...fadeWithDelay(0.4)} className="text-base md:text-lg leading-[1.7] text-darkbrown/60 mb-4">
+            <motion.p {...fadeWithDelay(0.4)} className="text-base md:text-lg leading-relaxed text-darkbrown/60 mb-4">
               고등학생처럼 기성 문제집에 의존할 수 없는 대학생들을 위해,<br />
               지런이는 당신이 공부한 자료에서 문제를 생성하고, 연습하며 학습을 완성할 수 있도록 돕습니다.<br />
               같은 목표를 가진 학생들과 문제를 공유하며, 배움을 더 넓고 깊게 확장하세요.
             </motion.p>
-            <motion.p {...fadeWithDelay(0.5)} className="text-xs md:text-sm leading-[1.5] text-[#C2AE97]">
+            <motion.p {...fadeWithDelay(0.5)} className="text-xs md:text-sm leading-[1.5] text-darkbrown/40">
               For college students who can't rely on ready-made workbooks, like high school students,<br />
               G-Learn-E helps you create problems, practice, and complete learning from the materials you study.<br />
               Share problems with students who share the same goals, and expand your learning wider and deeper.
@@ -124,9 +127,10 @@ export default function MainPage() {
         {/* 인용 섹션 1 */}
         <section className={`${sectionWrapper} bg-white px-4 md:px-16`}>
           <div className="w-full max-w-[960px] text-left">
+            
             <div className="border-l-4 border-darkbrown">
-              <div className="border-l-2 border-darkbrown/30 pl-4 mb-8">
-                <motion.p {...fadeWithDelay(0.2)} className="text-3xl md:text-5xl font-semibold text-darkbrown leading-snug md:leading-[4rem]">
+              <div className="border-l-2 border-[#C2AE97] pl-4 mb-8">
+                <motion.p {...fadeWithDelay(0.2)} className="text-3xl md:text-4xl font-semibold text-darkbrown leading-relaxed md:leading-[3.5rem]">
                   배움이 스쳐 지나가지 않도록,<br />
                   한 번 더 생각하고 문제로 풀어보세요.
                 </motion.p>
@@ -136,25 +140,46 @@ export default function MainPage() {
               지런이가 당신의 학습 자료를 문제로 변환하고,<br />
               연습과 이해를 돕는 새로운 학습 경험을 제공합니다.
             </motion.p>
+            
           </div>
         </section>
 
         {/* 인용 섹션 2 */}
         <section className={`${sectionWrapper} bg-[rgba(243,233,220,0.5)] justify-end px-4 md:px-16`}>
           <div className="w-full max-w-[960px] text-right">
+          
+            {/* 인용 텍스트 박스 */}
             <div className="border-r-4 border-darkbrown">
-              <div className="border-r-2 border-darkbrown/30 pr-4 mb-8">
-                <motion.p {...fadeWithDelay(0.2)} className="text-3xl md:text-5xl font-semibold text-darkbrown leading-snug md:leading-[4rem]">
+              <div className="border-r-2 border-[#C2AE97] pr-4 mb-8">
+                <motion.p
+                  {...fadeWithDelay(0.2)}
+                  className="text-3xl md:text-4xl font-semibold text-darkbrown leading-relaxed md:leading-[3.5rem]"
+                >
                   배움은 혼자만의 길이 아닙니다.<br />
                   같은 목표를 가진 학생들과 문제를 나누고 함께 풀어가며,<br />
                   우리는 더 깊이 이해하고 성장합니다.
                 </motion.p>
               </div>
             </div>
-            <motion.p {...fadeWithDelay(0.3)} className="text-base md:text-lg leading-normal text-darkbrown/60">
-              경상국립대학교 학생들과 생성된 문제를 공유하고,<br />
-              같이 고민하며 배움을 더욱 단단하게 만들어 보세요.
-            </motion.p>
+
+            {/* 설명 + 버튼 묶음 */}
+            <div className="space-y-4">
+              <motion.p
+                {...fadeWithDelay(0.3)}
+                className="text-base md:text-lg leading-normal text-darkbrown/60"
+              >
+                경상국립대학교 학생들과 생성된 문제를 공유하고,<br />
+                같이 고민하며 배움을 더욱 단단하게 만들어 보세요.
+              </motion.p>
+
+              <motion.div {...fadeWithDelay(0.4)} className="text-right">
+                <SelectableButton
+                  label="지금 문제 생성해보기 ⤴"
+                  onClick={() => navigate('/generate-problem')}
+                />
+              </motion.div>
+            </div>
+            
           </div>
         </section>
 
