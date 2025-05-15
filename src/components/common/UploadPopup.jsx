@@ -5,7 +5,7 @@ import {
     getDepartments,
     getSubjects,
     uploadWorkbook,
-} from "../../api/Workbook.js";
+} from "../../api/workbookApi.js";
 
 /**
  * @param {{
@@ -22,6 +22,7 @@ export default function UploadPopup({ selectedWorkbooks = [], onClose }) {
     const [departments, setDepartments] = useState([]); // 학과 리스트
     const [subjects, setSubjects] = useState([]);  // 과목 리스트
     const [isUploading, setIsUploading] = useState(false);
+    const [uploadSummary, setUploadSummary] = useState(null);
 
     // 문제집별 선택 결과  [{collegeId,name, …}] 형태
     const [selections, setSelections] = useState(
@@ -119,14 +120,28 @@ export default function UploadPopup({ selectedWorkbooks = [], onClose }) {
     /* 업로드 실행                                                          */
     /* ------------------------------------------------------------------ */
     const handleUploadAll = async () => {
+        if (isUploading) return;
         setIsUploading(true);
+        const results = [];
         for (let i = 0; i < selections.length; i++) {
-            const { id } = selectedWorkbooks[i];
-            const { collegeId, departmentId, subjectId } = selections[i];
-            await uploadWorkbook(id, collegeId, departmentId, subjectId);
+            const { id, name } = selectedWorkbooks[i];
+            const { collegeName, departmentName, subjectName } = selections[i];
+            try {
+                await uploadWorkbook(id, selections[i].collegeId, selections[i].departmentId, selections[i].subjectId);
+                results.push({ success: true });
+            } catch (err) {
+                results.push({
+                    success: false,
+                    name,
+                    path: `${collegeName} ▸ ${departmentName} ▸ ${subjectName}`
+                });
+            }
         }
         setIsUploading(false);
-        onClose();
+        // 요약 상태 설정
+        const successCount = results.filter(r => r.success).length;
+        const failures = results.filter(r => !r.success);
+        setUploadSummary({ total: selections.length, successCount, failures });
     };
 
     /* ------------------------------------------------------------------ */
@@ -135,9 +150,40 @@ export default function UploadPopup({ selectedWorkbooks = [], onClose }) {
     const currSel = selections[step] || {};
     const currWb = selectedWorkbooks[step] || {};
 
+    // 업로드 요약 뷰
+    if (uploadSummary) {
+        return (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-6 w-[600px] max-h-[90vh] overflow-auto relative">
+                    <h3 className="text-lg font-semibold mb-4">업로드 결과</h3>
+                    <p className="mb-2">
+                        총 {uploadSummary.total}건 중 <span className="font-medium text-green-600">{uploadSummary.successCount}</span>건 성공,{' '}
+                        <span className="font-medium text-red-600">{uploadSummary.failures.length}</span>건 실패
+                    </p>
+                    {uploadSummary.failures.length > 0 && (
+                        <ul className="list-disc list-inside mb-4 text-sm">
+                            {uploadSummary.failures.map((f, idx) => (
+                                <li key={idx}>
+                                    <span className="font-medium">{f.name}</span> — {f.path}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                    <div className="flex justify-end">
+                        <button
+                            onClick={onClose}
+                            className="px-4 py-2 bg-[#5f360a] text-white rounded"
+                        >
+                            닫기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-96 max-h-[80vh] overflow-auto relative">
+            <div className="bg-white rounded-lg p-6 w-[600px] max-h-[90vh] overflow-auto relative">
                 {/* ────────── 단계별 입력 ────────── */}
                 {step < selections.length ? (
                     <>

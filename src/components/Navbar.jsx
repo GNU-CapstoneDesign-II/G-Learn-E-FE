@@ -1,42 +1,55 @@
-import React from "react";
+// src/components/Navbar.jsx
+import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import logoImage from "../assets/logo.png";
-import { useAuth } from '../contexts/AuthContext';
-
+import statIcon1 from "../assets/statistic.png";
+import FAQ from "../assets/QnA.png"
+import setting from "../assets/setting.png"
+import logoutIcon from "../assets/logout.png"
+import alarm from "../assets/alarm.png"
+import { useAuth } from "../contexts/AuthContext";
+import LevelIcon from "./common/LevelIcon";
 
 function Navbar() {
-
   const { user, loading, logout } = useAuth();
 
+  /* ───── 프로필 드롭다운 상태 ───── */
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  /* 드롭다운 외부 클릭 시 자동 닫기 */
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    // ✅ 상단 고정을 위한 핵심 속성들:
-    // - fixed: 항상 고정
-    // - top-0 left-0: 화면 최상단, 좌측에 위치
-    // - z-50: 다른 요소보다 위에 보이게
-    <header className="fixed top-0 left-0 w-full z-50 border-b border-[#e7d6c4] bg-white">
-      {/* ✅ 페이지 최대 너비 제한 + 좌우 padding + 세로 중앙 정렬 */}
-      {/* h-[60px]: 상단바 전체 높이 고정 */}
-      <div className="max-w-[1280px] mx-auto flex items-center justify-between h-[60px] px-6">
-        {/* ⬅️ 왼쪽: 로고 + 메뉴 */}
-        <div className="flex items-center gap-8">
+    <header className="fixed top-0 left-0 w-full z-50 bg-white border-b border-[#e7d6c4]">
+      {/* 상단바 컨테이너 */}
+      <div className="w-full flex justify-between items-center h-[65px] px-[25px]">
+        {/* ───────── 왼쪽 영역: 로고 + 메뉴 ───────── */}
+        <div className="flex items-center gap-6">
           <Link to="/">
-            {/* h-10: 로고 높이 제한, object-contain: 비율 유지 */}
             <img src={logoImage} alt="G-Learn-E Logo" className="h-10 object-contain" />
           </Link>
 
-          {/* 메뉴 링크: 자연스러운 여백과 글꼴 설정 */}
-          <nav className="flex items-center gap-4 text-[#9A7E5F] text-sm font-medium">
-            <Link to="/generate-problem">문제 생성</Link>
+          <nav className="flex items-center gap-4 font-medium" style={{ fontSize: "13.5px", color: "#9A7E5F" }}>
+            <Link to="/generate-problem" className="hover:text-[#5F360A]">문제 생성</Link>
             <span>|</span>
-            <Link to="/folder">문제집 리스트</Link>
+            <Link to="/folder" className="hover:text-[#5F360A]">문제집 리스트</Link>
             <span>|</span>
-            <Link to="/ranking">랭킹</Link>
+            <Link to="/ranking" className="hover:text-[#5F360A]">랭킹</Link>
           </nav>
         </div>
 
-        {/* ➡️ 오른쪽: 검색창 + 알림 + 로그인 */}
+        {/* ───────── 오른쪽 영역: 검색창 + 알림 + 로그인/프로필 ───────── */}
         <div className="flex items-center gap-6">
-          {/* 🔍 검색창 영역: 연한 배경 + 둥근 테두리 */}
+          {/* 🔍 검색창 */}
           <div className="flex items-center bg-[#f8f1e7] px-4 py-2 rounded-md text-[#9A7E5F] text-sm w-[260px]">
             <span className="mr-2">🔍</span>
             <input
@@ -46,31 +59,86 @@ function Navbar() {
             />
           </div>
 
-          {/* 🔔 알림 아이콘: 배경과 원형 빨간 점 */}
+          {/* 🔔 알림 아이콘 */}
           <div className="relative bg-[#f8f1e7] rounded-md p-2 text-[#9A7E5F] text-lg">
-            🔔
-            {/* 빨간 알림 점 (새 알림 표시용) */}
-            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+            <img src={alarm} alt="알람 아이콘" className="w-5 h-5 object-contain" />
+            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" />
           </div>
 
-          {/* 로그인 / 환영 영역 */}
+          {/* 로그인 상태별 분기 */}
           {!loading && user ? (
-            /* 로그인된 상태 ─ 닉네임 + 로그아웃 버튼 */
-            <div className="flex items-center gap-2 text-sm text-[#5F360A]">
-              <span>{user.nickname}님&nbsp;환영합니다.</span>
+            /* ───── 로그인됨: 프로필 드롭다운 ───── */
+            <div className="relative" ref={dropdownRef}>
               <button
-                onClick={logout}
-                className="px-3 py-1 rounded bg-[#AC957B] text-white hover:bg-[#5F360A] transition-colors"
+                onClick={() => setDropdownOpen((prev) => !prev)}
+                className="flex items-center gap-2"
               >
-                로그아웃
+                <LevelIcon level={user.level} size={45} />
+                <span className="text-sm text-[#5F360A]">{user.nickname}님</span>
               </button>
+
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-3 w-72 bg-white border-4 border-[#e7d6c4] rounded-2xl shadow-lg p-6 z-50">
+                  {/* 프로필 헤더 */}
+                  <div className="text-center mb-5">
+                    <LevelIcon level={user.level} size={60} />
+                    <p className="mt-2 font-bold text-[#5F360A]">안녕하세요, {user.nickname}님!</p>
+                    {/* 학교·학부 정보는 추후 DB 연동 시 교체 */}
+                    <span className="block text-xs text-[#9A7E5F] mt-1">
+                      GNU - {user.college.collegeName} - {user.department.departmentName}
+                    </span>
+                  </div>
+
+                  <hr className="h-px bg-[#e7d6c4] mb-4" />
+
+                  {/* 드롭다운 메뉴 */}
+                  <ul className="space-y-2 text-sm text-[#5F360A]">
+                    <li>
+                      <Link
+                        to="/mypage"
+                        className="flex items-center gap-2 hover:bg-[#f8f1e7] rounded-lg p-2"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <img src={statIcon1} alt="통계 아이콘" className="w-5 h-5" />
+                        My Learning Journey
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/settings"
+                        className="flex items-center gap-2 hover:bg-[#f8f1e7] rounded-lg p-2"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <img src={setting} alt="설정 아이콘" className="w-5 h-5" />
+                        Settings
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/faq"
+                        className="flex items-center gap-2 hover:bg-[#f8f1e7] rounded-lg p-2"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <img src={FAQ} alt="FAQ 아이콘" className="w-5 h-5" />
+                        FAQ
+                      </Link>
+                    </li>
+                    <li>
+                      <button
+                        onClick={logout}
+                        className="flex items-center gap-2 hover:bg-[#f8f1e7] rounded-lg p-2 w-full"
+                      >
+                        <img src={logoutIcon} alt="로그아웃 아이콘" className="w-5 h-5" />
+                        Log Out
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              )}
             </div>
           ) : (
-            /* 비로그인 상태 ─ 로그인/회원가입 링크 */
-            <Link
-              to="/login"
-              className="text-[#9A7E5F] text-sm hover:underline whitespace-nowrap"
-            >
+            /* ───── 비로그인: 로그인/가입 링크 ───── */
+            <Link to="/login" className="text-[#9A7E5F] text-sm hover:underline whitespace-nowrap">
               Login&nbsp;/&nbsp;Sign&nbsp;up
             </Link>
           )}

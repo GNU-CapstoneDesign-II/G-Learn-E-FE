@@ -1,136 +1,216 @@
-import React, { useState } from 'react';
+// src/pages/Ranking.jsx
+import React, { useState, useEffect } from 'react';
+import {
+  getUserRanking,
+  getDepartmentRanking,
+  getDepartmentUserRanking,
+  getCollegeRanking,
+  getCollegeUserRanking,
+} from '../api/rankingApi';
+import { useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import logoImageBack from '../assets/image-logo-background.png';
+import { useAuth } from '../contexts/AuthContext.jsx';
+import LevelIcon from '../components/common/LevelIcon.jsx';
 
-const Ranking = () => {
-  const [activeTab, setActiveTab] = useState('user'); // ✅ 기본은 유저별
+const tabConfig = [
+  { label: '유저별',        value: 'user' },
+  { label: '학과별',        value: 'department' },
+  { label: '내 학과',      value: 'departmentUser' },
+  { label: '단과대별',      value: 'college' },
+  { label: '내 단과대',    value: 'collegeUser' },
+];
 
-  // ✅ 탭별 데이터
-  const data = {
-    user: [
-      { id: 1, nickname: '가람', level: 60, madeProblems: 25, solvedProblems: 60 },
-      { id: 2, nickname: '나래', level: 35, madeProblems: 18, solvedProblems: 45 },
-    ],
-    daily: [
-      { id: 1, nickname: '지런이', level: 46, madeProblems: 20, solvedProblems: 50 },
-      { id: 2, nickname: '지우', level: 20, madeProblems: 12, solvedProblems: 30 },
-    ],
-    weekly: [
-      { id: 1, nickname: '철수', level: 40, madeProblems: 18, solvedProblems: 48 },
-      { id: 2, nickname: '영희', level: 25, madeProblems: 10, solvedProblems: 28 },
-    ],
-    monthly: [
-      { id: 1, nickname: '민수', level: 55, madeProblems: 30, solvedProblems: 70 },
-      { id: 2, nickname: '수지', level: 22, madeProblems: 15, solvedProblems: 33 },
-    ],
-    major: [
-      { id: 1, nickname: '컴퓨터공학과', level: 70, madeProblems: 40, solvedProblems: 80 },
-      { id: 2, nickname: '전자공학과', level: 50, madeProblems: 22, solvedProblems: 55 },
-    ],
-  };
+export default function Ranking() {
+  const { user } = useAuth();
 
-  const rankings = data[activeTab]; // ✅ 현재 탭에 맞는 데이터 가져오기
+  const [activeTab, setActiveTab]     = useState('user');
+  const [rankings, setRankings]       = useState([]);
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages]   = useState(1);
+
+  const isUserTab    = ['user','departmentUser','collegeUser'].includes(activeTab);
+  const isDeptTab    = activeTab === 'department';
+  const isCollegeTab = activeTab === 'college';
+
+  const scrollToTop = () =>
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+  useEffect(() => {
+    async function fetch() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        let data;
+        switch (activeTab) {
+          case 'user':
+            data = await getUserRanking(currentPage);
+            break;
+          case 'department':
+            data = await getDepartmentRanking(currentPage);
+            break;
+          case 'departmentUser':
+            data = await getDepartmentUserRanking(user.department.id, currentPage);
+            break;
+          case 'college':
+            data = await getCollegeRanking(currentPage);
+            break;
+          case 'collegeUser':
+            data = await getCollegeUserRanking(user.college.id, currentPage);
+            break;
+          default:
+            data = await getUserRanking(currentPage);
+        }
+
+        // service 함수가 { rankings?, departments?, colleges?, totalPages } 형태 리턴
+        const list = data.rankings 
+          ?? data.departments 
+          ?? data.colleges 
+          ?? [];
+        setRankings(list);
+        setTotalPages(data.totalPages ?? 1);
+
+      } catch (e) {
+        console.error(e);
+        setError('랭킹을 불러오는 중 오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetch();
+  }, [activeTab, currentPage]);
 
   return (
-    <div>
+    <div className="flex flex-col min-h-screen w-full bg-[rgba(243,233,220,0.5)]">
       <Navbar />
 
-      <div className="relative min-h-screen w-screen bg-[rgba(243,233,220,0.5)] pt-24 p-10">
-        
-        {/* ✅ 배경 로고 */}
+      {/* 백그라운드 로고 */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <img
           src={logoImageBack}
-          alt="G-Learn-E Background Logo"
-          className="absolute top-1/2 left-1/2 w-[320px] h-auto transform -translate-x-1/2 -translate-y-1/2"
+          alt="Background Logo"
+          className="w-[320px] h-auto"
         />
+      </div>
 
-        <div className="relative z-10 px-10 py-20">
-
-          {/* ✅ 탭 버튼 */}
-          <div className="mb-4 flex gap-4 flex-wrap">
-            {[
-              { label: '유저별', value: 'user' },
-              { label: '일간', value: 'daily' },
-              { label: '주간', value: 'weekly' },
-              { label: '월간', value: 'monthly' },
-              { label: '학과별', value: 'major' },
-            ].map((tab) => (
+      {/* 실제 컨텐츠 */}
+      <div className="relative z-10 pt-[130px] flex-grow overflow-auto">
+        <div className="w-full max-w-[1400px] mx-auto px-4">
+          {/* 탭 버튼 */}
+          <div className="flex flex-wrap">
+            {tabConfig.map(tab => (
               <button
                 key={tab.value}
-                className={`px-4 py-2 border-b-2 transition-all ${
+                className={`px-4 py-2 border-b-2 transition-all hover:bg-lightbrown/20 ${
                   activeTab === tab.value
                     ? 'border-brown font-bold text-brown'
-                    : 'border-transparent text-gray-500'
+                    : 'border-transparent text-gray-500 hover:border-brown'
                 }`}
-                onClick={() => setActiveTab(tab.value)}
+                onClick={() => { setActiveTab(tab.value); setCurrentPage(0); }}
               >
                 {tab.label}
               </button>
             ))}
           </div>
 
-          {/* ✅ 테이블 */}
-          <div className="overflow-x-auto">
-            <table className="min-w-full border-collapse text-center">
-              <thead className="bg-white">
-                <tr className="border-b border-gray-300">
-                  <th className="p-4">등수</th>
-                  {/* ✅ 'nickname' 대신 학과명 표시 */}
-                  <th className="p-4">
-                    {activeTab === 'major' ? '학과명' : '닉네임'}
-                  </th>
-                  <th className="p-4">레벨</th>
-                  <th className="p-4">만든 문제</th>
-                  <th className="p-4">푼 문제</th>
-                </tr>
-              </thead>
+          {/* 에러 */}
+          {error   && <p className="text-center text-red-500">{error}</p>}
 
-              <tbody>
-                {rankings.map((user, index) => (
-                  <tr
-                    key={user.id}
-                    className={"border-b border-gray-300 h-16"}
+          {/* 랭킹 테이블 */}
+          {!loading && !error && (
+            <>
+              <div className="overflow-x-auto">
+                <table className="min-w-full border-collapse text-center">
+                  <thead className="bg-white">
+                    <tr className="border-b border-gray-300">
+                      <th className="p-4">등수</th>
+                      <th className="p-4">
+                        {isDeptTab && '학과명'}
+                        {isCollegeTab && '단과대명'}
+                        {isUserTab && '닉네임'}
+                      </th>
+                      <th className="p-4">레벨</th>
+                      <th className="p-4">만든 문제</th>
+                      <th className="p-4">푼 문제</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rankings.map((u, i) => (
+                      <tr key={u.id} className="h-16 border-b border-gray-300">
+                        <td className={`p-4 text-right font-bold ${
+                          i === 0 ? 'text-yellow-500'
+                            : i === 1 ? 'text-gray-400'
+                            : i === 2 ? 'text-orange-500'
+                            : ''
+                        }`}>
+                          {u.ranking}
+                        </td>
+                        <td className="p-4 flex items-center justify-start gap-2">
+                          {i === 0 && <span className="text-2xl">👑</span>}
+                          {isUserTab && (
+                            // 프로필 이미지 없어서 대체로 유저 레벨 아이콘 사용함
+                            // <img
+                            //   src={`/images/profiles/${u.profileImage}.png`}
+                            //   alt="프로필"
+                            //   className="w-6 h-6 rounded-full"
+                            // />
+                            <LevelIcon level={u.level} size={30} />
+                          )}
+                          <span className="font-semibold">
+                            {isDeptTab && u.name}
+                            {isCollegeTab && u.name}
+                            {isUserTab && u.nickname}
+                          </span>
+                        </td>
+                        <td className="p-4 text-center text-[#00b3ff] font-bold">{u.level}</td>
+                        <td className="p-4 text-right font-bold">{u.createdWorkbooks}</td>
+                        <td className="p-4 text-right font-bold">{u.solvedWorkbooks}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* 페이지 네비게이션 */}
+              <div className="flex justify-center gap-2 mt-12">
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i)}
+                    className={`px-3 py-1 border rounded ${
+                      currentPage === i 
+                        ? 'bg-brown text-white' 
+                        : 'text-brown hover:bg-lightbrown/20'
+                    }`}
                   >
-                    {/* ✅ 등수에 금/은/동 색 적용 */}
-                    <td
-                      className={`p-4 text-right font-bold ${
-                        index === 0
-                          ? 'text-yellow-500'
-                          : index === 1
-                          ? 'text-gray-400'
-                          : index === 2
-                          ? 'text-orange-500'
-                          : ''
-                      }`}
-                    >
-                      {index + 1}
-                    </td>
-
-                    {/* 닉네임 또는 학과명: 왼쪽 정렬 */}
-                    <td className="p-4 flex items-center justify-start gap-2">
-                      {index === 0 && <span className="text-2xl mr-1">👑</span>}
-                      <span className="text-2xl ml-1">🪱</span>
-                      <span className="font-semibold">{user.nickname}</span>
-                    </td>
-
-                    {/* 레벨: 가운데 정렬 */}
-                    <td className="p-4 text-center text-[#3ADBFF]">{user.level}</td>
-
-                    {/* 만든 문제: 오른쪽 정렬 */}
-                    <td className="p-4 text-right">{user.madeProblems}</td>
-
-                    {/* 푼 문제: 오른쪽 정렬 */}
-                    <td className="p-4 text-right">{user.solvedProblems}</td>
-                  </tr>
+                    {i + 1}
+                  </button>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </div>
+            </>
+          )}
 
-        </div>
+        </div>  
       </div>
+
+      {/* Footer */}
+      <footer className="bg-[#B3977B] px-4 md:px-8 py-8 text-white">
+        <div className="max-w-[1400px] mx-auto flex flex-col gap-6">
+          <div className="flex justify-between items-center">
+            <p className="text-xs md:text-sm">경상국립대학교 컴퓨터공학과 전공종합설계 PBL</p>
+            <button onClick={scrollToTop} type="button" className="flex items-center space-x-1 text-sm md:text-base hover:underline">
+              <span>Back Top ︿</span>
+            </button>
+          </div>
+          <div className="flex justify-between items-center">
+            <p className="text-xs md:text-sm">지도교수 : 김건우 | 팀원 : 최원영 박지원 김수현 강지우</p>
+            <p className="text-2xl md:text-3xl font-namdhinggo tracking-wider select-none">G-Learn-E</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
-};
-
-export default Ranking;
+}
