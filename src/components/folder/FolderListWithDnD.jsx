@@ -26,6 +26,7 @@ export default function FolderListWithDnD({
   workbooks,
   onRefresh,
   onFolderClick,
+  onWorkbookClick,
   onRename,
   onDeleteFolder,
   onDeleteWorkbook,
@@ -230,6 +231,7 @@ export default function FolderListWithDnD({
             onDelete={onDeleteWorkbook}
             onRename={onRenameWorkbook}
             onContextMenu={e => handleContextMenu(e, ItemTypes.WORKBOOK, wb.id)}
+            onWorkbookClick={() => onWorkbookClick(wb.id)}
             isPublic={isPublic}
           />
         ))}
@@ -330,6 +332,7 @@ function WorkbookItem({
   onRefresh,
   onRename,
   onContextMenu,
+  onWorkbookClick,
 }) {
   const navigate = useNavigate();
   const [, drag] = useDrag({ type: ItemTypes.WORKBOOK, item: { id: workbook.id } });
@@ -348,7 +351,7 @@ function WorkbookItem({
     if (isSelectMode) {
       onSelect(workbook.id);
     } else {
-      navigate(`/solve/${workbook.id}`);
+      onWorkbookClick();
     }
   };
 

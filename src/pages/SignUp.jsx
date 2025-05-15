@@ -278,7 +278,7 @@ export default function SignUp() {
 }
 
 /* ─────────────────── 재사용 컴포넌트 ─────────────────── */
-function InputField({ label, name, value, onChange, type = "text" }) {
+export function InputField({ label, name, value, onChange, type = "text" }) {
   return (
     <div>
       <label className="block text-sm mb-1">{label}</label>
@@ -294,7 +294,7 @@ function InputField({ label, name, value, onChange, type = "text" }) {
   );
 }
 
-function SelectField({ placeholder, value, options, onChange, disabled }) {
+export function SelectField({ placeholder, value, options, onChange, disabled }) {
   return (
     <div className="relative flex-1">
       <select

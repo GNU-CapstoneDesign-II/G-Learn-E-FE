@@ -6,6 +6,8 @@ import ConfirmPopup from "../common/ConfirmPopup.jsx";
 import InformationPopup from "../common/InformationPopup.jsx";
 import UploadPopup from "../common/UploadPopup.jsx";
 import InputPopup from "../common/InputPopup.jsx";
+import WorkbookDetailPopup from "../WorkbookDetailPopup.jsx";
+import InfoEditPopup from "../InfoEditPopup.jsx";
 import {
   fetchPrivateFolder,
   createPrivateFolder,
@@ -15,6 +17,7 @@ import {
   deleteFolder,
   deleteWorkbook,
   renameWorkbook,
+  // updateWorkbookInfo,
 } from "../../api/privateFolderApi";
 
 export default function PrivateMain() {
@@ -36,7 +39,7 @@ export default function PrivateMain() {
 
   // —— 팝업 관리 state ——
   const [modal, setModal] = useState({
-    type: null,   // "renameFolder" | "renameWorkbook" | "deleteFolder" | "deleteWorkbook" | "addFolder"
+    type: null,   // "renameFolder" | "renameWorkbook" | "deleteFolder" | "deleteWorkbook" | "addFolder" | "workbookDetail" | "editWorkbook"
     id: null,     // 대상 id (rename/delete 시)
   });
   const [infoMsg, setInfoMsg] = useState(null);
@@ -52,6 +55,10 @@ export default function PrivateMain() {
     setModal({ type: "deleteWorkbook", id });
   const openAddFolder = () =>
     setModal({ type: "addFolder" });
+  const openWorkbookDetail = id =>
+    setModal({ type: "workbookDetail", id });
+  const openEditWorkbook = id =>
+    setModal({ type: "editWorkbook", id });
 
   const closeModal = () =>
     setModal({ type: null, id: null });
@@ -212,10 +219,18 @@ export default function PrivateMain() {
         workbooks={sortedWorkbooks}
         onRefresh={() => loadFolder(folderData.id)}
         onFolderClick={(id) => !isSelectMode && loadFolder(id)}
+        onWorkbookClick={id => {
+          if (isSelectMode) {
+            handleSelectItem(id);
+          } else {
+            openWorkbookDetail(id);
+          }
+        }}
         onRename={openRenameFolder}
         onRenameWorkbook={openRenameWorkbook}
         onDeleteFolder={openDeleteFolder}
         onDeleteWorkbook={openDeleteWorkbook}
+        onEditWorkbook={openEditWorkbook}
         onAddFolder={openAddFolder}
         onSelectItem={handleSelectItem}
       />
@@ -270,6 +285,33 @@ export default function PrivateMain() {
         <InformationPopup
           message={infoMsg}
           onClose={() => setInfoMsg(null)}
+        />
+      )}
+
+      {/* 4) 워크북 상세 팝업 WorkbookDetailPopup */}
+      {modal.type === "workbookDetail" && (
+        <WorkbookDetailPopup
+          workbook={folderData.childWorkbooks.find(w => w.id === modal.id)}
+          onClose={closeModal}
+          onEdit={openEditWorkbook}
+        />
+      )}
+
+      {/* 5) 워크북 상세 (정보 편집용) 팝업 InfoEditPopup */}
+      {modal.type === "editWorkbook" && (
+        <InfoEditPopup
+          workbook={folderData.childWorkbooks.find(w => w.id === modal.id)}
+          onClose={closeModal}
+          // onSave={async updated => {
+          //   try {
+          //     await updateWorkbookInfo(modal.id, updated);
+          //     setInfoMsg("정보가 저장되었습니다.");
+          //     closeModal();
+          //     loadFolder(folderData.id);
+          //   } catch {
+          //     setInfoMsg("저장 중 오류가 발생했습니다.");
+          //   }
+          // }}
         />
       )}
     </main>
