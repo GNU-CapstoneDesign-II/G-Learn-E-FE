@@ -17,6 +17,7 @@ import {
   deleteFolder,
   deleteWorkbook,
   renameWorkbook,
+  fetchWorkbookDetail,
   // updateWorkbookInfo,
 } from "../../api/privateFolderApi";
 
@@ -37,6 +38,8 @@ export default function PrivateMain() {
   const [selectedIds, setSelectedIds] = useState([]);
   const [showUploadPopup, setShowUploadPopup] = useState(false);
 
+  const [selectedWorkbook, setSelectedWorkbook] = useState(null);
+
   // —— 팝업 관리 state ——
   const [modal, setModal] = useState({
     type: null,   // "renameFolder" | "renameWorkbook" | "deleteFolder" | "deleteWorkbook" | "addFolder" | "workbookDetail" | "editWorkbook"
@@ -55,8 +58,21 @@ export default function PrivateMain() {
     setModal({ type: "deleteWorkbook", id });
   const openAddFolder = () =>
     setModal({ type: "addFolder" });
-  const openWorkbookDetail = id =>
+  const openWorkbookDetail = async id => {
+    // try {
+    //   const detail = await fetchWorkbookDetail(id);
+    //   setSelectedWorkbook(detail);
+    //   setModal({ type: "workbookDetail", id });
+    // } catch {
+    //   setInfoMsg("워크북 상세 정보를 불러오는데 실패했습니다.");
+    // }
+
+
+    // 기존에 가져온 folderData.childWorkbooks 배열에서 해당 워크북 정보만 꺼내 사용합니다.
+    const wb = folderData.childWorkbooks.find(w => w.id === id);
+    setSelectedWorkbook(wb);
     setModal({ type: "workbookDetail", id });
+  };
   const openEditWorkbook = id =>
     setModal({ type: "editWorkbook", id });
 
@@ -289,24 +305,27 @@ export default function PrivateMain() {
       )}
 
       {/* 4) 워크북 상세 팝업 WorkbookDetailPopup */}
-      {modal.type === "workbookDetail" && (
+      {modal.type === "workbookDetail" && selectedWorkbook && (
         <WorkbookDetailPopup
-          workbook={folderData.childWorkbooks.find(w => w.id === modal.id)}
-          onClose={closeModal}
+          workbook={selectedWorkbook}
+          onClose={() => {
+            setSelectedWorkbook(null);
+            closeModal();
+          }}
           onEdit={openEditWorkbook}
         />
       )}
 
       {/* 5) 워크북 상세 (정보 편집용) 팝업 InfoEditPopup */}
-      {modal.type === "editWorkbook" && (
+      {modal.type === "editWorkbook" && selectedWorkbook && (
         <InfoEditPopup
-          workbook={folderData.childWorkbooks.find(w => w.id === modal.id)}
-          onClose={closeModal}
+          workbook={selectedWorkbook}
+          onClose={() => setModal({ type: "workbookDetail", id: modal.id })}
           // onSave={async updated => {
           //   try {
           //     await updateWorkbookInfo(modal.id, updated);
           //     setInfoMsg("정보가 저장되었습니다.");
-          //     closeModal();
+          //     setModal({ type: "workbookDetail", id: modal.id });
           //     loadFolder(folderData.id);
           //   } catch {
           //     setInfoMsg("저장 중 오류가 발생했습니다.");

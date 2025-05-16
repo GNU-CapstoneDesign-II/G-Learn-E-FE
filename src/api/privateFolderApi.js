@@ -109,3 +109,25 @@ export function renameWorkbook(workbookId, newName) {
         .patch(`/api/workbook/${workbookId}/rename`, { newName })
         .then((res) => res.data.data);
 }
+
+/**
+ * 워크북 상세 정보를 가져옵니다.
+ * GET /api/workbook/{workbookId}
+ * @param {number} workbookId
+ * @returns {Promise<{
+ *   id: number,             // 문제집 ID
+ *   name: string,           // 워크북 이름
+ *   professor: string,      // 교수 이름
+ *   examType: string,       // 시험 유형
+ *   coverImage: number,     // 표지 이미지 (서버에선 Integer)
+ *   courseYear: number,     // 수강 연도
+ *   semester: string,       // 학기
+ *   createdAt: string,      // 생성일 (ISO 문자열)
+ *   problems: ProblemResponse[]  // 문제 목록
+ * }>}
+ */
+export function fetchWorkbookDetail(workbookId) {
+ return axiosInstance
+   .get(`/api/workbook/${workbookId}`)
+   .then(res => res.data.data);
+}
