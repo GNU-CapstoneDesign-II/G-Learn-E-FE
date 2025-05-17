@@ -6,6 +6,7 @@ import Checkbox from "./Checkbox.jsx";
 import { moveWorkbook, moveFolder } from "../../api/privateFolderApi.js";
 import ContextMenu from "../common/ContextMenu";
 import workbookImg from "../../assets/workbook.png"
+import folderImg from "../../assets/folder.png"
 
 const ItemTypes = { FOLDER: "folder", WORKBOOK: "workbook" };
 
@@ -270,8 +271,11 @@ function FolderItem({
       onContextMenu={onContextMenu}
     >
       <div className="relative w-[80px] h-[60px]">
-        <div className="absolute top-0 left-0 w-[52px] h-[16px] bg-[#E0CCB3] border border-[#BDA68A] border-b-0 rounded-tl-md rounded-tr-md" />
-        <div className="absolute top-[12px] left-0 w-full h-[48px] bg-[#C9A77F] border border-[#BDA68A] rounded-md" />
+        <img
+          src={folderImg}
+          alt="Folder"
+          className="absolute top-1/2 left-1/2 w-15 h-15 transform -translate-x-1/2 -translate-y-1/2 object-contain"
+        />
       </div>
 
       <span className="mt-2 text-sm font-medium text-[#5f360a] text-center break-words">
