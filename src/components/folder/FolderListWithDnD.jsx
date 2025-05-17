@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Checkbox from "./Checkbox.jsx";
 import { moveWorkbook, moveFolder } from "../../api/privateFolderApi.js";
 import ContextMenu from "../common/ContextMenu";
+import workbookImg from "../../assets/workbook.png"
 
 const ItemTypes = { FOLDER: "folder", WORKBOOK: "workbook" };
 
@@ -132,7 +133,7 @@ export default function FolderListWithDnD({
           <h2 className="text-lg font-semibold text-[#5f360a]">
             <span>{selectedFolder.name}</span>
 
-            { (isOver || canDrop) && (!isRoot) && (
+            {(isOver || canDrop) && (!isRoot) && (
               <span className="ml-5 px-2 py-1 bg-[#AC957B] text-white text-xs rounded">
                 상위 폴더로 이동
               </span>
@@ -248,7 +249,7 @@ function FolderItem({
   const [, drop] = useDrop({
     accept: [ItemTypes.FOLDER, ItemTypes.WORKBOOK],
     drop: (item, monitor) => {
-      if(item.id === folder.id) return; // 자기 자신으로 드롭 방지
+      if (item.id === folder.id) return; // 자기 자신으로 드롭 방지
       const mover =
         monitor.getItemType() === ItemTypes.FOLDER ? moveFolder : moveWorkbook;
       mover(item.id, folder.id).then(onRefresh);
@@ -342,8 +343,12 @@ function WorkbookItem({
         </div>
       )}
       <div className="relative w-[80px] h-[80px] bg-white border border-[#DACEC0] rounded-lg flex items-center justify-center shadow-sm transition-shadow hover:shadow-md">
-        <div className="absolute top-1/2 left-1/2 w-10 h-10 bg-[#F3E9DC] rounded-full transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
-          <span className="text-xl text-[#DAC6A6]">📄</span>
+        <div className="absolute top-1/2 left-1/2 bg-[#F3E9DC] rounded-full transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+          <img
+            src={workbookImg}
+            alt="Workbook"
+            className="w-10 h-10 object-contain"
+          />
         </div>
       </div>
 
