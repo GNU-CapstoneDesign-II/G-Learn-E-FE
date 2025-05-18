@@ -60,7 +60,6 @@ export default function InfoEditPopup({ workbook, onClose, onSave }) {
       <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto p-4">
         <div
           className="relative bg-white border border-[#e9e1d8] rounded-[2.5rem] shadow-xl w-[95vw] max-w-lg max-h-[90vh] p-8 overflow-auto"
-          onClick={e => e.stopPropagation()}
         >
           {/* 닫기 버튼 */}
           <button

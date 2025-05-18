@@ -7,39 +7,43 @@ import {
   getCollegeRanking,
   getCollegeUserRanking,
 } from '../api/rankingApi';
-import { useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import logoImageBack from '../assets/image-logo-background.png';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import LevelIcon from '../components/common/LevelIcon.jsx';
 
 const tabConfig = [
-  { label: '유저별',        value: 'user' },
-  { label: '학과별',        value: 'department' },
-  { label: '내 학과',      value: 'departmentUser' },
-  { label: '단과대별',      value: 'college' },
-  { label: '내 단과대',    value: 'collegeUser' },
+  { label: '유저별',     value: 'user' },
+  { label: '학과별',     value: 'department' },
+  { label: '내 학과',   value: 'departmentUser' },
+  { label: '단과대별',   value: 'college' },
+  { label: '내 단과대', value: 'collegeUser' },
 ];
 
 export default function Ranking() {
   const { user } = useAuth();
 
+  // UI 상태
   const [activeTab, setActiveTab]     = useState('user');
   const [rankings, setRankings]       = useState([]);
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState(null);
+
+  // 페이징 상태
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages]   = useState(1);
+  const [hasNextPage, setHasNextPage]         = useState(false);
+  const [hasPreviousPage, setHasPreviousPage] = useState(false);
 
   const isUserTab    = ['user','departmentUser','collegeUser'].includes(activeTab);
   const isDeptTab    = activeTab === 'department';
   const isCollegeTab = activeTab === 'college';
 
   const scrollToTop = () =>
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
   useEffect(() => {
-    async function fetch() {
+    async function fetchData() {
       setLoading(true);
       setError(null);
 
@@ -65,14 +69,18 @@ export default function Ranking() {
             data = await getUserRanking(currentPage);
         }
 
-        // service 함수가 { rankings?, departments?, colleges?, totalPages } 형태 리턴
-        const list = data.rankings 
-          ?? data.departments 
-          ?? data.colleges 
-          ?? [];
-        setRankings(list);
-        setTotalPages(data.totalPages ?? 1);
+        // ▶ 변경된 부분: 항상 data.rankings 사용
+        const {
+          pageInfo: { totalPages, pageNumber, hasNextPage, hasPreviousPage },
+          rankings: list
+        } = data;
 
+        setRankings(list);
+        setTotalPages(totalPages);
+        setHasNextPage(hasNextPage);
+        setHasPreviousPage(hasPreviousPage);
+        // 완전 동기화가 필요 없으면 이 줄은 없어도 됩니다.
+        // setCurrentPage(pageNumber);
       } catch (e) {
         console.error(e);
         setError('랭킹을 불러오는 중 오류가 발생했습니다.');
@@ -80,8 +88,8 @@ export default function Ranking() {
         setLoading(false);
       }
     }
-    fetch();
-  }, [activeTab, currentPage]);
+    fetchData();
+  }, [activeTab, currentPage, user.department.id, user.college.id]);
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-[rgba(243,233,220,0.5)]">
@@ -96,11 +104,11 @@ export default function Ranking() {
         />
       </div>
 
-      {/* 실제 컨텐츠 */}
+      {/* 컨텐츠 */}
       <div className="relative z-10 pt-[130px] flex-grow overflow-auto">
         <div className="w-full max-w-[1400px] mx-auto px-4">
-          {/* 탭 버튼 */}
-          <div className="flex flex-wrap">
+          {/* 탭 */}
+          <div className="flex flex-wrap mb-4">
             {tabConfig.map(tab => (
               <button
                 key={tab.value}
@@ -109,7 +117,10 @@ export default function Ranking() {
                     ? 'border-brown font-bold text-brown'
                     : 'border-transparent text-gray-500 hover:border-brown'
                 }`}
-                onClick={() => { setActiveTab(tab.value); setCurrentPage(0); }}
+                onClick={() => {
+                  setActiveTab(tab.value);
+                  setCurrentPage(0);
+                }}
               >
                 {tab.label}
               </button>
@@ -117,9 +128,9 @@ export default function Ranking() {
           </div>
 
           {/* 에러 */}
-          {error   && <p className="text-center text-red-500">{error}</p>}
+          {error && <p className="text-center text-red-500">{error}</p>}
 
-          {/* 랭킹 테이블 */}
+          {/* 테이블 */}
           {!loading && !error && (
             <>
               <div className="overflow-x-auto">
@@ -128,9 +139,7 @@ export default function Ranking() {
                     <tr className="border-b border-gray-300">
                       <th className="p-4">등수</th>
                       <th className="p-4">
-                        {isDeptTab && '학과명'}
-                        {isCollegeTab && '단과대명'}
-                        {isUserTab && '닉네임'}
+                        {isDeptTab ? '학과명' : isCollegeTab ? '단과대명' : '닉네임'}
                       </th>
                       <th className="p-4">레벨</th>
                       <th className="p-4">만든 문제</th>
@@ -151,18 +160,11 @@ export default function Ranking() {
                         <td className="p-4 flex items-center justify-start gap-2">
                           {i === 0 && <span className="text-2xl">👑</span>}
                           {isUserTab && (
-                            // 프로필 이미지 없어서 대체로 유저 레벨 아이콘 사용함
-                            // <img
-                            //   src={`/images/profiles/${u.profileImage}.png`}
-                            //   alt="프로필"
-                            //   className="w-6 h-6 rounded-full"
-                            // />
                             <LevelIcon level={u.level} size={30} />
                           )}
                           <span className="font-semibold">
-                            {isDeptTab && u.name}
-                            {isCollegeTab && u.name}
                             {isUserTab && u.nickname}
+                            {(isDeptTab || isCollegeTab) && u.name}
                           </span>
                         </td>
                         <td className="p-4 text-center text-[#00b3ff] font-bold">{u.level}</td>
@@ -175,25 +177,48 @@ export default function Ranking() {
               </div>
 
               {/* 페이지 네비게이션 */}
-              <div className="flex justify-center gap-2 mt-12">
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentPage(i)}
-                    className={`px-3 py-1 border rounded ${
-                      currentPage === i 
-                        ? 'bg-brown text-white' 
-                        : 'text-brown hover:bg-lightbrown/20'
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-              </div>
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-4 mt-6">
+                  {/* 이전 버튼: 첫 페이지가 아닐 때만 */}
+                  {hasPreviousPage && (
+                    <button
+                      onClick={() => setCurrentPage(prev => prev - 1)}
+                      className="px-3 py-1 text-gray-500"
+                    >
+                      이전
+                    </button>
+                  )}
+
+                  {/* 페이지 번호 */}
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i}
+                      aria-label={`페이지 ${i + 1}`}
+                      onClick={() => setCurrentPage(i)}
+                      className={` px-3 py-1 ${
+                        currentPage === i
+                          ? 'text-brown font-bold'                // 선택된 페이지는 갈색
+                          : 'text-gray-500 hover:underline' // 나머지는 회색 + hover 시 밑줄
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+
+                  {/* 다음 버튼: 마지막 페이지가 아닐 때만 */}
+                  {hasNextPage && (
+                    <button
+                      onClick={() => setCurrentPage(prev => prev + 1)}
+                      className="px-3 py-1 text-gray-500"
+                    >
+                      다음
+                    </button>
+                  )}
+                </div>
+              )}
             </>
           )}
-
-        </div>  
+        </div>
       </div>
 
       {/* Footer */}
