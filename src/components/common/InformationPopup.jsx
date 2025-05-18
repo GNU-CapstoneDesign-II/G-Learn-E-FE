@@ -16,7 +16,7 @@ export default function InformationPopup({ message, onClose }) {
         </p>
         <button
           onClick={onClose}
-          className="px-6 py-2 text-base font-bold bg-brown text-white rounded-full"
+          className="px-6 py-2 text-base font-semibold bg-brown text-white rounded-full"
         >
           확인
         </button>

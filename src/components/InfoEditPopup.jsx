@@ -1,6 +1,7 @@
 // src/components/common/InfoEditPopup.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { InputField, SelectField } from "../pages/SignUp"; // InputField, SelectField가 export된 파일
+import ConfirmPopup from "./common/ConfirmPopup";
 
 export default function InfoEditPopup({ workbook, onClose, onSave }) {
   if (!workbook) return null;
@@ -11,6 +12,7 @@ export default function InfoEditPopup({ workbook, onClose, onSave }) {
   const [year, setYear]               = useState(workbook.year          || "");
   const [semester, setSemester]       = useState(workbook.semester      || "");
   const [examType, setExamType]       = useState(workbook.examType      || "중간");
+  const [showConfirmClose, setShowConfirmClose] = useState(false);
 
   // ① 학사년도 옵션 (현재 연도 기준 최근 5년)
   const currentYear = new Date().getFullYear();
@@ -26,90 +28,126 @@ export default function InfoEditPopup({ workbook, onClose, onSave }) {
     { value: "W", label: "겨울계절학기" },
   ];
 
+  // 변경사항 유무 확인
+  const isDirty = () => (
+    subjectName   !== (workbook.subjectName || "") ||
+    professor     !== (workbook.professor     || "") ||
+    year          !== (workbook.year          || "") ||
+    semester      !== (workbook.semester      || "") ||
+    examType      !== (workbook.examType      || "중간")
+  );  
+
+  // X 버튼 클릭 핸들러: 변경사항 없으면 닫기, 있으면 확인 팝업
+  const handleCloseClick = () => {
+    if (isDirty()) setShowConfirmClose(true);
+    else onClose();
+  };
+
+  // 확인 팝업 제어
+  const handleConfirmClose = () => {
+    setShowConfirmClose(false);
+    onClose();
+  };
+  const handleCancelClose = () => setShowConfirmClose(false);
+  
   const handleSave = () => {
     onSave({ subjectName, professor, year, semester, examType });
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto p-4">
-      <div className="relative bg-white border border-[#e9e1d8] rounded-[2.5rem] shadow-xl w-[95vw] max-w-lg max-h-[90vh] p-8 overflow-auto">
-        {/* 닫기 버튼 */}
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 text-2xl"
+    <>
+      <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto p-4">
+        <div
+          className="relative bg-white border border-[#e9e1d8] rounded-[2.5rem] shadow-xl w-[95vw] max-w-lg max-h-[90vh] p-8 overflow-auto"
+          onClick={e => e.stopPropagation()}
         >
-          ✕
-        </button>
-
-        {/* 타이틀 */}
-        <h2 className="text-xl md:text-2xl font-semibold text-[#5F360A] text-center mb-8">
-          {workbook.name}
-        </h2>
-
-        {/* 필드 그룹 */}
-        <div className="space-y-5 text-[#5F360A] text-base">
-          <InputField
-            label="교과목 명"
-            name="subjectName"
-            value={subjectName}
-            onChange={e => setSubjectName(e.target.value)}
-          />
-          <InputField
-            label="교수님"
-            name="professor"
-            value={professor}
-            onChange={e => setProfessor(e.target.value)}
-          />
-
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <label className="block text-sm mb-1">수강년도</label>
-              <SelectField
-                placeholder="선택"
-                value={year}
-                options={yearOptions}
-                onChange={e => setYear(e.target.value)}
-              />
-            </div>
-            <div className="flex-1">
-              <label className="block text-sm mb-1">수강학기</label>
-              <SelectField
-                placeholder="선택"
-                value={semester}
-                options={semesterOptions}
-                onChange={e => setSemester(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-center gap-10">
-            {['중간','기말','전범위','기타'].map(type => (
-              <label key={type} className="flex items-center gap-1">
-                <input
-                  type="radio"
-                  name="examType"
-                  value={type}
-                  checked={examType === type}
-                  onChange={e => setExamType(e.target.value)}
-                  className="accent-[#BDA68A]"
-                />
-                <span>{type}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* 저장 버튼 */}
-        <div className="mt-8 flex justify-center">
+          {/* 닫기 버튼 */}
           <button
-            onClick={handleSave}
-            className="px-6 py-2 border border-[#BDA68A] text-[#5f360a] rounded-full hover:bg-[#F5EFE9] transition"
+            onClick={handleCloseClick}
+            className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 text-2xl"
           >
-            변경사항 저장
+            ✕
           </button>
+
+          {/* 타이틀 */}
+          <h2 className="text-xl md:text-2xl font-semibold text-[#5F360A] text-center mb-8">
+            {workbook.name}
+          </h2>
+
+          {/* 필드 그룹 */}
+          <div className="space-y-5 text-[#5F360A] text-base">
+            <InputField
+              label="교과목 명"
+              name="subjectName"
+              value={subjectName}
+              onChange={e => setSubjectName(e.target.value)}
+            />
+            <InputField
+              label="교수님"
+              name="professor"
+              value={professor}
+              onChange={e => setProfessor(e.target.value)}
+            />
+
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label className="block text-sm mb-1">학사년도</label>
+                <SelectField
+                  placeholder="선택"
+                  value={year}
+                  options={yearOptions}
+                  onChange={e => setYear(e.target.value)}
+                />
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm mb-1">학기</label>
+                <SelectField
+                  placeholder="선택"
+                  value={semester}
+                  options={semesterOptions}
+                  onChange={e => setSemester(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center gap-6">
+              {['중간','기말','전체','기타'].map(type => (
+                <label key={type} className="flex items-center gap-1">
+                  <input
+                    type="radio"
+                    name="examType"
+                    value={type}
+                    checked={examType === type}
+                    onChange={e => setExamType(e.target.value)}
+                    className="accent-[#BDA68A]"
+                  />
+                  <span>{type}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* 저장 버튼 */}
+          <div className="mt-8 flex justify-center">
+            <button
+              onClick={handleSave}
+              className="px-6 py-2 border border-[#BDA68A] text-[#5f360a] rounded-full hover:bg-[#F5EFE9] transition"
+            >
+              변경사항 저장
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* 변경사항 미저장 시 닫기 확인 팝업 */}
+      {showConfirmClose && (
+        <ConfirmPopup
+          message="저장하지 않은 변경사항은 사라집니다. 닫으시겠습니까?"
+          onConfirm={handleConfirmClose}
+          onCancel={handleCancelClose}
+        />
+      )}
+    </>
   );
 }
