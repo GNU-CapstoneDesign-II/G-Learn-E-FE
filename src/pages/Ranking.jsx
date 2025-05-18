@@ -80,7 +80,7 @@ export default function Ranking() {
         setHasNextPage(hasNextPage);
         setHasPreviousPage(hasPreviousPage);
         // 완전 동기화가 필요 없으면 이 줄은 없어도 됩니다.
-        // setCurrentPage(pageNumber);
+        setCurrentPage(pageNumber);
       } catch (e) {
         console.error(e);
         setError('랭킹을 불러오는 중 오류가 발생했습니다.');

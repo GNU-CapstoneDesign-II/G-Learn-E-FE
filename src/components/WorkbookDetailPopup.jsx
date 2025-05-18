@@ -28,25 +28,52 @@ export default function WorkbookDetailPopup({ workbook, onClose, onEdit }) {
 
         {/* 정보 필드 */}
         <div className="mt-6 space-y-5 text-[#5f360a] text-base">
-          <div className="flex items-center">
-            <span className="w-28 font-medium">교과목 명:</span>
-            <span className="flex-1">{workbook.subjectName}</span>
-          </div>
+          {/* 교수님 */}
           <div className="flex items-center">
             <span className="w-28 font-medium">교수님:</span>
             <span className="flex-1">{workbook.professor}</span>
           </div>
+
+          {/* 시험 유형 */}
           <div className="flex items-center">
-            <span className="w-28 font-medium">퀴즈생성자:</span>
-            <span className="flex-1">{workbook.user}</span>
+            <span className="w-28 font-medium">시험 유형:</span>
+            <span className="flex-1">{workbook.examType}</span>
+          </div>
+
+          {/* 커버 이미지 ID */}
+          <div className="flex items-center">
+            <span className="w-28 font-medium">Cover Image ID:</span>
+            <span className="flex-1">{workbook.coverImage}</span>
+          </div>
+
+          {/* 수강 연도 */}
+          <div className="flex items-center">
+            <span className="w-28 font-medium">수강 연도:</span>
+            <span className="flex-1">{workbook.courseYear} 학년</span>
+          </div>
+
+          {/* 학기 */}
+          <div className="flex items-center">
+            <span className="w-28 font-medium">학기:</span>
+            <span className="flex-1">{workbook.semester}</span>
+          </div>
+
+          {/* 생성일 */}
+          <div className="flex items-center">
+            <span className="w-28 font-medium">생성일:</span>
+            <span className="flex-1">
+              {new Date(workbook.createdAt).toLocaleString()}
+            </span>
+          </div>
+
+          {/* 좋아요 / 싫어요 */}
+          <div className="flex items-center">
+            <span className="w-28 font-medium">좋아요:</span>
+            <span className="flex-1">{workbook.likeCount}</span>
           </div>
           <div className="flex items-center">
-            <span className="w-28 font-medium">범위:</span>
-            <span className="flex-1">{workbook.range}</span>
-          </div>
-          <div className="flex items-center">
-            <span className="w-28 font-medium">문제수:</span>
-            <span className="flex-1">{workbook.questionCount}</span>
+            <span className="w-28 font-medium">싫어요:</span>
+            <span className="flex-1">{workbook.dislikeCount}</span>
           </div>
         </div>
 
@@ -65,7 +92,13 @@ export default function WorkbookDetailPopup({ workbook, onClose, onEdit }) {
             나의 풀이
           </button>
           <button
-            onClick={() => window.open(`/solve/${workbook.id}`, "_blank", "noopener,noreferrer")}
+            onClick={() =>
+              window.open(
+                `/solve/${workbook.id}`,
+                "_blank",
+                "noopener,noreferrer"
+              )
+            }
             className="px-6 py-2 bg-[#BDA68A] text-white rounded-full hover:bg-[#A78A64] transition"
           >
             문제 풀기
