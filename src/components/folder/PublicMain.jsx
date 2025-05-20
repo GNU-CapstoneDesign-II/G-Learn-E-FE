@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useTransition } from "react";
 import { useDrop } from "react-dnd";
 import FolderListWithDnD from "./FolderListWithDnD.jsx";
 import UploadPopup from "../common/UploadPopup.jsx";
@@ -21,7 +21,7 @@ export default function PublicMain({
   setSelectedCollege,
   setSelectedDepartment,
   setSelectedSubject,
-
+  sidebarRef,
 }) {
   const [items, setItems] = useState([]);
   const [workbooks, setWorkbooks] = useState([]);
@@ -30,6 +30,8 @@ export default function PublicMain({
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [showCopyPopup, setShowCopyPopup] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [startTransition] = useTransition();
 
   const filterDepth = selectedSubject
     ? 3
@@ -83,7 +85,7 @@ export default function PublicMain({
           setItems(filtered.map((s) => ({
             id: s.id,
             name: s.subjectName,
-            type: "subject", // ← 이걸로 onFolderClick도 가능하게
+            type: "subject",
           })));
         }
         setIsSelectMode(false);
@@ -125,7 +127,29 @@ export default function PublicMain({
   };
 
   useDrop({ accept: ["folder", "workbook"], drop: () => { } });
+  const handleBackClick = useCallback(() => {
+    setTimeout(() => {
+      setHistory((prev) => {
+        if (prev.length === 0) {
+          setSelectedCollege(null);
+          setSelectedDepartment(null);
+          setSelectedSubject(null);
+          return [];
+        }
 
+        const last = prev[prev.length - 1];
+        setSelectedCollege(last.college);
+        setSelectedDepartment(last.department);
+        setSelectedSubject(last.subject);
+
+        sidebarRef?.current?.setMain?.(last.college?.id || "");
+        sidebarRef?.current?.setSub?.(last.department?.id || "");
+        sidebarRef?.current?.setSubject?.(last.subject?.id || "");
+
+        return prev.slice(0, -1);
+      });
+    }, 0);
+  }, [sidebarRef, setSelectedCollege, setSelectedDepartment, setSelectedSubject]);
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">로딩 중…</div>
@@ -152,7 +176,7 @@ export default function PublicMain({
         selectedItems={selectedIds}
         sortOption={sortOption}
         onSortChange={setSortOption}
-        onBack={handleBack}
+        onBack={handleBackClick}
         onToggleAll={toggleSelectMode}
         isSelectMode={isSelectMode}
         onDownload={() => setShowCopyPopup(true)}
@@ -161,22 +185,34 @@ export default function PublicMain({
         workbooks={sortedWorkbooks}
         onRefresh={() => { }}
         onFolderClick={(id) => {
-          const folder = items.find(f => f.id === id);
+          const folder = items.find((f) => f.id === id);
           if (!folder) return;
-          switch (folder.type) {
-            case "college":
-              setSelectedCollege({ id: folder.id, name: folder.name });
-              sidebarRef.current?.setMain(folder.id);
-              break;
-            case "department":
-              setSelectedDepartment({ id: folder.id, name: folder.name });
-              sidebarRef.current?.setSub(folder.id);
-              break;
-            case "grade":
-              setSelectedSubject({ id: folder.id, name: folder.name });
-              sidebarRef.current?.setSubject(folder.id);
-              break;
-          }
+
+          setTimeout(() => {
+            setHistory((prev) => [
+              ...prev,
+              {
+                college: selectedCollege,
+                department: selectedDepartment,
+                subject: selectedSubject,
+              },
+            ]);
+
+            switch (folder.type) {
+              case "college":
+                setSelectedCollege({ id: folder.id, name: folder.name });
+                sidebarRef?.current?.setMain?.(folder.id);
+                break;
+              case "department":
+                setSelectedDepartment({ id: folder.id, name: folder.name });
+                sidebarRef?.current?.setSub?.(folder.id);
+                break;
+              case "grade":
+                setSelectedSubject({ id: folder.id, name: folder.name });
+                sidebarRef?.current?.setSubject?.(folder.id);
+                break;
+            }
+          }, 0);
         }}
         onRename={() => { }}
         onDeleteFolder={() => { }}

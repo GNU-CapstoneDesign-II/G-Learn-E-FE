@@ -39,8 +39,8 @@ function LeftSidebar({
   onCollegeSelect,
   onDepartmentSelect,
   onSubjectSelect,
-  filterDepth,
-}) {
+  filterDepth
+}, ref) {
   const [state, dispatch] = useReducer(filterReducer, initialFilterState);
   const prevDepth = useRef(filterDepth);
   const [colleges, setColleges] = useState([]);
@@ -49,6 +49,12 @@ function LeftSidebar({
   const [subjects, setSubjects] = useState([]);
   const [grades, setGrades] = useState([]);
   const isGeneral = liberal && String(state.main) === String(liberal.id);
+
+  useImperativeHandle(ref, () => ({
+    setMain: (id) => dispatch({ type: "SET_MAIN", value: id }),
+    setSub: (id) => dispatch({ type: "SET_SUB", value: id }),
+    setSubject: (id) => dispatch({ type: "SET_SUBJECT", value: id }),
+  }));
 
   useEffect(() => {
     if (filterDepth < prevDepth.current) {
@@ -284,6 +290,7 @@ export default function FolderPage() {
               setSelectedCollege={setSelectedCollege}
               setSelectedDepartment={setSelectedDepartment}
               setSelectedSubject={setSelectedSubject}
+              sidebarRef={sidebarRef}
             />
           )}
         </div>
