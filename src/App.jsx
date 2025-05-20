@@ -14,6 +14,8 @@ import Ranking from "./pages/Ranking.jsx";
 import Mypage from './pages/MyPage.jsx';
 import WorkbookEdit from './pages/WorkbookEdit.jsx'
 import WorkbookMerge from './pages/WorkbookMerge.jsx';
+import SearchPage from "./pages/SearchPage.jsx";
+
 
 function App() {
   return (
@@ -33,6 +35,7 @@ function App() {
         <Route path="/ranking" element={<Ranking />} />
         <Route path="/mypage" element={<Mypage />} />
         <Route path="/edit/:ids" element={<WorkbookEdit />} />
+        <Route path="/search" element={<SearchPage />} />
       </Route>
 
       {/* 그 외 리디렉트 */}
