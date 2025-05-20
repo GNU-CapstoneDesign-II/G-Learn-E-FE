@@ -10,10 +10,14 @@ import alarm from "../assets/alarm.png"
 import search from "../assets/search.png"
 import { useAuth } from "../contexts/AuthContext";
 import LevelIcon from "./common/LevelIcon";
+import { useNavigate } from "react-router-dom";
 
-function Navbar() {
+
+function Navbar({ initialSearch = "" }) {
   const { user, loading, logout } = useAuth();
 
+  const [searchInput, setSearchInput] = useState(initialSearch);
+  const navigate = useNavigate();
   /* ───── 프로필 드롭다운 상태 ───── */
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -55,9 +59,17 @@ function Navbar() {
             <span className="mr-2"><img src={search} alt="검색 아이콘" className="w-5 h-5 object-contain" /></span>
             <input
               type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && searchInput.trim()) {
+                  navigate(`/search?keyword=${encodeURIComponent(searchInput.trim())}`);
+                }
+              }}
               placeholder="Search for something!"
               className="bg-transparent outline-none w-full placeholder-[#9A7E5F]"
             />
+
           </div>
 
           {/* 🔔 알림 아이콘 */}

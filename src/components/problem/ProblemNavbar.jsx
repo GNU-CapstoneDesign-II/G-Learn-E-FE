@@ -1,6 +1,6 @@
 // src/components/problem/ProblemNavbar.jsx
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import gridIcon from '../../assets/grid-mode-icon.png';
 import listIcon from '../../assets/list-mode-icon.png';
@@ -9,12 +9,23 @@ import listIcon from '../../assets/list-mode-icon.png';
 export default function ProblemNavbar({ onTempSave, onGrade, onReset, isSolved, layoutMode, onLayoutChange }) {
     const navigate = useNavigate();
 
+    const { search } = useLocation();
+    const isPopup = new URLSearchParams(search).get('popup') === 'true';
+
+    const handleClose = () => {
+        if (isPopup) {
+            window.close();
+        } else {
+            navigate(-1);
+        }
+    };
+
     return (
         <div className="relative w-full bg-white shadow-sm border-b border-[#e2e2e2] px-6 py-3">
             {/* 왼쪽: 닫기 버튼 */}
             <div className="absolute left-6 top-1/2 -translate-y-1/2">
                 <button
-                    onClick={() => navigate(-1)}
+                    onClick={handleClose}
                     className="text-[#5c4033] text-2xl font-bold focus:outline-none"
                     aria-label="뒤로가기"
                 >

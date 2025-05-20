@@ -151,7 +151,7 @@ export default function WorkbookDetailPopup({ workbookId, isPublic, onClose, onE
           <button
             onClick={() =>
               window.open(
-                `/solve/${workbook.id}`,
+                `/solve/${workbook.id}?popup=true`,
                 "_blank",
                 "noopener,noreferrer"
               )
