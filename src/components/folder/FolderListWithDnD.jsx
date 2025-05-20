@@ -132,30 +132,31 @@ export default function FolderListWithDnD({
       {/* 상단 툴바 영역 */}
       <header
         ref={dropToParent}
-        className="fixed top-[66px] left-[200px] w-[calc(100%-200px)] flex items-center justify-between px-6 py-3 border-b border-[#e5d5c5] bg-[#fdf9f4] z-30 hover:bg-[#f0ede8] transition-colors">
+        className="fixed top-[66px] left-[200px] w-[calc(100%-200px)] flex items-center justify-between px-6 py-3 border-b border-[#e5d5c5] bg-[#fdf9f4] z-30 hover:bg-[#f0ede8] transition-colors"
+      >
         <div className="flex items-center gap-3">
-          {!isRoot && (
+          {!isRoot && typeof onBack === "function" && (
             <button onClick={onBack} className="text-xl text-[#5f360a] hover:opacity-70">
               ◀
             </button>
           )}
           <h2 className="text-lg font-semibold text-[#5f360a]">
-            <span>{selectedFolder.name}</span>
+            <span>{selectedFolder?.name ?? ""}</span>
 
-            {(isOver || canDrop) && (!isRoot) && (!isPublic) && (
+            {(isOver || canDrop) && !isRoot && !isPublic && (
               <span className="ml-5 px-2 py-1 bg-[#AC957B] text-white text-xs rounded">
                 상위 폴더로 이동
               </span>
             )}
           </h2>
-
         </div>
+
         <div className="flex items-center gap-3 text-sm text-[#5f360a]">
           {/* 정렬 드롭다운 */}
           <div className="relative">
             <select
               value={sortOption}
-              onChange={e => onSortChange(e.target.value)}
+              onChange={(e) => onSortChange(e.target.value)}
               className="appearance-none border px-3 py-1 pr-6 rounded text-sm"
             >
               <option value="name">이름</option>
@@ -240,21 +241,23 @@ export default function FolderListWithDnD({
       </div>
 
       {/* ContextMenu */}
-      {ctxMenu.visible && (
-        <ContextMenu
-          x={ctxMenu.x}
-          y={ctxMenu.y}
-          /* ⭐️ 항목을 종류별로 분기 */
-          options={[
-            { label: "이름 변경", onClick: handleRenameContext },
-            ...(ctxMenu.type === ItemTypes.WORKBOOK
-              ? [{ label: "문제집 편집", onClick: handleEditContext }]
-              : []),
-            { label: "삭제", onClick: handleDeleteContext },
-          ]}
-          onClose={closeContextMenu}
-        />
-      )}
+      {
+        ctxMenu.visible && (
+          <ContextMenu
+            x={ctxMenu.x}
+            y={ctxMenu.y}
+            /* ⭐️ 항목을 종류별로 분기 */
+            options={[
+              { label: "이름 변경", onClick: handleRenameContext },
+              ...(ctxMenu.type === ItemTypes.WORKBOOK
+                ? [{ label: "문제집 편집", onClick: handleEditContext }]
+                : []),
+              { label: "삭제", onClick: handleDeleteContext },
+            ]}
+            onClose={closeContextMenu}
+          />
+        )
+      }
     </>
   );
 }
