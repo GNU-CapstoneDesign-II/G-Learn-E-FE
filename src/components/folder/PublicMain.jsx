@@ -23,7 +23,6 @@ export default function PublicMain({
   setSelectedSubject,
   sidebarRef,
 }) {
-  const isPublic = true;   // 항상 public
   const [items, setItems] = useState([]);
   const [workbooks, setWorkbooks] = useState([]);
   const [loading, setLoading] = useState(true);

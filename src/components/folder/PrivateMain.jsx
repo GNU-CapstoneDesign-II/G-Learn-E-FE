@@ -20,9 +20,9 @@ import {
   fetchWorkbookDetail,
   updateWorkbookInfo,
 } from "../../api/privateFolderApi";
+import { fetchWorkbook } from "../../api/problemSolveApi";
 
 export default function PrivateMain() {
-  const isPublic = false;  // 항상 private
   const [folderData, setFolderData] = useState({
     id: null,
     name: "private",
@@ -61,9 +61,18 @@ export default function PrivateMain() {
     setModal({ type: "addFolder" });
   const openWorkbookDetail = async id => {
     try {
-      // 1) 서버에서 워크북 상세 정보 가져오기
+      // 1) 워크북 메타(이름·교수·이미지 등)
       const detail = await fetchWorkbookDetail(id);
-      setCurrentWorkbook(detail);
+      // 2) 사용자 풀이 상태(isSolved, correctCount, wrongCount 등)
+      const { workbook: solvedInfo } = await fetchWorkbook(id);
+
+      // merged object
+      setCurrentWorkbook({
+        ...detail,
+        isSolved:     solvedInfo.isSolved,
+        correctCount: solvedInfo.correctCount,
+        wrongCount:   solvedInfo.wrongCount,
+      });
       setModal({ type: "workbookDetail", id });
     } catch (err) {
       console.error(err);
@@ -305,7 +314,8 @@ export default function PrivateMain() {
       {modal.type === "workbookDetail" && currentWorkbook && (
         <WorkbookDetailPopup
           workbookId={currentWorkbook.id}
-          isPublic={isPublic}
+          isPublic={false}
+          isSolved={currentWorkbook.isSolved}
           onClose={() => {
             setCurrentWorkbook(null);
             closeModal();

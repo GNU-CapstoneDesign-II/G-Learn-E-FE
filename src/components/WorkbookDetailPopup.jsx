@@ -1,13 +1,44 @@
 // src/components/WorkbookDetailPopup.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import { fetchWorkbookDetail, voteWorkbook } from "../api/privateFolderApi";
+import { resetSolveLog } from "../api/problemSolveApi";
 import { SEMESTER_LABELS, EXAM_TYPE_LABELS } from "./popupConstants";
 
-export default function WorkbookDetailPopup({ workbookId, isPublic, onClose, onEdit }) {
+export default function WorkbookDetailPopup({ workbookId, isPublic, isSolved, onClose, onEdit }) {
   const [workbook, setWorkbook] = useState(null);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  // 새 풀이로 시작: 기존 로그를 지우고 팝업
+  const handleStartFresh = useCallback(async () => {
+    if (!workbook) return;
+    setLoading(true);
+    try {
+      // 1) 기존 임시 저장 / 채점 기록 삭제
+      await resetSolveLog(workbook.id);
+      // 2) 새 창으로 열기
+      window.open(
+        `/solve/${workbook.id}?popup=true`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    } catch (err) {
+      console.error("새 풀이 시작 중 오류:", err);
+      alert("새 문제 풀이 시작에 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  }, [workbook]);
+
+  // 나의 풀이 보기: 저장된(실은 채점된) 풀이가 없으면 경고
+  const handleViewMySolve = useCallback(() => {
+    if (!isSolved) {
+      alert("저장된 풀이가 없습니다.");
+      return;
+    }
+    window.open(`/solve/${workbookId}?popup=true`, "_blank");
+  }, [isSolved, workbookId]);
 
   // 워크북 상세 정보 로드
   useEffect(() => {
@@ -140,23 +171,19 @@ export default function WorkbookDetailPopup({ workbookId, isPublic, onClose, onE
           >
             정보 편집
           </button>
+          {/* 채점된 경우에만 내 풀이 보기 */}
           <button
-            onClick={() => {
-              /* 나의 풀이 로직 */
-            }}
+            onClick={handleViewMySolve}
             className="px-6 py-2 border border-[#BDA68A] text-[#5f360a] rounded-full hover:bg-[#F5EFE9] transition"
           >
             나의 풀이
           </button>
+
+          {/* 항상 새 풀이로 시작 */}
           <button
-            onClick={() =>
-              window.open(
-                `/solve/${workbook.id}?popup=true`,
-                "_blank",
-                "noopener,noreferrer"
-              )
-            }
-            className="px-6 py-2 bg-[#BDA68A] text-white rounded-full hover:bg-[#A78A64] transition"
+            onClick={handleStartFresh}
+            disabled={loading}
+            className="px-6 py-2 bg-[#BDA68A] text-white rounded-full hover:bg-[#A78A64] transition disabled:opacity-50"
           >
             문제 풀기
           </button>
