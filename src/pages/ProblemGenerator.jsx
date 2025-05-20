@@ -7,6 +7,9 @@ import SelectableButton from '../components/ProblemGenerator/SelectableButton.js
 import { generateWorkbook } from '../api/workbookApi.js';
 import InformationPopup from '../components/common/InformationPopup.jsx';
 import FileUploadModal from '../components/ProblemGenerator/FileUploadModal.jsx';
+import Text from '../assets/Text.png'
+import voice from '../assets/voice.png'
+import pdf from '../assets/pdf.png'
 
 const ProblemGenerator = () => {
   const navigate = useNavigate();
@@ -153,9 +156,18 @@ const ProblemGenerator = () => {
               내용 입력 및 문제 유형을 선택한 후 문제를 생성해보세요!
             </h2>
             <div className="flex gap-[24px]">
-              <SelectableButton label="T Text" isActive={inputType === 'text'} onClick={() => setInputType('text')} />
-              <SelectableButton label="📄 PDF" isActive={inputType === 'pdf'} onClick={() => { setInputType('pdf'); setIsPDFPopupOpen(true); }} />
-              <SelectableButton label="🎙️ 음성파일" isActive={inputType === 'voice'} onClick={() => { setInputType('voice'); setIsAudioPopupOpen(true); }} />
+              <SelectableButton label={<span className="flex items-center gap-1">
+                <img src={Text} alt="Text" className="w-5 h-5 object-contain" />
+                Text
+              </span>} isActive={inputType === 'text'} onClick={() => setInputType('text')} />
+              <SelectableButton label={<span className="flex items-center gap-1">
+                <img src={pdf} alt="pdf" className="w-5 h-5 object-contain" />
+                PDF
+              </span>} isActive={inputType === 'pdf'} onClick={() => { setInputType('pdf'); setIsPDFPopupOpen(true); }} />
+              <SelectableButton label={<span className="flex items-center gap-1">
+                <img src={voice} alt="voice" className="w-5 h-5 object-contain" />
+                음성파일
+              </span>} isActive={inputType === 'voice'} onClick={() => { setInputType('voice'); setIsAudioPopupOpen(true); }} />
             </div>
           </div>
         </div>
@@ -253,11 +265,10 @@ const ProblemGenerator = () => {
                   return (
                     <li
                       key={type}
-                      className={`flex items-center p-[0.6rem] rounded-[12px] cursor-pointer transition-colors duration-300 ${
-                        isActive
-                          ? 'bg-[rgba(243,233,220,0.5)] text-brown font-bold'
-                          : 'hover:bg-[#f5f5f5]'
-                      }`}
+                      className={`flex items-center p-[0.6rem] rounded-[12px] cursor-pointer transition-colors duration-300 ${isActive
+                        ? 'bg-[rgba(243,233,220,0.5)] text-brown font-bold'
+                        : 'hover:bg-[#f5f5f5]'
+                        }`}
                       onClick={() => {
                         toggleTypeSelection(type);
                         toggleDropdown(type);

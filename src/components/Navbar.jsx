@@ -7,6 +7,7 @@ import FAQ from "../assets/QnA.png"
 import setting from "../assets/setting.png"
 import logoutIcon from "../assets/logout.png"
 import alarm from "../assets/alarm.png"
+import search from "../assets/search.png"
 import { useAuth } from "../contexts/AuthContext";
 import LevelIcon from "./common/LevelIcon";
 import { useNavigate } from "react-router-dom";
@@ -55,7 +56,7 @@ function Navbar({ initialSearch = "" }) {
         <div className="flex items-center gap-6">
           {/* 🔍 검색창 */}
           <div className="flex items-center bg-[#f8f1e7] px-4 py-2 rounded-md text-[#9A7E5F] text-sm w-[260px]">
-            <span className="mr-2">🔍</span>
+            <span className="mr-2"><img src={search} alt="검색 아이콘" className="w-5 h-5 object-contain" /></span>
             <input
               type="text"
               value={searchInput}
