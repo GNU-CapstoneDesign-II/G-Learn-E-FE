@@ -10,7 +10,7 @@ export default function InfoEditPopup({ workbook, onClose, onSave }) {
   // 로컬 상태 초기값 (백엔드 프로퍼티명과 일치)
   const [name, setName]               = useState(workbook.name             || "");
   const [professor, setProfessor]     = useState(workbook.professor       || "");
-  const [examType, setExamType]       = useState(workbook.examType        || "중간");
+  const [examType, setExamType] = useState(workbook.examType);
   const [courseYear, setCourseYear]   = useState(String(workbook.courseYear) || "");
   const [semester, setSemester]       = useState(workbook.semester        || "");
   const [showConfirmClose, setShowConfirmClose] = useState(false);

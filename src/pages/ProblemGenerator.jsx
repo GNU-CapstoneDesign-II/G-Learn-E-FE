@@ -27,7 +27,7 @@ const ProblemGenerator = () => {
   const [isAudioPopupOpen, setIsAudioPopupOpen] = useState(false);
 
   const [typeOptions, setTypeOptions] = useState({
-    '객관식': { optionCount: 4, questionCount: 5, customQuestionCount: '' },
+    '객관식': { optionCount: 5, questionCount: 5, customQuestionCount: '' },
     'O/X 퀴즈': { questionCount: 5, customQuestionCount: '' },
     '주관식': { questionCount: 5, customQuestionCount: '' },
     '빈칸 채우기': { optionCount: 2, questionCount: 5, customQuestionCount: '' },
