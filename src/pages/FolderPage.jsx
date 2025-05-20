@@ -2,7 +2,7 @@
 import React, { useState, useReducer, useEffect, useMemo } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-
+import { useRef } from "react";
 import Navbar from "../components/Navbar.jsx";
 import PrivateMain from "../components/folder/PrivateMain.jsx";
 import PublicMain from "../components/folder/PublicMain.jsx";
@@ -19,6 +19,8 @@ import publicIcon from "../assets/public.png";
 const initialFilterState = { main: "", sub: "", year: "", subject: "" };
 function filterReducer(state, action) {
   switch (action.type) {
+    case "RESET":
+      return initialFilterState;
     case "SET_MAIN":
       return { main: action.value, sub: "", year: "", subject: "" };
     case "SET_SUB":
@@ -38,14 +40,32 @@ function LeftSidebar({
   onCollegeSelect,
   onDepartmentSelect,
   onSubjectSelect,
+  filterDepth,
 }) {
   const [state, dispatch] = useReducer(filterReducer, initialFilterState);
+  const prevDepth = useRef(filterDepth);
   const [colleges, setColleges] = useState([]);
   const [liberal, setLiberal] = useState(null);
   const [lv2, setLv2] = useState([]);        // 학과 or 교양영역
   const [subjects, setSubjects] = useState([]);
   const [grades, setGrades] = useState([]);
   const isGeneral = liberal && String(state.main) === String(liberal.id);
+
+  useEffect(() => {
+    if (filterDepth < prevDepth.current) {
+      if (prevDepth.current === 3 && filterDepth === 2) {
+        dispatch({ type: "SET_SUBJECT", value: "" });
+        dispatch({ type: "SET_YEAR", value: "" });
+      } else if (prevDepth.current === 2 && filterDepth === 1) {
+        dispatch({ type: "SET_SUB", value: "" });
+        dispatch({ type: "SET_YEAR", value: "" });
+        dispatch({ type: "SET_SUBJECT", value: "" });
+      } else if (filterDepth === 0) {
+        dispatch({ type: "RESET" });
+      }
+    }
+    prevDepth.current = filterDepth;
+  }, [filterDepth]);
 
   /* ① 단과대 + 교양 로드 */
   useEffect(() => {
@@ -101,9 +121,9 @@ function LeftSidebar({
     onDepartmentSelect(
       selDept
         ? {
-            id: selDept.id,
-            name: isGeneral ? selDept : selDept.departmentName,
-          }
+          id: selDept.id,
+          name: isGeneral ? selDept : selDept.departmentName,
+        }
         : null
     );
 
@@ -135,7 +155,7 @@ function LeftSidebar({
         {tabs.map(({ key, label, icon }) => (
           <button
             key={key}
-            onClick={() => handleTab(key)}
+            onClick={() => onTabChange(key)}
             className={`
               px-4 py-2 rounded-r-full flex items-center gap-2
               ${selectedTab === key ? "bg-[#f8f1e7]" : ""}
@@ -241,15 +261,23 @@ export default function FolderPage() {
   const [size] = useState(25);
   const [sort, setSort] = useState("createdAt");
   const [order, setOrder] = useState("desc");
-
+  const handleBack = () => {
+    if (selectedSubject) {
+      setSelectedSubject(null); // 과목 → 학과로
+    } else if (selectedDepartment) {
+      setSelectedDepartment(null); // 학과 → 단과대
+    } else if (selectedCollege) {
+      setSelectedCollege(null); // 단과대 → root
+    }
+  };
   /* filterDepth 계산 (subject→3, department→2, college→1, root→0) */
   const filterDepth = selectedSubject
     ? 3
     : selectedDepartment
-    ? 2
-    : selectedCollege
-    ? 1
-    : 0;
+      ? 2
+      : selectedCollege
+        ? 1
+        : 0;
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -264,6 +292,7 @@ export default function FolderPage() {
             onCollegeSelect={setSelectedCollege}
             onDepartmentSelect={setSelectedDepartment}
             onSubjectSelect={setSelectedSubject}
+            filterDepth={filterDepth}
           />
 
           {/* 메인 영역 */}
@@ -279,6 +308,7 @@ export default function FolderPage() {
               size={size}
               sort={sort}
               order={order}
+              handleBack={handleBack}
             />
           )}
         </div>

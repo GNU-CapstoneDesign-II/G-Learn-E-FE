@@ -25,23 +25,24 @@ export default function PublicMain({
   size = 20,
   sort = "name",
   order = "asc",
+  handleBack,
 }) {
   /* ───────── 기타 UI 상태 ───────── */
-  const [workbooks, setWorkbooks]       = useState([]);
-  const [loading, setLoading]           = useState(true);
-  const [sortOption, setSortOption]     = useState("name");      // 클라이언트측 이름 정렬
+  const [workbooks, setWorkbooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [sortOption, setSortOption] = useState("name");      // 클라이언트측 이름 정렬
   const [isSelectMode, setIsSelectMode] = useState(false);
-  const [selectedIds, setSelectedIds]   = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
   const [showCopyPopup, setShowCopyPopup] = useState(false);
 
   /* ───────── 필터 깊이 계산 ───────── */
   const filterDepth = selectedSubject
     ? 3
     : selectedDepartment
-    ? 2
-    : selectedCollege
-    ? 1
-    : 0;
+      ? 2
+      : selectedCollege
+        ? 1
+        : 0;
 
   /* ───────── 워크북 로딩 ───────── */
   useEffect(() => {
@@ -83,7 +84,14 @@ export default function PublicMain({
           default:
             res = { data: { data: [] } };
         }
-        setWorkbooks(res.data.data || []);
+
+        // ✅ 응답 구조에 따른 분기 처리
+        const raw = res.data.data;
+        const wbList = Array.isArray(raw)
+          ? raw
+          : raw?.publicWorkbooks ?? [];
+
+        setWorkbooks(wbList);
         setIsSelectMode(false);
         setSelectedIds([]);
       } catch (err) {
@@ -104,6 +112,7 @@ export default function PublicMain({
     order,
     filterDepth,
   ]);
+
 
   /* ───────── 이름 정렬(Null‑safe) ───────── */
   const sortedWorkbooks = useMemo(() => {
@@ -133,13 +142,9 @@ export default function PublicMain({
     return parts.length ? parts.join(" - ") : "Public";
   };
 
-  /* ───────── 뒤로가기(부모 state 조작 필요하면 prop으로 전달하세요) ───────── */
-  // 현재 구조에선 PublicMain이 단독으로 filter를 줄일 방법이 없으므로
-  // handleBack을 부모에서 내려주도록 바꾸거나, 선택 로직을 Sidebar에서만 처리합니다.
-  const handleBack = () => {}; // 필요 시 props로 받아서 사용
 
   /* ───────── DnD 장애 방지용 빈 drop 영역 ───────── */
-  useDrop({ accept: ["folder", "workbook"], drop: () => {} });
+  useDrop({ accept: ["folder", "workbook"], drop: () => { } });
 
   if (loading) {
     return (
@@ -157,10 +162,10 @@ export default function PublicMain({
             filterDepth === 3
               ? selectedSubject?.id
               : filterDepth === 2
-              ? selectedDepartment?.id
-              : filterDepth === 1
-              ? selectedCollege?.id
-              : null,
+                ? selectedDepartment?.id
+                : filterDepth === 1
+                  ? selectedCollege?.id
+                  : null,
           name: makeTitle(),
           parentId: filterDepth > 0 ? true : null,
         }}
@@ -174,12 +179,12 @@ export default function PublicMain({
         currentFolder={{ id: null }}
         folders={[]}
         workbooks={sortedWorkbooks}
-        onRefresh={() => {}}
-        onFolderClick={() => {}}
-        onRename={() => {}}
-        onDeleteFolder={() => {}}
-        onDeleteWorkbook={() => {}}
-        onRenameWorkbook={() => {}}
+        onRefresh={() => { }}
+        onFolderClick={() => { }}
+        onRename={() => { }}
+        onDeleteFolder={() => { }}
+        onDeleteWorkbook={() => { }}
+        onRenameWorkbook={() => { }}
         onAddFolder={null}
         onSelectItem={handleSelect}
       />
