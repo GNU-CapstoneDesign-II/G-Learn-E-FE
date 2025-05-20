@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import logoImage from "../assets/image-logo.png";
 import textLogoImage from "../assets/text-logo.png";
 import Navbar from "../components/Navbar.jsx";
-import SelectableButton from '../components/ProblemGenerator/SelectableButton.jsx';
+import SelectableButton from '../components/problemgenerator/SelectableButton.jsx';
 
 export default function MainPage() {
   const navigate = useNavigate();

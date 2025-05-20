@@ -116,20 +116,29 @@ export function renameWorkbook(workbookId, newName) {
  *
  * @param {number} workbookId
  * @returns {Promise<{
-*   id: number,           // 문제집 ID
-*   name: string,         // 워크북 이름
-*   professor: string,    // 교수 이름
-*   examType: string,     // 시험 유형
-*   coverImage: number,   // 표지 이미지 (서버에선 Integer)
-*   courseYear: number,   // 수강 연도
-*   semester: string,     // 학기
-*   createdAt: string     // 생성일 (ISO 문자열)
+*   id: number,
+*   name: string,
+*   professor: string,
+*   examType: string,
+*   coverImage: number,
+*   courseYear: number,
+*   semester: string,
+*   createdAt: string,
+*   likeCount: number,
+*   dislikeCount: number
 * }>}
 */
 export function fetchWorkbookDetail(workbookId) {
  return axiosInstance
    .get(`/api/workbook/${workbookId}`)
-   .then(res => res.data.data);
+   .then(res => {
+     const d = res.data.data;
+     return {
+       ...d,
+       likeCount: typeof d.likeCount === 'number' ? d.likeCount : 0,
+       dislikeCount: typeof d.dislikeCount === 'number' ? d.dislikeCount : 0,
+     };
+   });
 }
 
 /**
@@ -160,4 +169,18 @@ export function updateWorkbookInfo(workbookId, payload) {
  return axiosInstance
    .patch(`/api/workbook/${workbookId}`, payload)
    .then(res => res.data.data);
+}
+
+/**
+ * 워크북 좋아요/싫어요 투표를 합니다.
+ * POST /api/workbook/{workbookId}/vote
+ *
+ * @param {number} workbookId
+ * @param {"LIKE"|"DISLIKE"} voteType
+ * @returns {Promise<{ likeCount: number, dislikeCount: number }>}
+ */
+export function voteWorkbook(workbookId, voteType) {
+  return axiosInstance
+    .post(`/api/workbook/${workbookId}/vote`, { voteType })
+    .then(res => res.data.data);
 }

@@ -26,6 +26,7 @@ export default function PublicMain({
   sort = "name",
   order = "asc",
 }) {
+  const isPublic = true;   // 항상 public
   /* ───────── 기타 UI 상태 ───────── */
   const [workbooks, setWorkbooks]       = useState([]);
   const [loading, setLoading]           = useState(true);

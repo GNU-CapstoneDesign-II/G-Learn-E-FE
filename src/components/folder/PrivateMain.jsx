@@ -22,6 +22,7 @@ import {
 } from "../../api/privateFolderApi";
 
 export default function PrivateMain() {
+  const isPublic = false;  // 항상 private
   const [folderData, setFolderData] = useState({
     id: null,
     name: "private",
@@ -38,7 +39,7 @@ export default function PrivateMain() {
   const [selectedIds, setSelectedIds] = useState([]);
   const [showUploadPopup, setShowUploadPopup] = useState(false);
 
-  const [selectedWorkbook, setSelectedWorkbook] = useState(null);
+  const [currentWorkbook, setCurrentWorkbook] = useState(null);
 
   // —— 팝업 관리 state ——
   const [modal, setModal] = useState({
@@ -62,7 +63,7 @@ export default function PrivateMain() {
     try {
       // 1) 서버에서 워크북 상세 정보 가져오기
       const detail = await fetchWorkbookDetail(id);
-      setSelectedWorkbook(detail);
+      setCurrentWorkbook(detail);
       setModal({ type: "workbookDetail", id });
     } catch (err) {
       console.error(err);
@@ -301,11 +302,12 @@ export default function PrivateMain() {
       )}
 
       {/* 4) 워크북 상세 팝업 WorkbookDetailPopup */}
-      {modal.type === "workbookDetail" && selectedWorkbook && (
+      {modal.type === "workbookDetail" && currentWorkbook && (
         <WorkbookDetailPopup
-          workbook={selectedWorkbook}
+          workbookId={currentWorkbook.id}
+          isPublic={isPublic}
           onClose={() => {
-            setSelectedWorkbook(null);
+            setCurrentWorkbook(null);
             closeModal();
           }}
           onEdit={openEditWorkbook}
@@ -313,9 +315,9 @@ export default function PrivateMain() {
       )}
 
       {/* 5) 워크북 정보 편집 팝업 InfoEditPopup */}
-      {modal.type === "editWorkbook" && selectedWorkbook && (
+      {modal.type === "editWorkbook" && currentWorkbook && (
         <InfoEditPopup
-          workbook={selectedWorkbook}
+          workbook={currentWorkbook}
           onClose={() => setModal({ type: "workbookDetail", id: modal.id })}
           onSave={async updated => {
             try {
@@ -324,13 +326,13 @@ export default function PrivateMain() {
                 name:        updated.name,
                 professor:   updated.professor,
                 examType:    updated.examType,
-                coverImage:  selectedWorkbook.coverImage,
+                coverImage:  currentWorkbook.coverImage,
                 courseYear:  Number(updated.courseYear),
                 semester:    updated.semester,
               });
 
               // 2) 팝업에 최신 데이터 반영
-              setSelectedWorkbook(wb);
+              setCurrentWorkbook(wb);
               setInfoMsg("정보가 저장되었습니다.");
 
               // 3) 다시 상세보기 상태로

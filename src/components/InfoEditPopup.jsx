@@ -1,6 +1,7 @@
 // src/components/InfoEditPopup.jsx
 import React, { useState } from "react";
 import { InputField, SelectField } from "../pages/SignUp"; // InputField, SelectField가 export된 파일
+import { SEMESTER_OPTIONS, EXAM_TYPE_OPTIONS } from "./popupConstants";
 import ConfirmPopup from "./common/ConfirmPopup";
 
 export default function InfoEditPopup({ workbook, onClose, onSave }) {
@@ -20,13 +21,6 @@ export default function InfoEditPopup({ workbook, onClose, onSave }) {
     const y = currentYear - i;
     return { value: String(y), label: `${y}년` };
   });
-
-  const semesterOptions = [
-    { value: "1", label: "1학기" },
-    { value: "2", label: "2학기" },
-    { value: "S", label: "여름계절학기" },
-    { value: "W", label: "겨울계절학기" },
-  ];
 
   // 변경사항 유무 확인
   const isDirty = () => (
@@ -77,14 +71,14 @@ export default function InfoEditPopup({ workbook, onClose, onSave }) {
           </button>
 
           {/* 타이틀 */}
-          <h2 className="text-xl md:text-2xl font-semibold text-[#5F360A] text-center mb-8">
+          <h2 className="text-xl md:text-2xl font-semibold text-[#5F360A] text-center">
             {workbook.name}
           </h2>
 
           {/* 필드 그룹 */}
-          <div className="space-y-5 text-[#5F360A] text-base">
+          <div className="mt-8 space-y-5 text-[#5F360A] text-base">
             <InputField
-              label="과목명"
+              label="문제집 이름"
               name="name"
               value={name}
               onChange={e => setName(e.target.value)}
@@ -98,7 +92,7 @@ export default function InfoEditPopup({ workbook, onClose, onSave }) {
 
             <div className="flex gap-4">
               <div className="flex-1">
-                <label className="block text-sm mb-1">학사년도</label>
+                <label className="block text-sm mb-1">수강연도</label>
                 <SelectField
                   placeholder="선택"
                   value={courseYear}
@@ -111,24 +105,25 @@ export default function InfoEditPopup({ workbook, onClose, onSave }) {
                 <SelectField
                   placeholder="선택"
                   value={semester}
-                  options={semesterOptions}
+                  options={SEMESTER_OPTIONS}
                   onChange={e => setSemester(e.target.value)}
                 />
               </div>
             </div>
 
+            {/* 시험 유형 라디오 */}
             <div className="flex items-center justify-center gap-6">
-              {['중간','기말','전체','기타'].map(type => (
-                <label key={type} className="flex items-center gap-1">
+              {EXAM_TYPE_OPTIONS.map(opt => (   // ← 상수에서 가져온 시험 유형 옵션
+                <label key={opt.value} className="flex items-center gap-1">
                   <input
                     type="radio"
                     name="examType"
-                    value={type}
-                    checked={examType === type}
+                    value={opt.value}
+                    checked={examType === opt.value}
                     onChange={e => setExamType(e.target.value)}
                     className="accent-[#BDA68A]"
                   />
-                  <span>{type}</span>
+                  <span>{opt.label}</span>
                 </label>
               ))}
             </div>
