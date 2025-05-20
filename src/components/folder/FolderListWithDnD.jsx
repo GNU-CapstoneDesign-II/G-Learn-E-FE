@@ -40,11 +40,9 @@ export default function FolderListWithDnD({
   const isPublic = (mode === "public");
   const isRoot = isPublic ? filterDepth === 0 : selectedFolder?.parentId == null;
 
-  // ⭐️ 공통 높이(1개당 40px)·폭(140px) 기준으로 viewport overflow 방지
   const MENU_ITEM_HEIGHT = 40;
   const MENU_WIDTH = 140;
 
-  // ContextMenu state
   const [ctxMenu, setCtxMenu] = useState({
     visible: false,
     x: 0,
@@ -53,27 +51,22 @@ export default function FolderListWithDnD({
     id: null,
   });
 
-  // 클릭된 카드 바로 위에 메뉴를 띄우도록 위치 계산
   const handleContextMenu = (e, type, id) => {
-    if (isPublic) return; // 공용 폴더에서는 우클릭 금지
+    if (isPublic) return;
     e.preventDefault();
 
-    const itemCount = type === ItemTypes.WORKBOOK ? 3 : 2; // 편집 메뉴 유무
+    const itemCount = type === ItemTypes.WORKBOOK ? 3 : 2;
     const menuHeight = itemCount * MENU_ITEM_HEIGHT;
 
-    /* 1) 기본 위치 = 클릭 지점 바로 옆 */
-    let x = e.clientX + 2;   // ↘︎ 살짝 떨어뜨림
+    let x = e.clientX + 2;
     let y = e.clientY + 2;
 
-    /* 2) 오른쪽·아래쪽으로 넘치면 좌/위쪽으로 보정 */
     if (x + MENU_WIDTH > window.innerWidth) {
       x = e.clientX - MENU_WIDTH - 2;
     }
     if (y + menuHeight > window.innerHeight) {
       y = e.clientY - menuHeight - 2;
     }
-
-    /* 3) 최종 보정 (드물게 음수 좌표 방지) */
     if (x < 0) x = 8;
     if (y < 0) y = 8;
 
@@ -109,10 +102,8 @@ export default function FolderListWithDnD({
   const [{ isOver, canDrop }, dropToParent] = useDrop({
     accept: [ItemTypes.FOLDER, ItemTypes.WORKBOOK],
     drop: (item, monitor) => {
-      // 부모 폴더가 없으면 무시
       if (selectedFolder.parentId == null) return;
       if (isPublic) return;
-      // 종류에 따라 API 호출
       const mover =
         monitor.getItemType() === ItemTypes.FOLDER
           ? moveFolder
@@ -131,7 +122,6 @@ export default function FolderListWithDnD({
 
   return (
     <>
-      {/* 상단 툴바 영역 */}
       <header
         ref={dropToParent}
         className="fixed top-[66px] left-[200px] w-[calc(100%-200px)] flex items-center justify-between px-6 py-3 border-b border-[#e5d5c5] bg-[#fdf9f4] z-30 hover:bg-[#f0ede8] transition-colors"
@@ -144,7 +134,6 @@ export default function FolderListWithDnD({
           )}
           <h2 className="text-lg font-semibold text-[#5f360a]">
             <span>{selectedFolder?.name ?? ""}</span>
-
             {(isOver || canDrop) && !isRoot && !isPublic && (
               <span className="ml-5 px-2 py-1 bg-[#AC957B] text-white text-xs rounded">
                 상위 폴더로 이동
@@ -154,7 +143,6 @@ export default function FolderListWithDnD({
         </div>
 
         <div className="flex items-center gap-3 text-sm text-[#5f360a]">
-          {/* 정렬 드롭다운 */}
           <div className="relative">
             <select
               value={sortOption}
@@ -171,7 +159,6 @@ export default function FolderListWithDnD({
             </span>
           </div>
 
-          {/* 선택 모드 툴바 */}
           {isSelectMode && (
             <>
               {isPublic ? (
@@ -206,11 +193,10 @@ export default function FolderListWithDnD({
         </div>
       </header>
 
-      {/* 폴더/워크북 리스트 */}
       <div className="flex flex-wrap gap-6 items-start">
-        {folders.map(f => (
+        {Array.from(new Map(folders.map(f => [`${f.type}-${f.id}-${f.name}`, f])).values()).map(f => (
           <FolderItem
-            key={f.id}
+            key={`folder-${f.type}-${f.id}-${f.name}`}
             folder={f}
             onRefresh={onRefresh}
             onFolderClick={onFolderClick}
@@ -236,30 +222,25 @@ export default function FolderListWithDnD({
             isPublic={isPublic}
           />
         ))}
-        {/* 추가하기 카드 */}
         {!isPublic && (
           <AddFolderCard onClick={onAddFolder} />
         )}
       </div>
 
-      {/* ContextMenu */}
-      {
-        ctxMenu.visible && (
-          <ContextMenu
-            x={ctxMenu.x}
-            y={ctxMenu.y}
-            /* ⭐️ 항목을 종류별로 분기 */
-            options={[
-              { label: "이름 변경", onClick: handleRenameContext },
-              ...(ctxMenu.type === ItemTypes.WORKBOOK
-                ? [{ label: "문제집 편집", onClick: handleEditContext }]
-                : []),
-              { label: "삭제", onClick: handleDeleteContext },
-            ]}
-            onClose={closeContextMenu}
-          />
-        )
-      }
+      {ctxMenu.visible && (
+        <ContextMenu
+          x={ctxMenu.x}
+          y={ctxMenu.y}
+          options={[
+            { label: "이름 변경", onClick: handleRenameContext },
+            ...(ctxMenu.type === ItemTypes.WORKBOOK
+              ? [{ label: "문제집 편집", onClick: handleEditContext }]
+              : []),
+            { label: "삭제", onClick: handleDeleteContext },
+          ]}
+          onClose={closeContextMenu}
+        />
+      )}
     </>
   );
 }

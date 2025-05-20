@@ -4,38 +4,33 @@ import FolderListWithDnD from "./FolderListWithDnD.jsx";
 import UploadPopup from "../common/UploadPopup.jsx";
 import { copyWorkbookToPrivate } from "../../api/publicFolderApi";
 import {
-  getPublicWorkbooks,
-  getPublicWorkbooksByCollege,
-  getPublicWorkbooksByDepartment,
-  getPublicWorkbooksBySubject,
-} from "../../api/publicWorkbooksApi";
+  getColleges,
+  getDepartments,
+  getSubjects,
+} from "../../api/workbookApi";
 
-/**
- * 완전 제어형 PublicMain
- *  - college / department / subject를 prop 그대로 사용
- */
 export default function PublicMain({
-  /* === 필터 값들 (부모가 제어) === */
   selectedCollege = null,
   selectedDepartment = null,
   selectedSubject = null,
-
-  /* === 페이징·정렬 (부모가 제어하거나 초기값만) === */
   page = 0,
   size = 20,
   sort = "name",
   order = "asc",
   handleBack,
+  setSelectedCollege,
+  setSelectedDepartment,
+  setSelectedSubject,
+
 }) {
-  /* ───────── 기타 UI 상태 ───────── */
+  const [items, setItems] = useState([]);
   const [workbooks, setWorkbooks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sortOption, setSortOption] = useState("name");      // 클라이언트측 이름 정렬
+  const [sortOption, setSortOption] = useState("name");
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [showCopyPopup, setShowCopyPopup] = useState(false);
 
-  /* ───────── 필터 깊이 계산 ───────── */
   const filterDepth = selectedSubject
     ? 3
     : selectedDepartment
@@ -44,77 +39,66 @@ export default function PublicMain({
         ? 1
         : 0;
 
-  /* ───────── 워크북 로딩 ───────── */
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {
-        let res;
-        switch (filterDepth) {
-          case 0:
-            res = await getPublicWorkbooks(page, size, sort, order);
-            break;
-          case 1:
-            res = await getPublicWorkbooksByCollege(
-              selectedCollege.id,
-              page,
-              size,
-              sort,
-              order
-            );
-            break;
-          case 2:
-            res = await getPublicWorkbooksByDepartment(
-              selectedDepartment.id,
-              page,
-              size,
-              sort,
-              order
-            );
-            break;
-          case 3:
-            res = await getPublicWorkbooksBySubject(
-              selectedSubject.id,
-              page,
-              size,
-              sort,
-              order
-            );
-            break;
-          default:
-            res = { data: { data: [] } };
+        if (filterDepth === 0) {
+          const [collegeRes, liberalRes] = await Promise.all([
+            getColleges(false),
+            getColleges(true),
+          ]);
+          const colleges = (collegeRes.data.data || []).map((c) => ({
+            id: c.id,
+            name: c.collegeName,
+            type: "college",
+          }));
+          const liberal = (liberalRes.data.data || [])[0];
+          const list = liberal
+            ? [...colleges, { id: liberal.id, name: liberal.collegeName, type: "college" }]
+            : colleges;
+          setItems(list);
+        } else if (filterDepth === 1 && selectedCollege) {
+          const res = await getDepartments(selectedCollege.id);
+          setItems((res.data.data || []).map((d) => ({
+            id: d.id,
+            name: d.departmentName,
+            type: "department",
+          })));
+        } else if (filterDepth === 2 && selectedDepartment) {
+          const res = await getSubjects(selectedDepartment.id);
+          const grouped = Array.from(
+            new Set((res.data.data || []).map((s) => s.grade).filter(Boolean))
+          ).sort();
+          setItems(grouped.map((g) => ({
+            id: g,
+            name: `${g}`,
+            type: "grade",
+          })));
+        } else if (filterDepth === 3 && selectedDepartment) {
+          const res = await getSubjects(selectedDepartment.id);
+          const subjectList = res.data.data || [];
+          const grade = selectedSubject?.id; // id = grade value
+          const filtered = subjectList.filter((s) => String(s.grade) === String(grade));
+          setItems(filtered.map((s) => ({
+            id: s.id,
+            name: s.subjectName,
+            type: "subject", // ← 이걸로 onFolderClick도 가능하게
+          })));
         }
-
-        // ✅ 응답 구조에 따른 분기 처리
-        const raw = res.data.data;
-        const wbList = Array.isArray(raw)
-          ? raw
-          : raw?.publicWorkbooks ?? [];
-
-        setWorkbooks(wbList);
         setIsSelectMode(false);
         setSelectedIds([]);
       } catch (err) {
-        console.error("문제집 불러오기 실패:", err);
+        console.error("Public 폴더링 로딩 실패:", err);
+        setItems([]);
         setWorkbooks([]);
       } finally {
         setLoading(false);
       }
     };
     load();
-  }, [
-    selectedCollege,
-    selectedDepartment,
-    selectedSubject,
-    page,
-    size,
-    sort,
-    order,
-    filterDepth,
-  ]);
+  }, [selectedCollege, selectedDepartment, selectedSubject, filterDepth]);
 
-
-  /* ───────── 이름 정렬(Null‑safe) ───────── */
   const sortedWorkbooks = useMemo(() => {
     if (sortOption !== "name") return workbooks;
     return [...workbooks].sort((a, b) =>
@@ -122,7 +106,6 @@ export default function PublicMain({
     );
   }, [workbooks, sortOption]);
 
-  /* ───────── 선택 모드 토글 / 선택 관리 ───────── */
   const toggleSelectMode = () => {
     setIsSelectMode((m) => !m);
     if (isSelectMode) setSelectedIds([]);
@@ -132,7 +115,6 @@ export default function PublicMain({
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
 
-  /* ───────── 폴더명 생성 ───────── */
   const makeTitle = () => {
     const parts = [
       selectedCollege?.name,
@@ -142,8 +124,6 @@ export default function PublicMain({
     return parts.length ? parts.join(" - ") : "Public";
   };
 
-
-  /* ───────── DnD 장애 방지용 빈 drop 영역 ───────── */
   useDrop({ accept: ["folder", "workbook"], drop: () => { } });
 
   if (loading) {
@@ -177,10 +157,27 @@ export default function PublicMain({
         isSelectMode={isSelectMode}
         onDownload={() => setShowCopyPopup(true)}
         currentFolder={{ id: null }}
-        folders={[]}
+        folders={items}
         workbooks={sortedWorkbooks}
         onRefresh={() => { }}
-        onFolderClick={() => { }}
+        onFolderClick={(id) => {
+          const folder = items.find(f => f.id === id);
+          if (!folder) return;
+          switch (folder.type) {
+            case "college":
+              setSelectedCollege({ id: folder.id, name: folder.name });
+              sidebarRef.current?.setMain(folder.id);
+              break;
+            case "department":
+              setSelectedDepartment({ id: folder.id, name: folder.name });
+              sidebarRef.current?.setSub(folder.id);
+              break;
+            case "grade":
+              setSelectedSubject({ id: folder.id, name: folder.name });
+              sidebarRef.current?.setSubject(folder.id);
+              break;
+          }
+        }}
         onRename={() => { }}
         onDeleteFolder={() => { }}
         onDeleteWorkbook={() => { }}
@@ -189,7 +186,6 @@ export default function PublicMain({
         onSelectItem={handleSelect}
       />
 
-      {/* 사본 만들기 팝업 */}
       {showCopyPopup && (
         <UploadPopup
           mode="copyToPrivate"
