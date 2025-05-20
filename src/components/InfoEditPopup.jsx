@@ -1,20 +1,20 @@
-// src/components/common/InfoEditPopup.jsx
-import React, { useState, useEffect, useRef } from "react";
+// src/components/InfoEditPopup.jsx
+import React, { useState } from "react";
 import { InputField, SelectField } from "../pages/SignUp"; // InputField, SelectField가 export된 파일
 import ConfirmPopup from "./common/ConfirmPopup";
 
 export default function InfoEditPopup({ workbook, onClose, onSave }) {
   if (!workbook) return null;
 
-  // 로컬 상태 초기값
-  const [subjectName, setSubjectName] = useState(workbook.subjectName || "");
-  const [professor, setProfessor]     = useState(workbook.professor     || "");
-  const [year, setYear]               = useState(workbook.year          || "");
-  const [semester, setSemester]       = useState(workbook.semester      || "");
-  const [examType, setExamType]       = useState(workbook.examType      || "중간");
+  // 로컬 상태 초기값 (백엔드 프로퍼티명과 일치)
+  const [name, setName]               = useState(workbook.name             || "");
+  const [professor, setProfessor]     = useState(workbook.professor       || "");
+  const [examType, setExamType]       = useState(workbook.examType        || "중간");
+  const [courseYear, setCourseYear]   = useState(String(workbook.courseYear) || "");
+  const [semester, setSemester]       = useState(workbook.semester        || "");
   const [showConfirmClose, setShowConfirmClose] = useState(false);
 
-  // ① 학사년도 옵션 (현재 연도 기준 최근 5년)
+  // 학사년도 옵션 (현재 연도 기준 최근 5년)
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from({ length: 5 }, (_, i) => {
     const y = currentYear - i;
@@ -30,28 +30,35 @@ export default function InfoEditPopup({ workbook, onClose, onSave }) {
 
   // 변경사항 유무 확인
   const isDirty = () => (
-    subjectName   !== (workbook.subjectName || "") ||
-    professor     !== (workbook.professor     || "") ||
-    year          !== (workbook.year          || "") ||
-    semester      !== (workbook.semester      || "") ||
-    examType      !== (workbook.examType      || "중간")
-  );  
+    name        !== (workbook.name             || "") ||
+    professor   !== (workbook.professor       || "") ||
+    courseYear  !== String(workbook.courseYear || "") ||
+    semester    !== (workbook.semester        || "") ||
+    examType    !== (workbook.examType        || "중간")
+  );
 
-  // X 버튼 클릭 핸들러: 변경사항 없으면 닫기, 있으면 확인 팝업
+  // 닫기 버튼 핸들러
   const handleCloseClick = () => {
     if (isDirty()) setShowConfirmClose(true);
     else onClose();
   };
 
-  // 확인 팝업 제어
   const handleConfirmClose = () => {
     setShowConfirmClose(false);
     onClose();
   };
   const handleCancelClose = () => setShowConfirmClose(false);
-  
+
+  // 저장 핸들러: backend payload 필드명과 일치시켜 전달
   const handleSave = () => {
-    onSave({ subjectName, professor, year, semester, examType });
+    onSave({
+      name,
+      professor,
+      examType,
+      coverImage: workbook.coverImage,
+      courseYear: Number(courseYear),
+      semester,
+    });
     onClose();
   };
 
@@ -77,10 +84,10 @@ export default function InfoEditPopup({ workbook, onClose, onSave }) {
           {/* 필드 그룹 */}
           <div className="space-y-5 text-[#5F360A] text-base">
             <InputField
-              label="교과목 명"
-              name="subjectName"
-              value={subjectName}
-              onChange={e => setSubjectName(e.target.value)}
+              label="과목명"
+              name="name"
+              value={name}
+              onChange={e => setName(e.target.value)}
             />
             <InputField
               label="교수님"
@@ -94,9 +101,9 @@ export default function InfoEditPopup({ workbook, onClose, onSave }) {
                 <label className="block text-sm mb-1">학사년도</label>
                 <SelectField
                   placeholder="선택"
-                  value={year}
+                  value={courseYear}
                   options={yearOptions}
-                  onChange={e => setYear(e.target.value)}
+                  onChange={e => setCourseYear(e.target.value)}
                 />
               </div>
               <div className="flex-1">

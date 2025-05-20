@@ -1,4 +1,4 @@
-// src/components/common/WorkbookDetailPopup.jsx
+// src/components/WorkbookDetailPopup.jsx
 import React from "react";
 
 export default function WorkbookDetailPopup({ workbook, onClose, onEdit }) {

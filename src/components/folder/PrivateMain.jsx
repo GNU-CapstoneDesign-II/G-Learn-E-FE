@@ -18,7 +18,7 @@ import {
   deleteWorkbook,
   renameWorkbook,
   fetchWorkbookDetail,
-  // updateWorkbookInfo,
+  updateWorkbookInfo,
 } from "../../api/privateFolderApi";
 
 export default function PrivateMain() {
@@ -59,19 +59,15 @@ export default function PrivateMain() {
   const openAddFolder = () =>
     setModal({ type: "addFolder" });
   const openWorkbookDetail = async id => {
-    // try {
-    //   const detail = await fetchWorkbookDetail(id);
-    //   setSelectedWorkbook(detail);
-    //   setModal({ type: "workbookDetail", id });
-    // } catch {
-    //   setInfoMsg("워크북 상세 정보를 불러오는데 실패했습니다.");
-    // }
-
-
-    // 기존에 가져온 folderData.childWorkbooks 배열에서 해당 워크북 정보만 꺼내 사용합니다.
-    const wb = folderData.childWorkbooks.find(w => w.id === id);
-    setSelectedWorkbook(wb);
-    setModal({ type: "workbookDetail", id });
+    try {
+      // 1) 서버에서 워크북 상세 정보 가져오기
+      const detail = await fetchWorkbookDetail(id);
+      setSelectedWorkbook(detail);
+      setModal({ type: "workbookDetail", id });
+    } catch (err) {
+      console.error(err);
+      setInfoMsg("워크북 상세 정보를 불러오는데 실패했습니다.");
+    }
   };
   const openEditWorkbook = id =>
     setModal({ type: "editWorkbook", id });
@@ -316,21 +312,37 @@ export default function PrivateMain() {
         />
       )}
 
-      {/* 5) 워크북 상세 (정보 편집용) 팝업 InfoEditPopup */}
+      {/* 5) 워크북 정보 편집 팝업 InfoEditPopup */}
       {modal.type === "editWorkbook" && selectedWorkbook && (
         <InfoEditPopup
           workbook={selectedWorkbook}
           onClose={() => setModal({ type: "workbookDetail", id: modal.id })}
-          // onSave={async updated => {
-          //   try {
-          //     await updateWorkbookInfo(modal.id, updated);
-          //     setInfoMsg("정보가 저장되었습니다.");
-          //     setModal({ type: "workbookDetail", id: modal.id });
-          //     loadFolder(folderData.id);
-          //   } catch {
-          //     setInfoMsg("저장 중 오류가 발생했습니다.");
-          //   }
-          // }}
+          onSave={async updated => {
+            try {
+              // 1) 서버에 PATCH 요청
+              const wb = await updateWorkbookInfo(modal.id, {
+                name:        updated.name,
+                professor:   updated.professor,
+                examType:    updated.examType,
+                coverImage:  selectedWorkbook.coverImage,
+                courseYear:  Number(updated.courseYear),
+                semester:    updated.semester,
+              });
+
+              // 2) 팝업에 최신 데이터 반영
+              setSelectedWorkbook(wb);
+              setInfoMsg("정보가 저장되었습니다.");
+
+              // 3) 다시 상세보기 상태로
+              setModal({ type: "workbookDetail", id: modal.id });
+
+              // 4) 목록도 리프레시
+              loadFolder(folderData.id);
+            } catch (err) {
+              console.error(err);
+              setInfoMsg("저장 중 오류가 발생했습니다.");
+            }
+          }}
         />
       )}
     </main>

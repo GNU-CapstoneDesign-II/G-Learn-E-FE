@@ -131,3 +131,33 @@ export function fetchWorkbookDetail(workbookId) {
    .get(`/api/workbook/${workbookId}`)
    .then(res => res.data.data);
 }
+
+/**
+ * 워크북 정보를 수정합니다.
+ * PATCH /api/workbook/{workbookId}
+ *
+ * @param {number} workbookId
+ * @param {{ 
+*   name: string,
+*   professor: string,
+*   examType: string,
+*   coverImage: any,
+*   courseYear: number,
+*   semester: string
+* }} payload
+* @returns {Promise<{
+*   id: number,
+*   name: string,
+*   professor: string,
+*   examType: string,
+*   coverImage: any,
+*   courseYear: number,
+*   semester: string,
+*   createdAt: string
+* }>}
+*/
+export function updateWorkbookInfo(workbookId, payload) {
+ return axiosInstance
+   .patch(`/api/workbook/${workbookId}`, payload)
+   .then(res => res.data.data);
+}
