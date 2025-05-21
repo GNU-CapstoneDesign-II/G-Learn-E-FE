@@ -223,39 +223,10 @@ export default function MyPageStatistics() {
                     최근 활동 기록
                 </h3>
                 <div className="overflow-x-auto">
-                    {/* <div className="flex gap-1">
-                        {heatmap.map((week, i) => (
-                            <div key={i} className="flex flex-col gap-1">
-                                {Array.from({ length: 7 }).map((_, d) => {
-                                    const cell = week[d] || { count: 0 };
-                                    const level =
-                                        cell.count === 0
-                                            ? 0
-                                            : cell.count < 2
-                                                ? 1
-                                                : cell.count < 4
-                                                    ? 2
-                                                    : cell.count < 6
-                                                        ? 3
-                                                        : 4;
-                                    return (
-                                        <div
-                                            key={d}
-                                            title={`${cell.date ?? ""} (${cell.count})`}
-                                            className="w-3.5 h-3.5 rounded-[2px]"
-                                            style={{ background: BROWN_SCALE[level] }}
-                                        />
-                                    );
-                                })}
-                            </div>
-                        ))}
-                    </div> */}
-                    {/* === 변경 시작 === */}
                     <HeatmapSVG
                         weeks={heatmap}
                         startDate={new Date(new Date().getFullYear(), 0, 1)} // 최근 90일 시작점
                     />
-                    {/* === 변경 끝 === */}
                 </div>
             </section>
         </div>

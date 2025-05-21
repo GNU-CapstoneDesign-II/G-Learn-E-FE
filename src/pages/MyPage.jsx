@@ -23,14 +23,16 @@ const Mypage = () => {
                 <MyPageSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
                 <main className="flex-1 p-8 bg-[#fefbf7] min-h-[calc(100vh-80px)]">
-                    {activeTab === 'home' && <MyPageHome />}
-                    {activeTab === 'info' && <MyPageInfo />}
-                    {activeTab === 'statistics' && <MyPageStatistics />}
-                    {activeTab === 'withdraw' && (
-                        <div>
-                            <p>정말 탈퇴하시겠습니까?</p>
-                        </div>
-                    )}
+                    <div className="space-y-12 max-w-6xl mx-auto w-full">
+                        {activeTab === 'home' && <MyPageHome />}
+                        {activeTab === 'info' && <MyPageInfo />}
+                        {activeTab === 'statistics' && <MyPageStatistics />}
+                        {activeTab === 'withdraw' && (
+                            <div>
+                                <p>정말 탈퇴하시겠습니까?</p>
+                            </div>
+                        )}
+                    </div>
                 </main>
             </div>
         </div>

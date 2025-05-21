@@ -19,5 +19,15 @@ export const getPublicWorkbooksBySubject = (subjectId, page, size, sort, order) 
 /**
  * 워크북 검색 (전체 / 공개 / 비공개 범위, 키워드 종류, 페이징/정렬)
  */
-export const searchWorkbooks = (keyword, range, type, page, size, sort, order) =>
-    axios.get(`/api/search`, { params: { keyword, range, type, page, size, sort, order } });
+export const searchWorkbooks = ({
+  keyword,
+  range = "all",
+  type = "total",
+  page = 0,
+  size = 25,
+  sort = "relevance",
+  order = "desc",
+}) =>
+  axios.get("/api/search", {
+    params: { keyword, range, type, page, size, sort, order },
+  });

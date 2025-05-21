@@ -68,3 +68,27 @@ export async function getActivityLog(types, days = 30) {
   });
   return data.data.activityLog;
 }
+
+
+/**
+ * 블랙리스트 조회
+ * @param {'BLOCK'|'HIDE'} blacklistType
+ * @returns {Promise<AxiosResponse<ApiResponse<BlacklistResponse>>>}
+ */
+export function getBlacklist(blacklistType = "BLOCK") {
+  return axiosInstance.get("/api/user/blacklist", {
+    params: { blacklistType },
+  });
+}
+
+/**
+ * 블랙리스트 삭제
+ * @param {number} targetId
+ * @param {'BLOCK'|'HIDE'} blacklistType
+ * @returns {Promise<AxiosResponse<ApiResponse<null>>>}
+ */
+export function removeBlacklist(targetId, blacklistType = "BLOCK") {
+  return axiosInstance.delete("/api/user/blacklist", {
+    data: { targetId, blacklistType },
+  });
+}
