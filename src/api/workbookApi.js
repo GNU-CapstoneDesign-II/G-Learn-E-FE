@@ -1,3 +1,4 @@
+// src/api/workbookApi.js
 import axios from "./axiosInstance";
 
 // 👉 단과대/교양 목록 가져오기
