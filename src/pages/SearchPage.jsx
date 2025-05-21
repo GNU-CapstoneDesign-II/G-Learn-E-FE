@@ -124,9 +124,9 @@ export default function SearchPage() {
                                     <div className="text-xs text-[#9A7E5F] mt-1">
                                         작성자: {wb.authorName} / 생성일: {wb.createdAt ? new Date(wb.createdAt).toLocaleDateString() : "-"}
                                     </div>
-                                    <div className="text-sm text-[#5F360A] mt-2 line-clamp-2">
+                                    {/* <div className="text-sm text-[#5F360A] mt-2 line-clamp-2">
                                         {wb.description ?? "설명이 없습니다."}
-                                    </div>
+                                    </div> */}
                                 </div>
                             ))}
                         </div>

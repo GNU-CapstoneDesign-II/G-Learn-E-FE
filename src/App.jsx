@@ -15,6 +15,7 @@ import Mypage from './pages/MyPage.jsx';
 import WorkbookEdit from './pages/WorkbookEdit.jsx'
 import WorkbookMerge from './pages/WorkbookMerge.jsx';
 import SearchPage from "./pages/SearchPage.jsx";
+import KeywordRecommendPage from "./pages/KeywordRecommendPage.jsx";
 
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
         <Route path="/mypage" element={<Mypage />} />
         <Route path="/edit/:ids" element={<WorkbookEdit />} />
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/keyword"   element={<KeywordRecommendPage />} />
       </Route>
 
       {/* 그 외 리디렉트 */}
