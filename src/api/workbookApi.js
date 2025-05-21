@@ -123,3 +123,27 @@ export async function generateWorkbook({
   console.log(data);
   return data.data.id;
 }
+
+
+export const getWorkbookProfile = (workbookId) =>
+  axios.get(`/api/workbook/${workbookId}`);
+
+export const getWorkbookSolveLog = (workbookId) =>
+  axios.get(`/api/solve-log/workbook/${workbookId}`);
+
+/** payload 예시
+ * {
+ *   name: "자료구조 기말",
+ *   professor: "김교수",
+ *   examType: "FINAL",        // "MIDDLE" | "FINAL" | "OTHER"
+ *   courseYear: 2025,
+ *   semester: "FALL"          // "SPRING" | "FALL" | "SUMMER" | …
+ * }
+ */
+export const updateWorkbook = (workbookId, payload) =>
+  axios.patch(`/api/workbook/${workbookId}`, payload);
+
+/* ────────────────── 좋아요 / 싫어요 투표 (공개 · 내가 만든 게 아닐 때) ── */
+/** voteType: "LIKE" | "DISLIKE" */
+export const voteWorkbook = (workbookId, voteType) =>
+  axios.post(`/api/workbook/${workbookId}/vote`, { voteType });
