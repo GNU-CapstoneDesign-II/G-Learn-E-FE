@@ -3,71 +3,169 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { searchWorkbooks } from "../api/publicWorkbooksApi";
 import Navbar from "../components/Navbar";
+import WorkbookProfilePopup from "../components/common/WorkbookProfilePopup.jsx";
 
 export default function SearchPage() {
-    const location = useLocation();
+    /* ── ① URL 파라미터 → 상태 ── */
+    const { search } = useLocation();
     const navigate = useNavigate();
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(search);
 
-    const keyword = params.get("keyword") ?? "";
-    const range = params.get("range") ?? "all";
+    const kw = params.get("keyword") ?? "";
+    const range = params.get("range") ?? "all";     // all | private | public
     const type = params.get("type") ?? "total";
-    const page = parseInt(params.get("page") ?? "0", 10);
-    const size = parseInt(params.get("size") ?? "25", 10);
+    const page = params.get("page") || 0;
+    const size = params.get("size") || 25;
     const sort = params.get("sort") ?? "relevance";
     const order = params.get("order") ?? "desc";
 
-    const [results, setResults] = useState([]);
-    const [totalCount, setTotalCount] = useState(0);
+    /* ── ② 결과 상태 ── */
+    const [privateRows, setPrivateRows] = useState([]);
+    const [publicRows, setPublicRows] = useState([]);
+    const [pageInfo, setPageInfo] = useState({ total: 0, pages: 0 });
     const [loading, setLoading] = useState(false);
+    const [popupInfo, setPopupInfo] = useState(null);
 
+    /* ── ③ API 호출 ── */
     useEffect(() => {
-        if (!keyword) return;
+        if (!kw) return;
         setLoading(true);
 
-        searchWorkbooks(keyword, range, type, page, size, sort, order)
-            .then((res) => {
-                const wbList = res.data.data?.publicWorkbooks || [];
-                setResults(wbList.map(entry => ({
-                    id: entry.workbook.id,
-                    name: entry.workbook.name,
-                    createdAt: entry.workbook.createdAt,
-                    description: entry.workbook.description,
-                    authorName: entry.author.nickname,
-                })));
-                setTotalCount(wbList.length);
-            })
-            .catch((err) => console.error("검색 실패:", err))
-            .finally(() => setLoading(false));
-    }, [keyword, range, type, page, size, sort, order]);
+        searchWorkbooks({ keyword: kw, range, type, page, size, sort, order })
+            .then(({ data }) => {
+                const res = data.data;                      // SearchResponse
 
-    const handleParamChange = (key, value) => {
-        params.set(key, value);
-        if (key !== "page") params.set("page", "0"); // 필터 변경 시 페이지 초기화
+                const priv = res.privateWorkbooks ?? [];
+                const publ = res.publicWorkbooks ?? [];
+
+                /* private·public 모두 받을 때를 대비해 분리 저장 */
+                setPrivateRows(
+                    priv.map(({ workbook, folder }) => ({
+                        id: workbook.id,
+                        name: workbook.name,
+                        createdAt: workbook.createdAt,
+                        folderName: folder?.name,
+                    }))
+                );
+
+                setPublicRows(
+                    publ.map(({ workbook, author, paths }) => ({
+                        id: workbook.id,
+                        name: workbook.name,
+                        createdAt: workbook.createdAt,
+                        author: author.nickname,
+                        downloaded: workbook.downloaded,
+                        pathChain: paths ? `${paths[0].collegeName} > ${paths[0].departmentName} > ${paths[0].subjectName}` : "(경로없음)",
+                    }))
+                );
+
+                /* 페이지 정보 (range별로 구분) */
+                const pg =
+                    range === "private"
+                        ? res.privatePageInfo
+                        : range === "public"
+                            ? res.publicPageInfo
+                            : {
+                                totalElements:
+                                    (res.privatePageInfo?.totalElements || 0) +
+                                    (res.publicPageInfo?.totalElements || 0),
+                                totalPages: Math.max(
+                                    res.privatePageInfo?.totalPages || 0,
+                                    res.publicPageInfo?.totalPages || 0
+                                ),
+                            };
+                setPageInfo({ total: pg.totalElements, pages: pg.totalPages });
+            })
+            .catch(err => console.error("검색 실패:", err))
+            .finally(() => setLoading(false));
+    }, [kw, range, type, page, size, sort, order]);
+
+    /* ── ④ URL 파라미터 수정 유틸 ── */
+    const setParam = (k, v) => {
+        params.set(k, v);
+        if (k !== "page") params.set("page", "0");
         navigate(`/search?${params.toString()}`);
     };
 
-    const totalPages = Math.ceil(totalCount / size);
+    /* ── ⑤ 렌더링 ── */
+    const Pagination = () => (
+        <div className="mt-8 flex justify-center gap-2 text-sm">
+            <button
+                onClick={() => setParam("page", Math.max(0, page - 1))}
+                disabled={page === 0}
+                className="px-3 py-1 border rounded disabled:opacity-40"
+            >
+                ◀ 이전
+            </button>
+            <span className="px-3 py-1 text-[#5F360A] font-semibold">
+                {page + 1} / {Math.max(1, pageInfo.pages)}
+            </span>
+            <button
+                onClick={() => setParam("page", Math.min(pageInfo.pages - 1, page + 1))}
+                disabled={page + 1 >= pageInfo.pages}
+                className="px-3 py-1 border rounded disabled:opacity-40"
+            >
+                다음 ▶
+            </button>
+        </div>
+    );
+
+    const Card = ({ wb, isPublic }) => (
+        <div
+            key={wb.id}
+            className="bg-white border border-[#E6CEBA] rounded-md p-4 shadow-sm"
+        >
+            <div
+                onClick={() => setPopupInfo({ id: wb.id, isPublic })}
+                className="cursor-pointer hover:underline text-[#5F360A] font-semibold"
+            >
+                {wb.name}
+            </div>
+            <div className="text-xs text-[#9A7E5F] mt-1">
+                {isPublic
+                    ? `경로: ${wb.pathChain} / 작성자: ${wb.author}`
+                    : wb.folderName
+                        ? `폴더: ${wb.folderName}`
+                        : "내 워크북"}
+                {" / "}생성일:{" "}
+                {wb.createdAt ? new Date(wb.createdAt).toLocaleDateString() : "-"}
+            </div>
+        </div>
+    );
 
     return (
         <>
-            <Navbar initialSearch={keyword} />
+            {popupInfo && (
+                <WorkbookProfilePopup
+                    workbookId={popupInfo.id}
+                    isPublic={popupInfo.isPublic}
+                    onClose={() => setPopupInfo(null)}
+                />
+            )}
+            <Navbar initialSearch={kw} />
             <main className="mt-[65px] p-8 min-h-screen bg-[#F9F4ED]">
-                {/* 검색어 요약 영역 */}
+                {/* 검색어 & 총 건수 */}
                 <div className="bg-white border border-[#E6CEBA] rounded-lg p-6 mb-6 shadow">
                     <p className="text-sm text-[#7B5A38]">
-                        검색어 <span className="text-red-600 font-bold">"{keyword}"</span>에 대한 검색결과는 총
-                        <span className="font-bold text-[#5F360A]"> {totalCount.toLocaleString()}건</span> 입니다.
+                        검색어{" "}
+                        <span className="text-red-600 font-bold">"{kw}"</span>에 대한
+                        검색결과는 총
+                        <span className="font-bold text-[#5F360A]">
+                            {" "}
+                            {pageInfo.total?.toLocaleString() ?? 0}건
+                        </span>{" "}
+                        입니다.
                     </p>
                 </div>
 
-                {/* 정렬 + 필터 */}
+                {/* 정렬·필터 */}
                 <div className="mb-4 flex items-center gap-4 flex-wrap text-sm">
-                    <div className="flex items-center gap-2">
-                        <label className="text-[#5F360A]">정렬 기준</label>
+                    {/* 정렬 기준 */}
+                    <label className="text-[#5F360A] flex items-center gap-2">
+                        정렬
                         <select
                             value={sort}
-                            onChange={(e) => handleParamChange("sort", e.target.value)}
+                            onChange={e => setParam("sort", e.target.value)}
                             className="border px-3 py-1 rounded"
                         >
                             <option value="relevance">연관도</option>
@@ -75,26 +173,28 @@ export default function SearchPage() {
                             <option value="title">제목</option>
                             <option value="author">작성자</option>
                         </select>
-                    </div>
+                    </label>
 
-                    <div className="flex items-center gap-2">
-                        <label className="text-[#5F360A]">공개 범위</label>
+                    {/* 공개 범위 */}
+                    <label className="text-[#5F360A] flex items-center gap-2">
+                        범위
                         <select
                             value={range}
-                            onChange={(e) => handleParamChange("range", e.target.value)}
+                            onChange={e => setParam("range", e.target.value)}
                             className="border px-3 py-1 rounded"
                         >
                             <option value="all">전체</option>
-                            <option value="public">공개</option>
-                            <option value="private">비공개</option>
+                            <option value="private">내 문제집</option>
+                            <option value="public">공개 문제집</option>
                         </select>
-                    </div>
+                    </label>
 
-                    <div className="flex items-center gap-2">
-                        <label className="text-[#5F360A]">검색 대상</label>
+                    {/* 검색 대상 */}
+                    <label className="text-[#5F360A] flex items-center gap-2">
+                        대상
                         <select
                             value={type}
-                            onChange={(e) => handleParamChange("type", e.target.value)}
+                            onChange={e => setParam("type", e.target.value)}
                             className="border px-3 py-1 rounded"
                         >
                             <option value="total">전체</option>
@@ -102,55 +202,46 @@ export default function SearchPage() {
                             <option value="author">작성자</option>
                             <option value="content">내용</option>
                         </select>
-                    </div>
+                    </label>
                 </div>
 
-                {/* 검색 결과 */}
+                {/* 결과 영역 */}
                 {loading ? (
                     <div>로딩 중…</div>
-                ) : !Array.isArray(results) || results.length === 0 ? (
+                ) : pageInfo.total === 0 ? (
                     <div className="text-center text-[#9A7E5F]">검색 결과가 없습니다.</div>
-                ) : (
-                    <>
+                ) : range === "all" ? (
+                    /* 좌: private / 우: public */
+                    <div className="grid md:grid-cols-2 gap-6">
+                        {/* Private */}
                         <div className="space-y-6">
-                            {results.map((wb) => (
-                                <div key={wb.id} className="bg-white border border-[#E6CEBA] rounded-md p-4 shadow-sm">
-                                    <div
-                                        onClick={() => navigate(`/solve/${wb.id}`)}
-                                        className="cursor-pointer hover:underline text-[#5F360A] font-semibold text-base"
-                                    >
-                                        {wb.name}
-                                    </div>
-                                    <div className="text-xs text-[#9A7E5F] mt-1">
-                                        작성자: {wb.authorName} / 생성일: {wb.createdAt ? new Date(wb.createdAt).toLocaleDateString() : "-"}
-                                    </div>
-                                    <div className="text-sm text-[#5F360A] mt-2 line-clamp-2">
-                                        {wb.description ?? "설명이 없습니다."}
-                                    </div>
-                                </div>
+                            <h4 className="font-bold text-[#5F360A] mb-2">내 워크북</h4>
+                            {privateRows.map(wb => (
+                                <Card key={wb.id} wb={wb} isPublic={false} />
                             ))}
                         </div>
 
-                        {/* 페이지네이션 */}
-                        <div className="mt-8 flex justify-center gap-2 text-sm">
-                            <button
-                                onClick={() => handleParamChange("page", Math.max(0, page - 1))}
-                                disabled={page === 0}
-                                className="px-3 py-1 border rounded disabled:opacity-40"
-                            >
-                                ◀ 이전
-                            </button>
-                            <span className="px-3 py-1 text-[#5F360A] font-semibold">
-                                {page + 1} / {totalPages}
-                            </span>
-                            <button
-                                onClick={() => handleParamChange("page", Math.min(totalPages - 1, page + 1))}
-                                disabled={page >= totalPages - 1}
-                                className="px-3 py-1 border rounded disabled:opacity-40"
-                            >
-                                다음 ▶
-                            </button>
+                        {/* Public */}
+                        <div className="space-y-6">
+                            <h4 className="font-bold text-[#5F360A] mb-2">공개 워크북</h4>
+                            {publicRows.map(wb => (
+                                <Card key={wb.id} wb={wb} isPublic />
+                            ))}
                         </div>
+                    </div>
+                ) : (
+                    /* 단일 영역 */
+                    <>
+                        <div className="space-y-6">
+                            {(range === "private" ? privateRows : publicRows).map(wb => (
+                                <Card
+                                    key={wb.id}
+                                    wb={wb}
+                                    isPublic={range === "public"}
+                                />
+                            ))}
+                        </div>
+                        <Pagination />
                     </>
                 )}
             </main>

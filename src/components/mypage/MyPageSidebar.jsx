@@ -13,7 +13,8 @@ const MyPageSidebar = ({ activeTab, onTabChange }) => {
     'block w-full text-left py-3 px-6 transition-colors border-l-4';
 
   return (
-    <aside className="w-[180px] min-h-screen bg-[#fdf7f0] border-r border-[#e7d7c7] pt-8 box-border">
+    <aside className="w-[180px] h-[calc(100vh-65px)] sticky top-[65px] bg-[#fdf7f0]
+                 border-r border-[#e7d7c7] pt-8 box-border">
       <ul className="list-none m-0 p-0 space-y-2">
         {menuItems.map(({ label, key }) => {
           const isActive = activeTab === key;

@@ -4,7 +4,7 @@ import { useAuth } from "../../contexts/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 
 import { getCollegesWith, getDepartments } from "../../api/workbookApi.js";
-import { updateUserInfo } from "../../api/userApi";
+import { updateUserInfo, getBlacklist, removeBlacklist } from "../../api/userApi";
 import { changePassword } from "../../api/authApi.js";
 import LevelIcon from "../common/LevelIcon.jsx";
 
@@ -13,13 +13,6 @@ import ConfirmPopup from "../common/ConfirmPopup.jsx";
 import InformationPopup from "../common/InformationPopup.jsx";
 
 
-// /* ───────────────── 더미 데이터 ───────────────── */
-// const colleges = ['IT 공과대학', '인문대학', '경상대학'];
-// const departmentsByCollege = {
-//     'IT 공과대학': ['컴퓨터공학과', '정보통신공학과', '전자공학과'],
-//     인문대학: ['영어영문학과', '국어국문학과'],
-//     경상대학: ['경영학과', '경제학과'],
-// };
 
 export default function MyPageInfo() {
     const { user, login } = useAuth();          // login: 프로필 재동기화를 위해 사용
@@ -37,7 +30,8 @@ export default function MyPageInfo() {
     const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
     const [passwordError, setPasswordError] = useState("");
 
-    const [blockedAccount, setBlockedAccount] = useState(['안유진', '장원영', '카리나', '윈터', '백지헌']);
+
+    const [blockedUsers, setBlockedUsers] = useState([]);
     const [unblockTarget, setUnblockTarget] = useState(null);
 
     useEffect(() => {
@@ -47,6 +41,16 @@ export default function MyPageInfo() {
             .catch(console.error)
             .finally(() => setLoadingCol(false));
     }, []);
+
+    useEffect(() => {
+        if (!user) return;
+        getBlacklist("BLOCK")
+            .then(res => {
+                // ApiResponse.data => { blacklistUsers: [...] }
+                setBlockedUsers(res.data.data.blacklistUsers);
+            })
+            .catch(console.error);
+    }, [user]);
 
     // user.collegeId 변경될 때 학과 목록 갱신
     const fetchDepartments = async (collegeId) => {
@@ -130,11 +134,21 @@ export default function MyPageInfo() {
         }
     };
 
-    const onUnblockClick = (username) => setUnblockTarget(username);
     const onConfirmUnblock = () => {
-        setBlockedAccount(prev => prev.filter(u => u !== unblockTarget));
-        setUnblockTarget(null);
+        if (!unblockTarget) return;
+        removeBlacklist({ targetId: unblockTarget.id, blacklistType: "BLOCK" })
+            .then(() => {
+                setBlockedUsers(prev =>
+                    prev.filter(u => u.id !== unblockTarget.id)
+                );
+                setUnblockTarget(null);
+            })
+            .catch(err => {
+                console.error(err);
+                setUnblockTarget(null);
+            });
     };
+    const onUnblockClick = userObj => setUnblockTarget(userObj);
     const onCancelUnblock = () => setUnblockTarget(null);
 
 
@@ -228,13 +242,9 @@ export default function MyPageInfo() {
                         )}
                     </div>
 
-                    <form className="space-y-6">
-
-
-                        <div className="grid grid-cols-2 gap-6">
-                            <FormField label="이름" readOnly={!isEditing} value={form.name} name="name" onChange={handleChange} inputClass={inputCommon} labelClass={labelStyle} />
-                            <FormField label="닉네임" readOnly={!isEditing} value={form.nickname} name="nickname" onChange={handleChange} inputClass={inputCommon} labelClass={labelStyle} />
-                        </div>
+                    <form className="space-y-2">
+                        <FormField label="이름" readOnly={!isEditing} value={form.name} name="name" onChange={handleChange} inputClass={inputCommon} labelClass={labelStyle} />
+                        <FormField label="닉네임" readOnly={!isEditing} value={form.nickname} name="nickname" onChange={handleChange} inputClass={inputCommon} labelClass={labelStyle} />
                         <FormSelect
                             label="단과대학"
                             readOnly={!isEditing}
@@ -263,7 +273,7 @@ export default function MyPageInfo() {
                         <button
                             type="button"
                             onClick={handleStartPasswordChange}
-                            className="w-full bg-[#b9a997] text-white rounded-xl py-5 mt-14 hover:bg-[#9f8267] transition-colors"
+                            className="w-full bg-[#b9a997] text-white rounded-xl py-3 mt-7 hover:bg-[#9f8267] transition-colors"
                         >
                             비밀번호 변경
                         </button>
@@ -297,14 +307,14 @@ export default function MyPageInfo() {
                                 <button
                                     type="button"
                                     onClick={handlePasswordSubmit}
-                                    className="flex-1 bg-[#b9a997] text-white rounded-xl py-3 hover:bg-[#9f8267]"
+                                    className="flex-1 bg-[#b9a997] text-white rounded-xl py-2 hover:bg-[#9f8267]"
                                 >
                                     저장
                                 </button>
                                 <button
                                     type="button"
                                     onClick={handleCancelPasswordChange}
-                                    className="flex-1 border border-[#b9a997] text-[#b9a997] rounded-xl py-3 hover:bg-[#b9a997]/20"
+                                    className="flex-1 border border-[#b9a997] text-[#b9a997] rounded-xl py-2 hover:bg-[#b9a997]/20"
                                 >
                                     취소
                                 </button>
@@ -313,23 +323,33 @@ export default function MyPageInfo() {
                     )}
                 </section>
 
-                <aside className="md:w-[380px] xl:w-[420px] shrink-0 h-[600px]">
-                    <div className={`${border} rounded-3xl h-full p-8 flex flex-col overflow-hidden`}>
-                        <h3 className="text-lg font-medium text-[#5F360A] mb-4">차단 유저</h3>
+                <aside className="w-full md:w-[380px] xl:w-[420px] shrink-0 h-[600px]">
+                    <div className={`${border} rounded-3xl h-full p-8 flex flex-col`}>
+                        <h3 className="text-lg font-medium text-[#5F360A] mb-4">
+                            차단 유저
+                        </h3>
                         <div className="w-full h-px bg-[#b9a997] mb-6" />
-                        {blockedAccount.length === 0 ? (
-                            <p className="text-sm text-[#5F360A]/50 text-center">(현재 차단된 유저 없음)</p>
+                        {blockedUsers.length === 0 ? (
+                            <p className="text-sm text-[#5F360A]/50 text-center">
+                                (현재 차단된 유저 없음)
+                            </p>
                         ) : (
                             <ul className="flex-1 overflow-y-auto space-y-4 scrollbar-thin
-    scrollbar-thumb-[#b9a997]
-    scrollbar-track-[#f5f1eb]
-    scrollbar-thumb-rounded-lg
-    scrollbar-track-rounded-lg">
-                                {blockedAccount.map(user => (
-                                    <li key={user} className="flex justify-between items-center h-12">
-                                        <span className="text-[#5F360A]">{user}</span>
+                                    scrollbar-thumb-[#b9a997]
+                                    scrollbar-track-[#f5f1eb]
+                                    scrollbar-thumb-rounded-lg
+                                    scrollbar-track-rounded-lg">
+                                {blockedUsers.map(u => (
+                                    <li
+                                        key={u.id}
+                                        className="flex justify-between items-center h-12"
+                                    >
+                                        <span className="text-[#5F360A]">{u.nickname}</span>
                                         {isEditing && (
-                                            <button onClick={() => onUnblockClick(user)} className="text-sm text-[#5E3813] px-2 py-1 border border-[#5E3813] rounded-lg mr-3">
+                                            <button
+                                                onClick={() => onUnblockClick(u)}
+                                                className="text-sm text-[#5E3813] px-2 py-1 border border-[#5E3813] rounded-lg"
+                                            >
                                                 해제
                                             </button>
                                         )}

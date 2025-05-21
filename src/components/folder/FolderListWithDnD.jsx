@@ -5,15 +5,16 @@ import { useNavigate } from "react-router-dom";
 import Checkbox from "./Checkbox.jsx";
 import { moveWorkbook, moveFolder } from "../../api/privateFolderApi.js";
 import ContextMenu from "../common/ContextMenu";
-import workbookImg from "../../assets/workbook.png"
-import folderImg from "../../assets/folder.png"
+import workbookImg from "../../assets/workbook.png";
+import folderImg from "../../assets/folder.png";
+import WorkbookProfilePopup from "../common/WorkbookProfilePopup.jsx";
 
 const ItemTypes = { FOLDER: "folder", WORKBOOK: "workbook" };
 
 export default function FolderListWithDnD({
   mode = "private",
   filterDepth = 0,
-  /* 상단 툴바 props */
+  /* ── 상단 툴바 props ── */
   selectedFolder,
   selectedItems,
   sortOption,
@@ -22,7 +23,7 @@ export default function FolderListWithDnD({
   onToggleAll,
   isSelectMode,
   onUpload,
-  /* 리스트 렌더링 props */
+  /* ── 리스트 렌더링 props ── */
   currentFolder,
   folders,
   workbooks,
@@ -37,8 +38,9 @@ export default function FolderListWithDnD({
   onDownload,
 }) {
   const navigate = useNavigate();
-  const isPublic = (mode === "public");
+  const isPublic = mode === "public";
   const isRoot = isPublic ? filterDepth === 0 : selectedFolder?.parentId == null;
+  const [popupId, setPopupId] = useState(null);
 
   const MENU_ITEM_HEIGHT = 40;
   const MENU_WIDTH = 140;
@@ -60,13 +62,8 @@ export default function FolderListWithDnD({
 
     let x = e.clientX + 2;
     let y = e.clientY + 2;
-
-    if (x + MENU_WIDTH > window.innerWidth) {
-      x = e.clientX - MENU_WIDTH - 2;
-    }
-    if (y + menuHeight > window.innerHeight) {
-      y = e.clientY - menuHeight - 2;
-    }
+    if (x + MENU_WIDTH > window.innerWidth) x = e.clientX - MENU_WIDTH - 2;
+    if (y + menuHeight > window.innerHeight) y = e.clientY - menuHeight - 2;
     if (x < 0) x = 8;
     if (y < 0) y = 8;
 
@@ -74,7 +71,7 @@ export default function FolderListWithDnD({
   };
 
   const closeContextMenu = () =>
-    setCtxMenu(cm => ({ ...cm, visible: false }));
+    setCtxMenu((cm) => ({ ...cm, visible: false }));
 
   const handleRenameContext = () => {
     if (ctxMenu.type === ItemTypes.FOLDER) {
@@ -93,9 +90,11 @@ export default function FolderListWithDnD({
   };
 
   const handleDeleteContext = () => {
-    ctxMenu.type === ItemTypes.FOLDER
-      ? onDeleteFolder(ctxMenu.id)
-      : onDeleteWorkbook(ctxMenu.id);
+    if (ctxMenu.type === ItemTypes.FOLDER) {
+      onDeleteFolder(ctxMenu.id);
+    } else {
+      onDeleteWorkbook(ctxMenu.id);
+    }
     closeContextMenu();
   };
 
@@ -110,15 +109,15 @@ export default function FolderListWithDnD({
           : moveWorkbook;
       mover(item.id, selectedFolder.parentId).then(onRefresh);
     },
-    collect: monitor => ({
+    collect: (monitor) => ({
       isOver: monitor.isOver(),
-      canDrop: monitor.canDrop()
-    })
+      canDrop: monitor.canDrop(),
+    }),
   });
 
   const selectedTitles = workbooks
-    .filter(wb => selectedItems.includes(wb.id))
-    .map(wb => wb.name);
+    .filter((wb) => selectedItems.includes(wb.id))
+    .map((wb) => wb.name);
 
   return (
     <>
@@ -128,7 +127,10 @@ export default function FolderListWithDnD({
       >
         <div className="flex items-center gap-3">
           {!isRoot && typeof onBack === "function" && (
-            <button onClick={onBack} className="text-xl text-[#5f360a] hover:opacity-70">
+            <button
+              onClick={onBack}
+              className="text-xl text-[#5f360a] hover:opacity-70"
+            >
               ◀
             </button>
           )}
@@ -178,7 +180,9 @@ export default function FolderListWithDnD({
                   </button>
                   <button
                     onClick={() =>
-                      navigate("/merge", { state: { ids: selectedItems, titles: selectedTitles } })
+                      navigate("/merge", {
+                        state: { ids: selectedItems, titles: selectedTitles },
+                      })
                     }
                     className="bg-[#AC957B] text-white px-3 py-1 rounded hover:bg-[#5F360A] transition-colors"
                   >
@@ -194,7 +198,11 @@ export default function FolderListWithDnD({
       </header>
 
       <div className="flex flex-wrap gap-6 items-start">
-        {Array.from(new Map(folders.map(f => [`${f.type}-${f.id}-${f.name}`, f])).values()).map(f => (
+        {Array.from(
+          new Map(
+            folders.map((f) => [`${f.type}-${f.id}-${f.name}`, f])
+          ).values()
+        ).map((f) => (
           <FolderItem
             key={`folder-${f.type}-${f.id}-${f.name}`}
             folder={f}
@@ -202,12 +210,14 @@ export default function FolderListWithDnD({
             onFolderClick={onFolderClick}
             onRename={onRename}
             onDelete={onDeleteFolder}
-            onContextMenu={e => handleContextMenu(e, ItemTypes.FOLDER, f.id)}
+            onContextMenu={(e) =>
+              handleContextMenu(e, ItemTypes.FOLDER, f.id)
+            }
             isPublic={isPublic}
           />
         ))}
 
-        {workbooks.map(wb => (
+        {workbooks.map((wb) => (
           <WorkbookItem
             key={wb.id}
             workbook={wb}
@@ -218,13 +228,15 @@ export default function FolderListWithDnD({
             onRefresh={onRefresh}
             onDelete={onDeleteWorkbook}
             onRename={onRenameWorkbook}
-            onContextMenu={e => handleContextMenu(e, ItemTypes.WORKBOOK, wb.id)}
+            onContextMenu={(e) =>
+              handleContextMenu(e, ItemTypes.WORKBOOK, wb.id)
+            }
             isPublic={isPublic}
+            onOpenPopup={setPopupId}
           />
         ))}
-        {!isPublic && (
-          <AddFolderCard onClick={onAddFolder} />
-        )}
+
+        {!isPublic && <AddFolderCard onClick={onAddFolder} />}
       </div>
 
       {ctxMenu.visible && (
@@ -241,39 +253,44 @@ export default function FolderListWithDnD({
           onClose={closeContextMenu}
         />
       )}
+
+      {popupId && (
+        <WorkbookProfilePopup
+          workbookId={popupId}
+          isPublic={isPublic}
+          onClose={() => setPopupId(null)}
+          onUpdated={() => {
+            setPopupId(null);
+            onRefresh();
+          }}
+        />
+      )}
     </>
   );
 }
 
 // ─── FolderItem ───────────────────────────────────────────────────────────────
-function FolderItem({
-  folder,
-  onRefresh,
-  onFolderClick,
-  onRename,
-  onContextMenu,
-  isPublic
-}) {
+function FolderItem({ folder, onRefresh, onFolderClick, onRename, onContextMenu, isPublic }) {
   const [, drag] = useDrag({ type: ItemTypes.FOLDER, item: { id: folder.id } });
   const [, drop] = useDrop({
     accept: [ItemTypes.FOLDER, ItemTypes.WORKBOOK],
     drop: (item, monitor) => {
-      if (item.id === folder.id) return; // 자기 자신으로 드롭 방지
-      if (isPublic) return; // 공용 폴더에서는 드래그 앤 드롭 금지
+      if (item.id === folder.id) return;
+      if (isPublic) return;
       const mover =
         monitor.getItemType() === ItemTypes.FOLDER ? moveFolder : moveWorkbook;
       mover(item.id, folder.id).then(onRefresh);
     },
   });
 
-  const handleRename = e => {
+  const handleRename = (e) => {
     e.preventDefault();
     onRename(folder.id);
   };
 
   return (
     <div
-      ref={node => drag(drop(node))}
+      ref={(node) => drag(drop(node))}
       className="relative flex flex-col items-center w-20 cursor-pointer group"
       onClick={() => onFolderClick(folder.id)}
       onDoubleClick={handleRename}
@@ -286,7 +303,6 @@ function FolderItem({
           className="absolute top-1/2 left-1/2 w-15 h-15 transform -translate-x-1/2 -translate-y-1/2 object-contain"
         />
       </div>
-
       <span className="mt-2 text-sm font-medium text-[#5f360a] text-center break-words">
         {folder.name}
       </span>
@@ -319,6 +335,7 @@ function WorkbookItem({
   onRefresh,
   onRename,
   onContextMenu,
+  onOpenPopup,
 }) {
   const navigate = useNavigate();
   const [, drag] = useDrag({ type: ItemTypes.WORKBOOK, item: { id: workbook.id } });
@@ -327,23 +344,23 @@ function WorkbookItem({
     drop: () => moveWorkbook(workbook.id, currentFolder.id).then(onRefresh),
   });
 
-  const handleRename = e => {
+  const handleRename = (e) => {
     e.preventDefault();
     onRename(workbook.id);
   };
 
-  const handleClick = e => {
+  const handleClick = (e) => {
     e.stopPropagation();
     if (isSelectMode) {
       onSelect(workbook.id);
     } else {
-      navigate(`/solve/${workbook.id}`);
+      onOpenPopup(workbook.id);
     }
   };
 
   return (
     <div
-      ref={node => drag(drop(node))}
+      ref={(node) => drag(drop(node))}
       className="relative flex flex-col items-center w-24 cursor-pointer group"
       onClick={handleClick}
       onDoubleClick={handleRename}
@@ -356,14 +373,9 @@ function WorkbookItem({
       )}
       <div className="relative w-[80px] h-[80px] bg-white border border-[#DACEC0] rounded-lg flex items-center justify-center shadow-sm transition-shadow hover:shadow-md">
         <div className="absolute top-1/2 left-1/2 bg-[#F3E9DC] rounded-full transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
-          <img
-            src={workbookImg}
-            alt="Workbook"
-            className="w-10 h-10 object-contain"
-          />
+          <img src={workbookImg} alt="Workbook" className="w-10 h-10 object-contain" />
         </div>
       </div>
-
       <span className="mt-2 text-xs text-[#5f360a] text-center break-words">
         {workbook.name}
       </span>
