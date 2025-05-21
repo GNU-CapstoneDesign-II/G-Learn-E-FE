@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { searchWorkbooks } from "../api/publicWorkbooksApi";
 import Navbar from "../components/Navbar";
+import WorkbookProfilePopup from "../components/common/WorkbookProfilePopup.jsx";
 
 export default function SearchPage() {
     /* ── ① URL 파라미터 → 상태 ── */
@@ -23,6 +24,7 @@ export default function SearchPage() {
     const [publicRows, setPublicRows] = useState([]);
     const [pageInfo, setPageInfo] = useState({ total: 0, pages: 0 });
     const [loading, setLoading] = useState(false);
+    const [popupInfo, setPopupInfo] = useState(null);
 
     /* ── ③ API 호출 ── */
     useEffect(() => {
@@ -114,17 +116,12 @@ export default function SearchPage() {
             className="bg-white border border-[#E6CEBA] rounded-md p-4 shadow-sm"
         >
             <div
-                onClick={() => navigate(`/solve/${wb.id}`)}
+                onClick={() => setPopupInfo({ id: wb.id, isPublic })}
                 className="cursor-pointer hover:underline text-[#5F360A] font-semibold"
             >
                 {wb.name}
             </div>
             <div className="text-xs text-[#9A7E5F] mt-1">
-                {/* {isPublic
-          ? `작성자: ${wb.author}`
-          : wb.folderName
-          ? `폴더: ${wb.folderName}`
-          : "내 워크북"} */}
                 {isPublic
                     ? `경로: ${wb.pathChain} / 작성자: ${wb.author}`
                     : wb.folderName
@@ -138,6 +135,13 @@ export default function SearchPage() {
 
     return (
         <>
+            {popupInfo && (
+                <WorkbookProfilePopup
+                    workbookId={popupInfo.id}
+                    isPublic={popupInfo.isPublic}
+                    onClose={() => setPopupInfo(null)}
+                />
+            )}
             <Navbar initialSearch={kw} />
             <main className="mt-[65px] p-8 min-h-screen bg-[#F9F4ED]">
                 {/* 검색어 & 총 건수 */}

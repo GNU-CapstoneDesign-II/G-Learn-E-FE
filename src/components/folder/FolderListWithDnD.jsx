@@ -7,6 +7,7 @@ import { moveWorkbook, moveFolder } from "../../api/privateFolderApi.js";
 import ContextMenu from "../common/ContextMenu";
 import workbookImg from "../../assets/workbook.png"
 import folderImg from "../../assets/folder.png"
+import WorkbookProfilePopup from "../common/WorkbookProfilePopup.jsx";
 
 const ItemTypes = { FOLDER: "folder", WORKBOOK: "workbook" };
 
@@ -39,6 +40,7 @@ export default function FolderListWithDnD({
   const navigate = useNavigate();
   const isPublic = (mode === "public");
   const isRoot = isPublic ? filterDepth === 0 : selectedFolder?.parentId == null;
+  const [popupId, setPopupId] = useState(null);
 
   const MENU_ITEM_HEIGHT = 40;
   const MENU_WIDTH = 140;
@@ -220,6 +222,7 @@ export default function FolderListWithDnD({
             onRename={onRenameWorkbook}
             onContextMenu={e => handleContextMenu(e, ItemTypes.WORKBOOK, wb.id)}
             isPublic={isPublic}
+            onOpenPopup={setPopupId}
           />
         ))}
         {!isPublic && (
@@ -239,6 +242,13 @@ export default function FolderListWithDnD({
             { label: "삭제", onClick: handleDeleteContext },
           ]}
           onClose={closeContextMenu}
+        />
+      )}
+      {popupId && (
+        <WorkbookProfilePopup
+          workbookId={popupId}
+          isPublic={isPublic}
+          onClose={() => setPopupId(null)}
         />
       )}
     </>
@@ -319,6 +329,7 @@ function WorkbookItem({
   onRefresh,
   onRename,
   onContextMenu,
+  onOpenPopup
 }) {
   const navigate = useNavigate();
   const [, drag] = useDrag({ type: ItemTypes.WORKBOOK, item: { id: workbook.id } });
@@ -337,7 +348,8 @@ function WorkbookItem({
     if (isSelectMode) {
       onSelect(workbook.id);
     } else {
-      navigate(`/solve/${workbook.id}`);
+      // navigate(`/solve/${workbook.id}`);
+      onOpenPopup(workbook.id);
     }
   };
 

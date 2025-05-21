@@ -7,6 +7,7 @@ import {
 import HeatmapSVG from "./HeatmapSVG.jsx"; // 헬퍼 컴포넌트
 import BubbleChart from "./BubbleChart.jsx";
 import { useNavigate } from "react-router-dom";
+import WorkbookProfilePopup from "../common/WorkbookProfilePopup.jsx";
 
 const BUBBLE_W = 600;   // ⬅︎ 필요에 따라 폭·높이만 바꿔주세요
 const BUBBLE_H = 400;
@@ -105,6 +106,7 @@ function buildHeatmap(raw, days) {
 /* ────────────────────────── 메인 컴포넌트 ────────────────────────── */
 export default function MyPageStatistics() {
     const navigate = useNavigate();
+    const [popupInfo, setPopupInfo] = useState(null); // 문제집 프로필 팝업
     const [keywords, setKeywords] = useState([]);
     const [workbooks, setWorkbooks] = useState([]);
     const [heatmap, setHeatmap] = useState([]);
@@ -166,69 +168,82 @@ export default function MyPageStatistics() {
     if (loading) return <p className="text-center">통계 로딩 중...</p>;
 
     return (
-        <div className="space-y-12 max-w-6xl mx-auto">
-            {/* ───────── ① 오답 키워드 버블 ───────── */}
-            <section className="bg-white rounded-3xl p-10 shadow-lg">
-                <h3 className="text-xl font-bold text-[#5F360A] mb-6">
-                    자주 틀린 키워드
-                </h3>
-                <BubbleChart
-                    nodes={packedKeywords}   // ← 위치·반지름·색까지 계산된 배열
-                    width={BUBBLE_W}
-                    height={BUBBLE_H}
+        <>
+            {popupInfo && (
+                <WorkbookProfilePopup
+                    workbookId={popupInfo.id}
+                    isPublic={popupInfo.isPublic}
+                    onClose={() => setPopupInfo(null)}
+                    showVote={popupInfo.showVote}
                 />
-                
-            </section>
-
-            {/* ───────── ② 오답률 높은 문제집 표 ───────── */}
-            <section className="bg-white rounded-3xl p-10 shadow-lg">
-                <h3 className="text-xl font-bold text-[#5F360A] mb-6">
-                    오답률 높은 문제집
-                </h3>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full text-left">
-                        <thead>
-                            <tr className="text-[#5F360A] border-b border-[#e0d5c5]">
-                                <th className="py-2 px-3">문제집 이름</th>
-                                <th className="py-2 px-3">오답률</th>
-                                <th className="py-2 px-3">오답 / 총문제</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {workbooks.map((w) => (
-                                // 문제집 틀린 개수가 0개 이상인 경우만 표시
-                                w.wrongCount > 0 &&
-                                <tr
-                                    key={w.workbookId}
-                                    onClick={() => navigate(`/solve/${w.workbookId}`)}
-                                    className="border-b border-[#f5f1eb] hover:bg-[#fefbf7]"
-                                >
-                                    <td className="py-2 px-3">{w.name}</td>
-                                    <td className="py-2 px-3 font-medium text-[#B45F04]">
-                                        {(w.wrongRate * 100).toFixed(1)}%
-                                    </td>
-                                    <td className="py-2 px-3">
-                                        {w.wrongCount} / {w.totalCount}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            {/* ───────── ③ 활동 로그 Heatmap ───────── */}
-            <section className="bg-white rounded-3xl p-10 shadow-lg">
-                <h3 className="text-xl font-bold text-[#5F360A] mb-6">
-                    최근 활동 기록
-                </h3>
-                <div className="overflow-x-auto">
-                    <HeatmapSVG
-                        weeks={heatmap}
-                        startDate={new Date(new Date().getFullYear(), 0, 1)} // 최근 90일 시작점
+            )}
+            <div className="space-y-12 max-w-6xl mx-auto">
+                {/* ───────── ① 오답 키워드 버블 ───────── */}
+                <section className="bg-white rounded-3xl p-10 shadow-lg">
+                    <h3 className="text-xl font-bold text-[#5F360A] mb-6">
+                        자주 틀린 키워드
+                    </h3>
+                    <BubbleChart
+                        nodes={packedKeywords}   // ← 위치·반지름·색까지 계산된 배열
+                        width={BUBBLE_W}
+                        height={BUBBLE_H}
                     />
-                </div>
-            </section>
-        </div>
+
+                </section>
+
+                {/* ───────── ② 오답률 높은 문제집 표 ───────── */}
+                <section className="bg-white rounded-3xl p-10 shadow-lg">
+                    <h3 className="text-xl font-bold text-[#5F360A] mb-6">
+                        오답률 높은 문제집
+                    </h3>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full text-left">
+                            <thead>
+                                <tr className="text-[#5F360A] border-b border-[#e0d5c5]">
+                                    <th className="py-2 px-3">문제집 이름</th>
+                                    <th className="py-2 px-3">오답률</th>
+                                    <th className="py-2 px-3">오답 / 총문제</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {workbooks.map((w) => (
+                                    // 문제집 틀린 개수가 0개 이상인 경우만 표시
+                                    w.wrongCount > 0 &&
+                                    <tr
+                                        key={w.workbookId}
+                                        onClick={() => {
+                                            setPopupInfo({ id: w.workbookId, isPublic: true, showVote: false });
+                                        }}
+                                        // onClick={() => navigate(`/solve/${w.workbookId}`)}
+                                        className="border-b border-[#f5f1eb] hover:bg-[#fefbf7]"
+                                    >
+                                        <td className="py-2 px-3">{w.name}</td>
+                                        <td className="py-2 px-3 font-medium text-[#B45F04]">
+                                            {(w.wrongRate * 100).toFixed(1)}%
+                                        </td>
+                                        <td className="py-2 px-3">
+                                            {w.wrongCount} / {w.totalCount}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                {/* ───────── ③ 활동 로그 Heatmap ───────── */}
+                <section className="bg-white rounded-3xl p-10 shadow-lg">
+                    <h3 className="text-xl font-bold text-[#5F360A] mb-6">
+                        최근 활동 기록
+                    </h3>
+                    <div className="overflow-x-auto">
+                        <HeatmapSVG
+                            weeks={heatmap}
+                            startDate={new Date(new Date().getFullYear(), 0, 1)} // 최근 90일 시작점
+                        />
+                    </div>
+                </section>
+            </div>
+        </>
     );
 }
