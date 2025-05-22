@@ -39,6 +39,7 @@ export default function PublicMain({
   setSelectedDepartment,
   setSelectedSubject,
   sidebarRef,
+  onSwitchTab,
 }) {
   /* ❖ filterDepth: 0(루트) → 1(단과) → 2(학과) → 3(과목) */
   const filterDepth = selectedSubject
@@ -57,6 +58,7 @@ export default function PublicMain({
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [downloadMode, setDownloadMode] = useState(null);
+  const [downloadResult, setDownloadResult] = useState({ success: 0, fail: 0 });
   const [downloading, setDownloading] = useState(false);
   const [history, setHistory] = useState([]);
   const [, startTransition] = useTransition();
@@ -247,22 +249,31 @@ export default function PublicMain({
 
   const handleDownloadConfirm = async () => {
     setDownloading(true);
-    try {
-      // 호출할 API: POST /api/workbook/{id}/download
-      await Promise.all(
-        selectedIds.map(id => downloadWorkbook(id)) // downloadWorkbook 함수 정의 필요
-      );
-      setDownloadMode("cancelled");  // 성공 후 메시지 모드 변경
-    } catch (err) {
-      console.error(err);
-      setDownloadMode("exists");     // 이미 다운된 경우
-    } finally {
-      setDownloading(false);
-      setSelectedIds([]);
-      setIsSelectMode(false);
+    let success = 0, fail = 0;
+    for (const id of selectedIds) {
+      try {
+        await downloadWorkbook(id);
+        success++;
+      } catch (err) {
+        console.error(`다운로드 실패 (id=${id})`, err);
+        fail++;
+      }
     }
+
+    setDownloading(false);
+    setDownloadResult({ success, fail });
+    setDownloadMode("result");       // ③ 결과 모드로 전환
+    setSelectedIds([]);
+    setIsSelectMode(false);
+
+    // ④ Private 탭으로 자동 전환
+    onSwitchTab("private");
   };
-  const handleDownloadClose = () => setDownloadMode(null);
+
+  const handleDownloadClose = () => {
+    setDownloadMode(null);
+  };
+
 
   /* ───────────────── 5) 폴더 클릭 시 이동 ───────────────── */
   const handleFolderClick = useCallback(
@@ -383,6 +394,7 @@ export default function PublicMain({
         <DownloadPopup
           mode={downloadMode}
           selectedCount={selectedIds.length}
+          result={downloadResult}
           onConfirm={handleDownloadConfirm}
           onClose={handleDownloadClose}
         />

@@ -34,5 +34,5 @@ export function copyWorkbookToPrivate(workbookId) {
 * POST /api/workbook/{workbookId}/download
 */
 export function downloadWorkbook(workbookId) {
-    return axios.post(`/api/workbook/${workbookId}/download`);
+    return axiosInstance.post(`/api/workbook/${workbookId}/download`);
 }

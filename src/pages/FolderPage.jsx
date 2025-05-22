@@ -305,6 +305,7 @@ export default function FolderPage() {
             <PrivateMain />
           ) : (
             <PublicMain
+              onSwitchTab={setTab}
               selectedCollege={selectedCollege}
               selectedDepartment={selectedDepartment}
               selectedSubject={selectedSubject}
