@@ -95,7 +95,7 @@ export default function MyPageWithdraw() {
                 <p className="font-semibold text-[#5F360A] mb-2">
                     탈퇴하시는 이유를 알려주시면, 서비스 개선에 큰 도움이 됩니다.
                 </p>
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-4 text-[#AC957B]">
                     <label className="flex items-center gap-2">
                         <input
                             type="checkbox"
@@ -161,7 +161,7 @@ export default function MyPageWithdraw() {
             <button
                 onClick={handleConfirm}
                 disabled={!password}
-                className="w-full bg-[#b9a997] text-white rounded-xl py-3 disabled:opacity-50"
+                className="w-full bg-[#AC957B] text-white rounded-xl hover:bg-[#5F360A] py-3 disabled:opacity-50"
             >
                 탈퇴하기
             </button>
