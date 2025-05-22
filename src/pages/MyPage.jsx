@@ -5,6 +5,7 @@ import MyPageSidebar from '../components/mypage/MyPageSidebar.jsx';
 import MyPageHome from '../components/mypage/MyPageHome.jsx';
 import MyPageInfo from '../components/mypage/MyPageInfo.jsx';
 import MyPageStatistics from '../components/mypage/MyPageStatistics.jsx';
+import MyPageWithdraw from '../components/mypage/MyPageWithdraw.jsx';
 
 const Mypage = () => {
     const [activeTab, setActiveTab] = useState('home');
@@ -27,11 +28,7 @@ const Mypage = () => {
                         {activeTab === 'home' && <MyPageHome />}
                         {activeTab === 'info' && <MyPageInfo />}
                         {activeTab === 'statistics' && <MyPageStatistics />}
-                        {activeTab === 'withdraw' && (
-                            <div>
-                                <p>정말 탈퇴하시겠습니까?</p>
-                            </div>
-                        )}
+                        {activeTab === 'withdraw' && <MyPageWithdraw />}
                     </div>
                 </main>
             </div>
