@@ -31,6 +31,7 @@ export default function PublicMain({
   selectedCollege = null,          // { id, name } | null
   selectedDepartment = null,       // { id, name } | null
   selectedSubject = null,          // { id, name } | null
+  selectedYear = "",
   page = 0,
   size = 20,
   sort = "name",
@@ -139,9 +140,13 @@ export default function PublicMain({
             type: "department",
           })));
         } else if (filterDepth === 2 && selectedDepartment) {
-          /* ❖ 학과 안: ‘과목’ 바로 보여주기 (grade 폴더 제거) */
           const res = await getSubjects(selectedDepartment.id);
-          setItems((res.data.data || []).map(s => ({
+          const list = res.data.data || [];
+          // 선택된 학년이 있으면 grade 필드와 매칭되는 과목만 남깁니다.
+          const filtered = selectedYear
+            ? list.filter(s => String(s.grade) === selectedYear)
+            : list;
+          setItems(filtered.map(s => ({
             id: s.id,
             name: s.subjectName,
             type: "subject",
@@ -162,7 +167,7 @@ export default function PublicMain({
     };
 
     loadFolders();
-  }, [selectedCollege, selectedDepartment, selectedSubject, filterDepth]);
+  }, [selectedCollege, selectedDepartment, selectedSubject, filterDepth, selectedYear]);
 
   /* ───────────────── 3) 클라이언트 정렬 ───────────────── */
   const sortedWorkbooks = useMemo(() => {
@@ -267,7 +272,7 @@ export default function PublicMain({
         onDownload={() => setShowCopyPopup(true)}
         currentFolder={{ id: null }}
         folders={items}
-        workbooks={sortedWorkbooks}
+        workbooks={filterDepth === 3 ? sortedWorkbooks : []}
         onRefresh={() => { }}
         onFolderClick={handleFolderClick}
         onRename={() => { }}

@@ -39,7 +39,8 @@ const LeftSidebar = React.forwardRef(function LeftSidebar({
   onCollegeSelect,
   onDepartmentSelect,
   onSubjectSelect,
-  filterDepth
+  filterDepth,
+  onYearSelect,
 }, ref) {
   const [state, dispatch] = useReducer(filterReducer, initialFilterState);
   const prevDepth = useRef(filterDepth);
@@ -74,9 +75,9 @@ const LeftSidebar = React.forwardRef(function LeftSidebar({
 
   useEffect(() => {
     Promise.all([getColleges(true), getColleges(false)])
-      .then(([cRes, lRes]) => {
-        setColleges(cRes.data.data || []);
-        setLiberal((lRes.data.data || [])[0] || null);
+      .then(([liberalRes, collegeRes]) => {
+        setColleges(collegeRes.data.data || []);
+        setLiberal((liberalRes.data.data || [])[0] || null);
       })
       .catch(console.error);
   }, []);
@@ -93,7 +94,7 @@ const LeftSidebar = React.forwardRef(function LeftSidebar({
         );
         setLv2(normalized);
       })
-      .catch(() => setLv2([]));   // ← 그대로 두면 안전
+      .catch(() => setLv2([]));
 
     setSubjects([]);
     setGrades([]);
@@ -106,9 +107,16 @@ const LeftSidebar = React.forwardRef(function LeftSidebar({
         const list = res.data.data || [];
         setSubjects(list);
         if (!isGeneral) {
-          setGrades(
-            Array.from(new Set(list.map((s) => s.grade).filter(Boolean))).sort()
-          );
+          const yearList = Array.from(
+            new Set(
+              list
+                .map((s) => String(s.grade))
+                .filter(Boolean)
+            )
+          ).sort();
+          setGrades(yearList);
+        } else {
+          setGrades([]);
         }
       })
       .catch(() => {
@@ -141,12 +149,19 @@ const LeftSidebar = React.forwardRef(function LeftSidebar({
     );
   }, [state, colleges, liberal, lv2, subjects, isGeneral]);
 
+
   const filteredSubjects = useMemo(() => {
     if (isGeneral || !state.year) return subjects;
-    return subjects.filter((s) => String(s.grade) === state.year);
+    return subjects.filter((s) => String(s.grade) === state.year)
   }, [subjects, isGeneral, state.year]);
 
-  const sync = (type, value) => dispatch({ type, value });
+
+  const sync = (type, value) => {
+    dispatch({ type, value });
+    if (type === "SET_YEAR") {
+      onYearSelect?.(value);
+    }
+  };
 
   const tabs = [
     { key: "private", label: "Private", icon: privateIcon },
@@ -254,6 +269,7 @@ export default function FolderPage() {
   const [size] = useState(25);
   const [sort, setSort] = useState("createdAt");
   const [order, setOrder] = useState("desc");
+  const [selectedYear, setSelectedYear] = useState("");
 
   const handleBack = () => {
     if (selectedSubject) setSelectedSubject(null);
@@ -282,6 +298,7 @@ export default function FolderPage() {
             onDepartmentSelect={setSelectedDepartment}
             onSubjectSelect={setSelectedSubject}
             filterDepth={filterDepth}
+            onYearSelect={setSelectedYear}
           />
           {tab === "private" ? (
             <PrivateMain />
@@ -300,6 +317,7 @@ export default function FolderPage() {
               setSelectedDepartment={setSelectedDepartment}
               setSelectedSubject={setSelectedSubject}
               sidebarRef={sidebarRef}
+              selectedYear={selectedYear}
             />
           )}
         </div>
