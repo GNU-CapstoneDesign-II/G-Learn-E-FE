@@ -17,7 +17,6 @@ import {
   getPublicWorkbooksByDepartment,
   getPublicWorkbooksBySubject,
 } from "../../api/publicWorkbooksApi";
-import useDownloadedIds from "../../hooks/useDownloadedIds";
 import {
   // 폴더(단과·학과·과목) 조회 API
   getColleges,
@@ -60,7 +59,6 @@ export default function PublicMain({
   const [downloadResult, setDownloadResult] = useState({ success: 0, fail: 0 });
   const [downloading, setDownloading] = useState(false);
   const [history, setHistory] = useState([]);
-  const { ids: downloadedIds, add: addDownloadedIds } = useDownloadedIds();
   const [, startTransition] = useTransition();
 
   // 전체 선택 모드 토글
@@ -257,7 +255,7 @@ export default function PublicMain({
         fail++;
       }
     }));
-    if (success) addDownloadedIds(selectedIds);
+
     setDownloading(false);
     setDownloadMode("result");
     setDownloadResult({ success, fail });
@@ -357,7 +355,6 @@ export default function PublicMain({
         }}
         currentFolder={{ id: null }}
         folders={paginatedFolders}
-        downloadedIds={downloadedIds}
         workbooks={filterDepth === 3 ? sortedWorkbooks : []}
         onRefresh={() => { }}
         onFolderClick={handleFolderClick}

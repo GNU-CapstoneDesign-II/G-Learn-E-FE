@@ -15,7 +15,6 @@ const ItemTypes = { FOLDER: "folder", WORKBOOK: "workbook" };
 export default function FolderListWithDnD({
   mode = "private",
   filterDepth = 0,
-  downloadedIds = [],
   /* ── 상단 툴바 props ── */
   selectedFolder,
   selectedItems,
@@ -223,7 +222,7 @@ export default function FolderListWithDnD({
           <WorkbookItem
             key={wb.id}
             workbook={wb}
-            isDownloaded={downloadedIds.includes(wb.id)}  // 전달
+            isDownloaded={wb.downloaded}
             currentFolder={currentFolder}
             isSelectMode={isSelectMode}
             selected={selectedItems.includes(wb.id)}
@@ -334,12 +333,12 @@ function WorkbookItem({
   currentFolder,
   isSelectMode,
   selected,
-  isDownloaded,
   onSelect,
   onRefresh,
   onRename,
   onContextMenu,
   onOpenPopup,
+  isDownloaded,
 }) {
   const navigate = useNavigate();
   const [, drag] = useDrag({ type: ItemTypes.WORKBOOK, item: { id: workbook.id } });
