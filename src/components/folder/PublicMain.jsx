@@ -375,7 +375,7 @@ export default function PublicMain({
           ◀ Prev
         </button>
 
-        <span className="px-2">ㅗ
+        <span className="px-2">
           {displayPageInfo.pageNumber + 1} / {displayPageInfo.totalPages}
         </span>
 
