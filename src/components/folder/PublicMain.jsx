@@ -239,7 +239,6 @@ export default function PublicMain({
       .filter(Boolean)
       .join(" - ") || "Public";
 
-  /* ───────────────── 3) 클라이언트 정렬 ───────────────── */
   const sortedWorkbooks = useMemo(() => {
     if (sortOption !== "name") return workbooks;
     return [...workbooks].sort((a, b) =>
@@ -250,24 +249,24 @@ export default function PublicMain({
   const handleDownloadConfirm = async () => {
     setDownloading(true);
     let success = 0, fail = 0;
-    for (const id of selectedIds) {
+    await Promise.all(selectedIds.map(async id => {
       try {
         await downloadWorkbook(id);
         success++;
-      } catch (err) {
-        console.error(`다운로드 실패 (id=${id})`, err);
+      } catch {
         fail++;
       }
-    }
-
+    }));
     setDownloading(false);
+    setDownloadMode("result");
     setDownloadResult({ success, fail });
-    setDownloadMode("result");       // ③ 결과 모드로 전환
     setSelectedIds([]);
     setIsSelectMode(false);
 
     // ④ Private 탭으로 자동 전환
-    onSwitchTab("private");
+    setTimeout(() => {
+      onSwitchTab("private");
+    }, 1000);
   };
 
   const handleDownloadClose = () => {
