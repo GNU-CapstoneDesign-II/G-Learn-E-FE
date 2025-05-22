@@ -10,7 +10,6 @@ import { useDrop } from "react-dnd";
 import FolderListWithDnD from "./FolderListWithDnD.jsx";
 import DownloadPopup from "../common/DownloadPopup.jsx";
 import { downloadWorkbook } from "../../api/publicFolderApi";
-
 import {
   // 공개 워크북 조회 API들
   getPublicWorkbooks,
@@ -18,7 +17,6 @@ import {
   getPublicWorkbooksByDepartment,
   getPublicWorkbooksBySubject,
 } from "../../api/publicWorkbooksApi";
-
 import {
   // 폴더(단과·학과·과목) 조회 API
   getColleges,
@@ -257,6 +255,7 @@ export default function PublicMain({
         fail++;
       }
     }));
+
     setDownloading(false);
     setDownloadMode("result");
     setDownloadResult({ success, fail });
