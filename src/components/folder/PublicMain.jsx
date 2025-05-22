@@ -31,6 +31,7 @@ export default function PublicMain({
   selectedCollege = null,          // { id, name } | null
   selectedDepartment = null,       // { id, name } | null
   selectedSubject = null,          // { id, name } | null
+  selectedYear = "",
   page = 0,
   size = 20,
   sort = "name",
@@ -42,12 +43,12 @@ export default function PublicMain({
   sidebarRef,
 }) {
   /* ───────────────── state ───────────────── */
-  const [items,       setItems]       = useState([]);       // 왼쪽 폴더(단과·학과·과목) 리스트
-  const [workbooks,   setWorkbooks]   = useState([]);       // 문제집 리스트
-  const [loading,     setLoading]     = useState(true);
-  const [sortOption,  setSortOption]  = useState("name");
+  const [items, setItems] = useState([]);       // 왼쪽 폴더(단과·학과·과목) 리스트
+  const [workbooks, setWorkbooks] = useState([]);       // 문제집 리스트
+  const [loading, setLoading] = useState(true);
+  const [sortOption, setSortOption] = useState("name");
   const [isSelectMode, setIsSelectMode] = useState(false);
-  const [selectedIds,  setSelectedIds]  = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
   const [showCopyPopup, setShowCopyPopup] = useState(false);
   const [history, setHistory] = useState([]);
 
@@ -58,10 +59,10 @@ export default function PublicMain({
   const filterDepth = selectedSubject
     ? 3
     : selectedDepartment
-    ? 2
-    : selectedCollege
-    ? 1
-    : 0;
+      ? 2
+      : selectedCollege
+        ? 1
+        : 0;
 
   /* ───────────────── 1) 공개 워크북 로딩 ───────────────── */
   useEffect(() => {
@@ -139,9 +140,13 @@ export default function PublicMain({
             type: "department",
           })));
         } else if (filterDepth === 2 && selectedDepartment) {
-          /* ❖ 학과 안: ‘과목’ 바로 보여주기 (grade 폴더 제거) */
           const res = await getSubjects(selectedDepartment.id);
-          setItems((res.data.data || []).map(s => ({
+          const list = res.data.data || [];
+          // 선택된 학년이 있으면 grade 필드와 매칭되는 과목만 남깁니다.
+          const filtered = selectedYear
+            ? list.filter(s => String(s.grade) === selectedYear)
+            : list;
+          setItems(filtered.map(s => ({
             id: s.id,
             name: s.subjectName,
             type: "subject",
@@ -162,7 +167,7 @@ export default function PublicMain({
     };
 
     loadFolders();
-  }, [selectedCollege, selectedDepartment, selectedSubject, filterDepth]);
+  }, [selectedCollege, selectedDepartment, selectedSubject, filterDepth, selectedYear]);
 
   /* ───────────────── 3) 클라이언트 정렬 ───────────────── */
   const sortedWorkbooks = useMemo(() => {
@@ -203,15 +208,19 @@ export default function PublicMain({
         switch (folder.type) {
           case "college":
             setSelectedCollege({ id: folder.id, name: folder.name });
-            sidebarRef?.current?.setMain?.(folder.id);
+            sidebarRef?.current?.setMain?.(String(folder.id));
+            setSelectedDepartment(null);
+            setSelectedSubject(null);
+
             break;
           case "department":
             setSelectedDepartment({ id: folder.id, name: folder.name });
-            sidebarRef?.current?.setSub?.(folder.id);
+            sidebarRef?.current?.setSub?.(String(folder.id));
+            setSelectedSubject(null);
             break;
           case "subject": // ❖ grade 단계 삭제 → 바로 subject
             setSelectedSubject({ id: folder.id, name: folder.name });
-            sidebarRef?.current?.setSubject?.(folder.id);
+            sidebarRef?.current?.setSubject?.(String(folder.id));
             break;
           default:
             break;
@@ -247,10 +256,10 @@ export default function PublicMain({
             filterDepth === 3
               ? selectedSubject?.id
               : filterDepth === 2
-              ? selectedDepartment?.id
-              : filterDepth === 1
-              ? selectedCollege?.id
-              : null,
+                ? selectedDepartment?.id
+                : filterDepth === 1
+                  ? selectedCollege?.id
+                  : null,
           name: makeTitle(),
           parentId: filterDepth > 0 ? true : null,
         }}
@@ -263,13 +272,13 @@ export default function PublicMain({
         onDownload={() => setShowCopyPopup(true)}
         currentFolder={{ id: null }}
         folders={items}
-        workbooks={sortedWorkbooks}
-        onRefresh={() => {}}
+        workbooks={filterDepth === 3 ? sortedWorkbooks : []}
+        onRefresh={() => { }}
         onFolderClick={handleFolderClick}
-        onRename={() => {}}
-        onDeleteFolder={() => {}}
-        onDeleteWorkbook={() => {}}
-        onRenameWorkbook={() => {}}
+        onRename={() => { }}
+        onDeleteFolder={() => { }}
+        onDeleteWorkbook={() => { }}
+        onRenameWorkbook={() => { }}
         onAddFolder={null}
         onSelectItem={handleSelect}
       />
