@@ -27,3 +27,12 @@ export function copyWorkbookToPrivate(workbookId) {
         .post(`/api/workbook/${workbookId}/upload`)
         .then(res => res.data);
 }
+
+
+/**
+* 공개 워크북 다운로드(Private로 복사)
+* POST /api/workbook/{workbookId}/download
+*/
+export function downloadWorkbook(workbookId) {
+    return axios.post(`/api/workbook/${workbookId}/download`);
+}

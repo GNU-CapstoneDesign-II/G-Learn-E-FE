@@ -8,8 +8,8 @@ import React, {
 } from "react";
 import { useDrop } from "react-dnd";
 import FolderListWithDnD from "./FolderListWithDnD.jsx";
-import UploadPopup from "../common/UploadPopup.jsx";
-import { copyWorkbookToPrivate } from "../../api/publicFolderApi";
+import DownloadPopup from "../common/DownloadPopup.jsx";
+import { downloadWorkbook } from "../../api/publicFolderApi";
 
 import {
   // 공개 워크북 조회 API들
@@ -56,9 +56,23 @@ export default function PublicMain({
   const [sortOption, setSortOption] = useState("name");
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
-  const [showCopyPopup, setShowCopyPopup] = useState(false);
+  const [downloadMode, setDownloadMode] = useState(null);
+  const [downloading, setDownloading] = useState(false);
   const [history, setHistory] = useState([]);
   const [, startTransition] = useTransition();
+
+  // 전체 선택 모드 토글
+  const toggleSelectMode = () => {
+    setIsSelectMode(prev => !prev);
+    if (isSelectMode) setSelectedIds([]);
+  };
+
+  // 워크북 선택/해제 핸들러
+  const handleSelect = (id) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
 
   // ───────────────── pagination state ─────────────────
   const [page, setPage] = useState(0);
@@ -218,6 +232,10 @@ export default function PublicMain({
 
     loadFolders();
   }, [selectedCollege, selectedDepartment, selectedSubject, filterDepth, selectedYear]);
+  const makeTitle = () =>
+    [selectedCollege?.name, selectedDepartment?.name, selectedSubject?.name]
+      .filter(Boolean)
+      .join(" - ") || "Public";
 
   /* ───────────────── 3) 클라이언트 정렬 ───────────────── */
   const sortedWorkbooks = useMemo(() => {
@@ -227,21 +245,24 @@ export default function PublicMain({
     );
   }, [workbooks, sortOption]);
 
-  /* ───────────────── 4) 선택·다운로드 핸들러 ───────────────── */
-  const toggleSelectMode = () => {
-    setIsSelectMode(m => !m);
-    if (isSelectMode) setSelectedIds([]);
+  const handleDownloadConfirm = async () => {
+    setDownloading(true);
+    try {
+      // 호출할 API: POST /api/workbook/{id}/download
+      await Promise.all(
+        selectedIds.map(id => downloadWorkbook(id)) // downloadWorkbook 함수 정의 필요
+      );
+      setDownloadMode("cancelled");  // 성공 후 메시지 모드 변경
+    } catch (err) {
+      console.error(err);
+      setDownloadMode("exists");     // 이미 다운된 경우
+    } finally {
+      setDownloading(false);
+      setSelectedIds([]);
+      setIsSelectMode(false);
+    }
   };
-  const handleSelect = id =>
-    setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id],
-    );
-
-  /* ❖ 현재 경로 타이틀 */
-  const makeTitle = () =>
-    [selectedCollege?.name, selectedDepartment?.name, selectedSubject?.name]
-      .filter(Boolean)
-      .join(" - ") || "Public";
+  const handleDownloadClose = () => setDownloadMode(null);
 
   /* ───────────────── 5) 폴더 클릭 시 이동 ───────────────── */
   const handleFolderClick = useCallback(
@@ -319,7 +340,10 @@ export default function PublicMain({
         onBack={handleBack}
         onToggleAll={toggleSelectMode}
         isSelectMode={isSelectMode}
-        onDownload={() => setShowCopyPopup(true)}
+        onDownload={() => {
+          if (selectedIds.length === 0) return;
+          setDownloadMode("confirm");
+        }}
         currentFolder={{ id: null }}
         folders={paginatedFolders}
         workbooks={filterDepth === 3 ? sortedWorkbooks : []}
@@ -354,17 +378,13 @@ export default function PublicMain({
           Next ▶
         </button>
       </div>
-      {/* 공개 → 내 워크북 복사 팝업 */}
-      {showCopyPopup && (
-        <UploadPopup
-          mode="copyToPrivate"
-          selectedWorkbooks={workbooks.filter(w => selectedIds.includes(w.id))}
-          onConfirm={async () => {
-            await Promise.all(selectedIds.map(id => copyWorkbookToPrivate(id)));
-            setShowCopyPopup(false);
-            setSelectedIds([]);
-          }}
-          onClose={() => setShowCopyPopup(false)}
+
+      {downloadMode && (
+        <DownloadPopup
+          mode={downloadMode}
+          selectedCount={selectedIds.length}
+          onConfirm={handleDownloadConfirm}
+          onClose={handleDownloadClose}
         />
       )}
     </main>
