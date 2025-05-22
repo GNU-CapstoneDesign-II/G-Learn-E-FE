@@ -8,8 +8,8 @@ import React, {
 } from "react";
 import { useDrop } from "react-dnd";
 import FolderListWithDnD from "./FolderListWithDnD.jsx";
-import UploadPopup from "../common/UploadPopup.jsx";
-import { copyWorkbookToPrivate } from "../../api/publicFolderApi";
+import DownloadPopup from "../common/DownloadPopup.jsx";
+import { downloadWorkbook } from "../../api/publicFolderApi";
 
 import {
   // 공개 워크북 조회 API들
@@ -32,8 +32,6 @@ export default function PublicMain({
   selectedDepartment = null,       // { id, name } | null
   selectedSubject = null,          // { id, name } | null
   selectedYear = "",
-  page = 0,
-  size = 20,
   sort = "name",
   order = "asc",
   handleBack,
@@ -41,20 +39,8 @@ export default function PublicMain({
   setSelectedDepartment,
   setSelectedSubject,
   sidebarRef,
+  onSwitchTab,
 }) {
-  /* ───────────────── state ───────────────── */
-  const [items, setItems] = useState([]);       // 왼쪽 폴더(단과·학과·과목) 리스트
-  const [workbooks, setWorkbooks] = useState([]);       // 문제집 리스트
-  const [loading, setLoading] = useState(true);
-  const [sortOption, setSortOption] = useState("name");
-  const [isSelectMode, setIsSelectMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [showCopyPopup, setShowCopyPopup] = useState(false);
-  const [history, setHistory] = useState([]);
-
-  /* ❖ useTransition  – isPending은 쓰지 않으므로 생략 */
-  const [, startTransition] = useTransition();
-
   /* ❖ filterDepth: 0(루트) → 1(단과) → 2(학과) → 3(과목) */
   const filterDepth = selectedSubject
     ? 3
@@ -63,6 +49,74 @@ export default function PublicMain({
       : selectedCollege
         ? 1
         : 0;
+
+  /* ───────────────── state ───────────────── */
+  const [items, setItems] = useState([]);       // 왼쪽 폴더(단과·학과·과목) 리스트
+  const [workbooks, setWorkbooks] = useState([]);       // 문제집 리스트
+  const [loading, setLoading] = useState(true);
+  const [sortOption, setSortOption] = useState("name");
+  const [isSelectMode, setIsSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [downloadMode, setDownloadMode] = useState(null);
+  const [downloadResult, setDownloadResult] = useState({ success: 0, fail: 0 });
+  const [downloading, setDownloading] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [, startTransition] = useTransition();
+
+  // 전체 선택 모드 토글
+  const toggleSelectMode = () => {
+    setIsSelectMode(prev => !prev);
+    if (isSelectMode) setSelectedIds([]);
+  };
+
+  // 워크북 선택/해제 핸들러
+  const handleSelect = (id) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
+
+  // ───────────────── pagination state ─────────────────
+  const [page, setPage] = useState(0);
+  const size = 20;
+  const [pageInfo, setPageInfo] = useState({
+    totalPages: 1,
+    pageNumber: 0,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
+
+  // ───────────────── folder-side pagination 계산 ─────────────────
+  const folderTotalPages = Math.max(1, Math.ceil(items.length / size));
+  useEffect(() => {
+    if (filterDepth < 3) {
+      const maxPage = Math.max(0, folderTotalPages - 1);
+      if (page > maxPage) setPage(maxPage);
+    }
+  }, [folderTotalPages, filterDepth, page]);
+
+  // ② 실제로 화면에 뿌릴 슬라이스
+  const paginatedFolders = useMemo(() => {
+    if (filterDepth < 3) {
+      const start = page * size;
+      return items.slice(start, start + size);
+    }
+    return items;
+  }, [items, page, size, filterDepth]);
+
+
+  const folderPageInfo = useMemo(() => ({
+    totalPages: folderTotalPages,
+    pageNumber: page,
+    hasNextPage: page < folderTotalPages - 1,
+    hasPreviousPage: page > 0,
+  }), [folderTotalPages, page]);
+
+  const displayPageInfo = filterDepth < 3 ? folderPageInfo : pageInfo;
+
+  /* depth 바뀌면 page 초기화 */
+  useEffect(() => { setPage(0); }, [filterDepth]);
+
 
   /* ───────────────── 1) 공개 워크북 로딩 ───────────────── */
   useEffect(() => {
@@ -87,7 +141,15 @@ export default function PublicMain({
           );
         }
 
-        setWorkbooks(res?.data?.data?.publicWorkbooks ?? []);
+        // ─── publicWorkbooks 과 pageInfo 를 분리하여 저장
+        const { publicWorkbooks, pageInfo: pi } = res.data.data;
+        setWorkbooks(publicWorkbooks ?? []);
+        setPageInfo({
+          totalPages: pi.totalPages,
+          pageNumber: pi.pageNumber,
+          hasNextPage: pi.hasNextPage,
+          hasPreviousPage: pi.hasPreviousPage,
+        });
       } catch (err) {
         console.error("공개 워크북 로딩 실패:", err);
         setWorkbooks([]);
@@ -126,11 +188,15 @@ export default function PublicMain({
             type: "college",
           }));
           const liberal = (liberalRes.data.data || [])[0];
-          setItems(
-            liberal
-              ? [...colleges, { id: liberal.id, name: liberal.collegeName, type: "college" }]
-              : colleges,
+          const combined = liberal
+            ? [...colleges, { id: liberal.id, name: liberal.collegeName, type: "college" }]
+            : colleges;
+
+          // ID 기준으로 중복 제거
+          const uniqueItems = Array.from(
+            new Map(combined.map(item => [item.id, item])).values()
           );
+          setItems(uniqueItems);
         } else if (filterDepth === 1 && selectedCollege) {
           /* 단과 안: 학과/교양 영역 */
           const res = await getDepartments(selectedCollege.id);
@@ -168,8 +234,11 @@ export default function PublicMain({
 
     loadFolders();
   }, [selectedCollege, selectedDepartment, selectedSubject, filterDepth, selectedYear]);
+  const makeTitle = () =>
+    [selectedCollege?.name, selectedDepartment?.name, selectedSubject?.name]
+      .filter(Boolean)
+      .join(" - ") || "Public";
 
-  /* ───────────────── 3) 클라이언트 정렬 ───────────────── */
   const sortedWorkbooks = useMemo(() => {
     if (sortOption !== "name") return workbooks;
     return [...workbooks].sort((a, b) =>
@@ -177,21 +246,33 @@ export default function PublicMain({
     );
   }, [workbooks, sortOption]);
 
-  /* ───────────────── 4) 선택·다운로드 핸들러 ───────────────── */
-  const toggleSelectMode = () => {
-    setIsSelectMode(m => !m);
-    if (isSelectMode) setSelectedIds([]);
-  };
-  const handleSelect = id =>
-    setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id],
-    );
+  const handleDownloadConfirm = async () => {
+    setDownloading(true);
+    let success = 0, fail = 0;
+    await Promise.all(selectedIds.map(async id => {
+      try {
+        await downloadWorkbook(id);
+        success++;
+      } catch {
+        fail++;
+      }
+    }));
+    setDownloading(false);
+    setDownloadMode("result");
+    setDownloadResult({ success, fail });
+    setSelectedIds([]);
+    setIsSelectMode(false);
 
-  /* ❖ 현재 경로 타이틀 */
-  const makeTitle = () =>
-    [selectedCollege?.name, selectedDepartment?.name, selectedSubject?.name]
-      .filter(Boolean)
-      .join(" - ") || "Public";
+    // ④ Private 탭으로 자동 전환
+    setTimeout(() => {
+      onSwitchTab("private");
+    }, 1000);
+  };
+
+  const handleDownloadClose = () => {
+    setDownloadMode(null);
+  };
+
 
   /* ───────────────── 5) 폴더 클릭 시 이동 ───────────────── */
   const handleFolderClick = useCallback(
@@ -269,9 +350,12 @@ export default function PublicMain({
         onBack={handleBack}
         onToggleAll={toggleSelectMode}
         isSelectMode={isSelectMode}
-        onDownload={() => setShowCopyPopup(true)}
+        onDownload={() => {
+          if (selectedIds.length === 0) return;
+          setDownloadMode("confirm");
+        }}
         currentFolder={{ id: null }}
-        folders={items}
+        folders={paginatedFolders}
         workbooks={filterDepth === 3 ? sortedWorkbooks : []}
         onRefresh={() => { }}
         onFolderClick={handleFolderClick}
@@ -282,18 +366,36 @@ export default function PublicMain({
         onAddFolder={null}
         onSelectItem={handleSelect}
       />
+      {/* ───── pagination controls ───── */}
+      <div className="fixed bottom-8 left-1/2  flex justify-center items-center gap-4 ">
+        <button
+          onClick={() => setPage(p => Math.max(p - 1, 0))}
+          disabled={!displayPageInfo.hasPreviousPage}
+          className="px-3 py-1 border rounded disabled:opacity-40"
+        >
+          ◀ Prev
+        </button>
 
-      {/* 공개 → 내 워크북 복사 팝업 */}
-      {showCopyPopup && (
-        <UploadPopup
-          mode="copyToPrivate"
-          selectedWorkbooks={workbooks.filter(w => selectedIds.includes(w.id))}
-          onConfirm={async () => {
-            await Promise.all(selectedIds.map(id => copyWorkbookToPrivate(id)));
-            setShowCopyPopup(false);
-            setSelectedIds([]);
-          }}
-          onClose={() => setShowCopyPopup(false)}
+        <span className="px-2">
+          {displayPageInfo.pageNumber + 1} / {displayPageInfo.totalPages}
+        </span>
+
+        <button
+          onClick={() => setPage(p => p + 1)}
+          disabled={!displayPageInfo.hasNextPage}
+          className="px-3 py-1 border rounded disabled:opacity-40"
+        >
+          Next ▶
+        </button>
+      </div>
+
+      {downloadMode && (
+        <DownloadPopup
+          mode={downloadMode}
+          selectedCount={selectedIds.length}
+          result={downloadResult}
+          onConfirm={handleDownloadConfirm}
+          onClose={handleDownloadClose}
         />
       )}
     </main>
