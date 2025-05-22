@@ -216,7 +216,7 @@ const LeftSidebar = React.forwardRef(function LeftSidebar({
               <option value="">{isGeneral ? "영역" : "학과"} 선택</option>
               {lv2.map((d) => (
                 <option key={d.id} value={d.id}>
-                  {isGeneral ? d : d.departmentName}
+                  {d.departmentName}
                 </option>
               ))}
             </select>

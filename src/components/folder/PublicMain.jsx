@@ -172,11 +172,15 @@ export default function PublicMain({
             type: "college",
           }));
           const liberal = (liberalRes.data.data || [])[0];
-          setItems(
-            liberal
-              ? [...colleges, { id: liberal.id, name: liberal.collegeName, type: "college" }]
-              : colleges,
+          const combined = liberal
+            ? [...colleges, { id: liberal.id, name: liberal.collegeName, type: "college" }]
+            : colleges;
+
+          // ID 기준으로 중복 제거
+          const uniqueItems = Array.from(
+            new Map(combined.map(item => [item.id, item])).values()
           );
+          setItems(uniqueItems);
         } else if (filterDepth === 1 && selectedCollege) {
           /* 단과 안: 학과/교양 영역 */
           const res = await getDepartments(selectedCollege.id);
