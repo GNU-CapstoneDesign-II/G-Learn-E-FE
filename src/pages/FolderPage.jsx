@@ -275,6 +275,7 @@ export default function FolderPage() {
     if (selectedSubject) setSelectedSubject(null);
     else if (selectedDepartment) setSelectedDepartment(null);
     else if (selectedCollege) setSelectedCollege(null);
+    setSelectedYear("");
   };
 
   const filterDepth = selectedSubject
