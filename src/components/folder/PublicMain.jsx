@@ -42,12 +42,12 @@ export default function PublicMain({
   sidebarRef,
 }) {
   /* ───────────────── state ───────────────── */
-  const [items,       setItems]       = useState([]);       // 왼쪽 폴더(단과·학과·과목) 리스트
-  const [workbooks,   setWorkbooks]   = useState([]);       // 문제집 리스트
-  const [loading,     setLoading]     = useState(true);
-  const [sortOption,  setSortOption]  = useState("name");
+  const [items, setItems] = useState([]);       // 왼쪽 폴더(단과·학과·과목) 리스트
+  const [workbooks, setWorkbooks] = useState([]);       // 문제집 리스트
+  const [loading, setLoading] = useState(true);
+  const [sortOption, setSortOption] = useState("name");
   const [isSelectMode, setIsSelectMode] = useState(false);
-  const [selectedIds,  setSelectedIds]  = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
   const [showCopyPopup, setShowCopyPopup] = useState(false);
   const [history, setHistory] = useState([]);
 
@@ -58,10 +58,10 @@ export default function PublicMain({
   const filterDepth = selectedSubject
     ? 3
     : selectedDepartment
-    ? 2
-    : selectedCollege
-    ? 1
-    : 0;
+      ? 2
+      : selectedCollege
+        ? 1
+        : 0;
 
   /* ───────────────── 1) 공개 워크북 로딩 ───────────────── */
   useEffect(() => {
@@ -203,15 +203,19 @@ export default function PublicMain({
         switch (folder.type) {
           case "college":
             setSelectedCollege({ id: folder.id, name: folder.name });
-            sidebarRef?.current?.setMain?.(folder.id);
+            sidebarRef?.current?.setMain?.(String(folder.id));
+            setSelectedDepartment(null);
+            setSelectedSubject(null);
+
             break;
           case "department":
             setSelectedDepartment({ id: folder.id, name: folder.name });
-            sidebarRef?.current?.setSub?.(folder.id);
+            sidebarRef?.current?.setSub?.(String(folder.id));
+            setSelectedSubject(null);
             break;
           case "subject": // ❖ grade 단계 삭제 → 바로 subject
             setSelectedSubject({ id: folder.id, name: folder.name });
-            sidebarRef?.current?.setSubject?.(folder.id);
+            sidebarRef?.current?.setSubject?.(String(folder.id));
             break;
           default:
             break;
@@ -247,10 +251,10 @@ export default function PublicMain({
             filterDepth === 3
               ? selectedSubject?.id
               : filterDepth === 2
-              ? selectedDepartment?.id
-              : filterDepth === 1
-              ? selectedCollege?.id
-              : null,
+                ? selectedDepartment?.id
+                : filterDepth === 1
+                  ? selectedCollege?.id
+                  : null,
           name: makeTitle(),
           parentId: filterDepth > 0 ? true : null,
         }}
@@ -264,12 +268,12 @@ export default function PublicMain({
         currentFolder={{ id: null }}
         folders={items}
         workbooks={sortedWorkbooks}
-        onRefresh={() => {}}
+        onRefresh={() => { }}
         onFolderClick={handleFolderClick}
-        onRename={() => {}}
-        onDeleteFolder={() => {}}
-        onDeleteWorkbook={() => {}}
-        onRenameWorkbook={() => {}}
+        onRename={() => { }}
+        onDeleteFolder={() => { }}
+        onDeleteWorkbook={() => { }}
+        onRenameWorkbook={() => { }}
         onAddFolder={null}
         onSelectItem={handleSelect}
       />

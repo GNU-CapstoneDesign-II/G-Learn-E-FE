@@ -33,7 +33,7 @@ function filterReducer(state, action) {
   }
 }
 
-function LeftSidebar({
+const LeftSidebar = React.forwardRef(function LeftSidebar({
   selectedTab,
   onTabChange,
   onCollegeSelect,
@@ -51,8 +51,8 @@ function LeftSidebar({
   const isGeneral = liberal && String(state.main) === String(liberal.id);
 
   useImperativeHandle(ref, () => ({
-    setMain: (id) => dispatch({ type: "SET_MAIN", value: id }),
-    setSub: (id) => dispatch({ type: "SET_SUB", value: id }),
+    setMain: (id) => dispatch({ type: "SET_MAIN", value: String(id) }),
+    setSub: (id) => dispatch({ type: "SET_SUB", value: String(id) }),
     setSubject: (id) => dispatch({ type: "SET_SUBJECT", value: id }),
   }));
 
@@ -84,8 +84,17 @@ function LeftSidebar({
   useEffect(() => {
     if (!state.main) return;
     getDepartments(state.main)
-      .then((res) => setLv2(res.data.data || []))
-      .catch(() => setLv2([]));
+      .then((res) => {
+        const list = res.data.data || [];
+        const normalized = list.map((d) =>
+          typeof d === "string"
+            ? { id: d, departmentName: d }
+            : d
+        );
+        setLv2(normalized);
+      })
+      .catch(() => setLv2([]));   // ← 그대로 두면 안전
+
     setSubjects([]);
     setGrades([]);
   }, [state.main]);
@@ -234,7 +243,7 @@ function LeftSidebar({
       )}
     </div>
   );
-}
+});
 
 export default function FolderPage() {
   const [tab, setTab] = useState("private");
