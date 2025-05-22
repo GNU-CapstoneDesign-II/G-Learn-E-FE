@@ -8,12 +8,14 @@ import ContextMenu from "../common/ContextMenu";
 import workbookImg from "../../assets/workbook.png";
 import folderImg from "../../assets/folder.png";
 import WorkbookProfilePopup from "../common/WorkbookProfilePopup.jsx";
+import { Upload } from "lucide-react";
 
 const ItemTypes = { FOLDER: "folder", WORKBOOK: "workbook" };
 
 export default function FolderListWithDnD({
   mode = "private",
   filterDepth = 0,
+  downloadedIds = [],
   /* ── 상단 툴바 props ── */
   selectedFolder,
   selectedItems,
@@ -221,6 +223,7 @@ export default function FolderListWithDnD({
           <WorkbookItem
             key={wb.id}
             workbook={wb}
+            isDownloaded={downloadedIds.includes(wb.id)}  // 전달
             currentFolder={currentFolder}
             isSelectMode={isSelectMode}
             selected={selectedItems.includes(wb.id)}
@@ -331,6 +334,7 @@ function WorkbookItem({
   currentFolder,
   isSelectMode,
   selected,
+  isDownloaded,
   onSelect,
   onRefresh,
   onRename,
@@ -372,6 +376,12 @@ function WorkbookItem({
         </div>
       )}
       <div className="relative w-[80px] h-[80px] bg-white border border-[#DACEC0] rounded-lg flex items-center justify-center shadow-sm transition-shadow hover:shadow-md">
+        {isDownloaded && (
+          <Upload
+            size={14}
+            className="absolute bottom-1 right-1 text-sky-400"
+          />
+        )}
         <div className="absolute top-1/2 left-1/2 bg-[#F3E9DC] rounded-full transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
           <img src={workbookImg} alt="Workbook" className="w-10 h-10 object-contain" />
         </div>
