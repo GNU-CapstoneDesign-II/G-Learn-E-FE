@@ -7,6 +7,10 @@ import {
   getCollegeRanking,
   getCollegeUserRanking,
 } from '../api/rankingApi';
+import goldMedal from "../assets/medal/gold.png";
+import silverMedal from '../assets/medal/silver.png';
+import bronzeMedal from '../assets/medal/bronze.png';
+
 import { useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import logoImageBack from '../assets/image-logo-background.png';
@@ -124,29 +128,54 @@ export default function Ranking() {
               <div className="overflow-x-auto">
                 <table className=" width: 20% min-w-full border-collapse text-center">
                   <thead className="bg-white">
-                    <tr className="border-b border-gray-300">
-                      <th className="p-4">등수</th>
-                      <th className="p-4">
+                    <tr className="text-darkbrown border-b-2 border-lightbrown/20">
+                      <th className="w-1/5 p-4">등수</th>
+                      <th className="w-1/5 p-4">
                         {isDeptTab && '학과명'}
                         {isCollegeTab && '단과대명'}
                         {isUserTab && '닉네임'}
                       </th>
-                      <th className="p-4">레벨</th>
-                      <th className="p-4">만든 문제</th>
-                      <th className="p-4">푼 문제</th>
+                      <th className="w-1/5 p-4">레벨</th>
+                      <th className="w-1/5 p-4">만든 문제</th>
+                      <th className="w-1/5 p-4">푼 문제</th>
                     </tr>
                   </thead>
                   <tbody>
                     {rankings.map((u, i) => (
-                      <tr key={u.id} className="h-16 border-b border-gray-300">
-                        <td className={`p-4 text-center font-bold ${i === 0 ? 'text-yellow-500'
-                          : i === 1 ? 'text-gray-400'
-                            : i === 2 ? 'text-orange-500'
-                              : ''
-                          }`}>
-                          {u.ranking}
+                      <tr key={u.id} className="h-16 border-b border-lightbrown/20">
+                        <td className="p-4 text-center font-bold">
+                          <div className="relative inline-block">
+                            {/* 1. 숫자용 박스: 고정 폭, 가운데 정렬 */}
+                            <span className="inline-block text-darkbrown w-6 text-center">{u.ranking}</span>
+
+                            {/* 2. 아이콘: 숫자 박스 왼쪽에 절대 위치 */}
+                            {i === 0 && (
+                              <img
+                                src={goldMedal}
+                                alt="Gold Medal"
+                                className="absolute right-4 top-1/2 w-5 h-5 transform -translate-y-1/2 -translate-x-full"
+                              />
+                            )}
+                            {i === 1 && (
+                              <img
+                                src={silverMedal}
+                                alt="Silver Medal"
+                                className="absolute right-4 top-1/2 w-5 h-5 transform -translate-y-1/2 -translate-x-full"
+                              />
+
+                            )}
+                            {i === 2 && (
+                              <img
+                                src={bronzeMedal}
+                                alt="Bronze Medal"
+                                className="absolute right-4 top-1/2 w-5 h-5 transform -translate-y-1/2 -translate-x-full"
+                              />
+                            )}
+                          </div>
                         </td>
-                        <td className="p-4 flex items-center justify-start gap-2">
+
+                        <td className=" p-4 flex items-center text-darkbrown justify-center gap-2">
+                          {/*
                           {i === 0 && <span className="text-2xl">👑</span>}
                           {isUserTab && (
                             // 프로필 이미지 없어서 대체로 유저 레벨 아이콘 사용함
@@ -156,16 +185,16 @@ export default function Ranking() {
                             //   className="w-6 h-6 rounded-full"
                             // />
                             <LevelIcon level={u.level} size={30} />
-                          )}
+                          )}*/}
                           <span className="font-semibold">
                             {isDeptTab && u.name}
                             {isCollegeTab && u.name}
                             {isUserTab && u.nickname}
                           </span>
                         </td>
-                        <td className="p-4 text-center text-[#00b3ff] font-bold">{u.level}</td>
-                        <td className="p-4 text-center font-bold">{u.createdWorkbooks}</td>
-                        <td className="p-4 text-center font-bold">{u.solvedWorkbooks}</td>
+                        <td className="p-4 text-center text-darkbrown font-bold">{u.level}</td>
+                        <td className="p-4 text-center text-darkbrown font-bold">{u.createdWorkbooks}</td>
+                        <td className="p-4 text-center text-darkbrown font-bold">{u.solvedWorkbooks}</td>
                       </tr>
                     ))}
                   </tbody>
