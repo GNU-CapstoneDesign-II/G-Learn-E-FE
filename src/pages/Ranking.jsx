@@ -14,25 +14,25 @@ import { useAuth } from '../contexts/AuthContext.jsx';
 import LevelIcon from '../components/common/LevelIcon.jsx';
 
 const tabConfig = [
-  { label: '유저별',        value: 'user' },
-  { label: '학과별',        value: 'department' },
-  { label: '내 학과',      value: 'departmentUser' },
-  { label: '단과대별',      value: 'college' },
-  { label: '내 단과대',    value: 'collegeUser' },
+  { label: '유저별', value: 'user' },
+  { label: '학과별', value: 'department' },
+  { label: '내 학과', value: 'departmentUser' },
+  { label: '단과대별', value: 'college' },
+  { label: '내 단과대', value: 'collegeUser' },
 ];
 
 export default function Ranking() {
   const { user } = useAuth();
 
-  const [activeTab, setActiveTab]     = useState('user');
-  const [rankings, setRankings]       = useState([]);
-  const [loading, setLoading]         = useState(false);
-  const [error, setError]             = useState(null);
+  const [activeTab, setActiveTab] = useState('user');
+  const [rankings, setRankings] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages]   = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const isUserTab    = ['user','departmentUser','collegeUser'].includes(activeTab);
-  const isDeptTab    = activeTab === 'department';
+  const isUserTab = ['user', 'departmentUser', 'collegeUser'].includes(activeTab);
+  const isDeptTab = activeTab === 'department';
   const isCollegeTab = activeTab === 'college';
 
   const scrollToTop = () =>
@@ -66,9 +66,9 @@ export default function Ranking() {
         }
 
         // service 함수가 { rankings?, departments?, colleges?, totalPages } 형태 리턴
-        const list = data.rankings 
-          ?? data.departments 
-          ?? data.colleges 
+        const list = data.rankings
+          ?? data.departments
+          ?? data.colleges
           ?? [];
         setRankings(list);
         setTotalPages(data.totalPages ?? 1);
@@ -84,11 +84,11 @@ export default function Ranking() {
   }, [activeTab, currentPage]);
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-[rgba(243,233,220,0.5)]">
+    <div className="flex mb-[30px] flex-col min-h-screen w-full bg-[rgba(243,233,220,0.5)]">
       <Navbar />
 
       {/* 백그라운드 로고 */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <div className="absolute inset-0 flex items-center mt-[120px] justify-center pointer-events-none">
         <img
           src={logoImageBack}
           alt="Background Logo"
@@ -97,18 +97,17 @@ export default function Ranking() {
       </div>
 
       {/* 실제 컨텐츠 */}
-      <div className="relative z-10 pt-[130px] flex-grow overflow-auto">
+      <div className="relative z-10 pt-[90px] flex-grow overflow-auto">
         <div className="w-full max-w-[1400px] mx-auto px-4">
           {/* 탭 버튼 */}
           <div className="flex flex-wrap">
             {tabConfig.map(tab => (
               <button
                 key={tab.value}
-                className={`px-4 py-2 border-b-2 transition-all hover:bg-lightbrown/20 ${
-                  activeTab === tab.value
-                    ? 'border-brown font-bold text-brown'
-                    : 'border-transparent text-gray-500 hover:border-brown'
-                }`}
+                className={`px-4 py-2 border-b-2 transition-all hover:bg-lightbrown/20 ${activeTab === tab.value
+                  ? 'border-brown font-bold text-brown'
+                  : 'border-transparent text-gray-500 hover:border-brown'
+                  }`}
                 onClick={() => { setActiveTab(tab.value); setCurrentPage(0); }}
               >
                 {tab.label}
@@ -117,13 +116,13 @@ export default function Ranking() {
           </div>
 
           {/* 에러 */}
-          {error   && <p className="text-center text-red-500">{error}</p>}
+          {error && <p className="text-center text-red-500">{error}</p>}
 
           {/* 랭킹 테이블 */}
           {!loading && !error && (
             <>
               <div className="overflow-x-auto">
-                <table className="min-w-full border-collapse text-center">
+                <table className=" width: 20% min-w-full border-collapse text-center">
                   <thead className="bg-white">
                     <tr className="border-b border-gray-300">
                       <th className="p-4">등수</th>
@@ -140,12 +139,11 @@ export default function Ranking() {
                   <tbody>
                     {rankings.map((u, i) => (
                       <tr key={u.id} className="h-16 border-b border-gray-300">
-                        <td className={`p-4 text-right font-bold ${
-                          i === 0 ? 'text-yellow-500'
-                            : i === 1 ? 'text-gray-400'
+                        <td className={`p-4 text-center font-bold ${i === 0 ? 'text-yellow-500'
+                          : i === 1 ? 'text-gray-400'
                             : i === 2 ? 'text-orange-500'
-                            : ''
-                        }`}>
+                              : ''
+                          }`}>
                           {u.ranking}
                         </td>
                         <td className="p-4 flex items-center justify-start gap-2">
@@ -166,8 +164,8 @@ export default function Ranking() {
                           </span>
                         </td>
                         <td className="p-4 text-center text-[#00b3ff] font-bold">{u.level}</td>
-                        <td className="p-4 text-right font-bold">{u.createdWorkbooks}</td>
-                        <td className="p-4 text-right font-bold">{u.solvedWorkbooks}</td>
+                        <td className="p-4 text-center font-bold">{u.createdWorkbooks}</td>
+                        <td className="p-4 text-center font-bold">{u.solvedWorkbooks}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -180,11 +178,10 @@ export default function Ranking() {
                   <button
                     key={i}
                     onClick={() => setCurrentPage(i)}
-                    className={`px-3 py-1 border rounded ${
-                      currentPage === i 
-                        ? 'bg-brown text-white' 
-                        : 'text-brown hover:bg-lightbrown/20'
-                    }`}
+                    className={`px-3 py-1 border rounded ${currentPage === i
+                      ? 'bg-brown text-white'
+                      : 'text-brown hover:bg-lightbrown/20'
+                      }`}
                   >
                     {i + 1}
                   </button>
@@ -193,11 +190,11 @@ export default function Ranking() {
             </>
           )}
 
-        </div>  
+        </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-[#B3977B] px-4 md:px-8 py-8 text-white">
+
+      {/*<footer className="bg-[#B3977B] px-4 md:px-8 py-8 text-white">
         <div className="max-w-[1400px] mx-auto flex flex-col gap-6">
           <div className="flex justify-between items-center">
             <p className="text-xs md:text-sm">경상국립대학교 컴퓨터공학과 전공종합설계 PBL</p>
@@ -210,7 +207,8 @@ export default function Ranking() {
             <p className="text-2xl md:text-3xl font-namdhinggo tracking-wider select-none">G-Learn-E</p>
           </div>
         </div>
-      </footer>
-    </div>
+                    </footer>*/}
+    </div >
+
   );
 }
