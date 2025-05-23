@@ -174,7 +174,7 @@ export default function Ranking() {
                           </div>
                         </td>
 
-                        <td className=" p-4 flex items-center text-darkbrown justify-center gap-2">
+                        <td className="p-4 text-center align-middle text-darkbrown font-semibold">
                           {/*
                           {i === 0 && <span className="text-2xl">👑</span>}
                           {isUserTab && (
@@ -192,7 +192,8 @@ export default function Ranking() {
                             {isUserTab && u.nickname}
                           </span>
                         </td>
-                        <td className="p-4 text-center text-darkbrown font-bold">{u.level}</td>
+                        {/* <td className="p-4 text-center text-darkbrown font-bold">{u.level}</td> */}
+                        <td className="p-4 h-full flex items-center justify-center text-darkbrown font-bold"><LevelIcon level={u.level} size={30} /></td>
                         <td className="p-4 text-center text-darkbrown font-bold">{u.createdWorkbooks}</td>
                         <td className="p-4 text-center text-darkbrown font-bold">{u.solvedWorkbooks}</td>
                       </tr>
