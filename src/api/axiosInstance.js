@@ -2,9 +2,7 @@
 import axios from "axios";
 import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "../utils/authToken";
 
-// 백엔드 API 주소 (직접 명시)
-// const BASE_URL = "http://3.39.155.100:8080";
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = "http://3.39.155.100:8080";
 
 const instance = axios.create({
     baseURL: BASE_URL,

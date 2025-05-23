@@ -29,6 +29,9 @@ export default function SignUp() {
   const [timeLeft, setTimeLeft] = useState(0);   // ← 6 분(360 초) 타이머
   const [shouldNavigate, setShouldNavigate] = useState(false);
 
+  const pwd = form.password;
+  const pwdRule = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+
   /* ─────────────────── 인증 관련 ─────────────────── */
   const [emailSent, setEmailSent] = useState(false);
   const [verified, setVerified] = useState(false);
@@ -82,6 +85,14 @@ export default function SignUp() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "password") {
+      if (!pwdRule.test(value)) {
+        setError("비밀번호는 최소 8자, 영문+숫자 포함");
+      } else {
+        setError("");
+      }
+    }
   };
 
   const handleCollegeChange = async (e) => {
@@ -134,14 +145,22 @@ export default function SignUp() {
       setError("❗ 이메일 인증을 완료해주세요.");
       return;
     }
+
+    if (!pwdRule.test(pwd)) {
+      setError("❗ 비밀번호는 최소 8자 이상, 영문자와 숫자를 각각 1개 이상 포함해야 합니다.");
+      return;
+    }
+
     if (form.password !== form.passwordConfirm) {
       setError("❗ 비밀번호가 일치하지 않습니다.");
       return;
     }
+
     if (!form.collegeId || !form.departmentId) {
       setError("❗ 단과대학과 학과를 모두 선택해주세요.");
       return;
     }
+
     try {
       setError("");
       await signup(
