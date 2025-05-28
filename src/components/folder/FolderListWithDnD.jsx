@@ -8,7 +8,7 @@ import ContextMenu from "../common/ContextMenu";
 import workbookImg from "../../assets/workbook.png";
 import folderImg from "../../assets/folder.png";
 import WorkbookProfilePopup from "../common/WorkbookProfilePopup.jsx";
-import { Upload } from "lucide-react";
+import downloadIcon from "../../assets/download.png"
 
 const ItemTypes = { FOLDER: "folder", WORKBOOK: "workbook" };
 
@@ -364,7 +364,7 @@ function WorkbookItem({
   return (
     <div
       ref={(node) => drag(drop(node))}
-      className="relative flex flex-col items-center w-24 cursor-pointer group"
+      className="relative flex flex-col items-center w-20 cursor-pointer group"
       onClick={handleClick}
       onDoubleClick={handleRename}
       onContextMenu={onContextMenu}
@@ -376,14 +376,19 @@ function WorkbookItem({
       )}
       <div className="relative w-[80px] h-[80px] bg-white border border-[#DACEC0] rounded-lg flex items-center justify-center shadow-sm transition-shadow hover:shadow-md">
         {isDownloaded && (
-          <Upload
-            size={14}
-            className="absolute bottom-1 right-1 text-sky-400"
+          <img
+            src={downloadIcon}
+            alt="downloaded"
+            className="absolute bottom-1 right-1"
+            width={14}
+            height={14}
           />
         )}
-        <div className="absolute top-1/2 left-1/2 bg-[#F3E9DC] rounded-full transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
-          <img src={workbookImg} alt="Workbook" className="w-10 h-10 object-contain" />
-        </div>
+        <img
+          src={workbookImg}
+          alt="Workbook"
+          className="absolute top-1/2 left-1/2 w-10 h-10 object-contain transform -translate-x-1/2 -translate-y-1/2"
+        />
       </div>
       <span className="mt-2 text-xs text-[#5f360a] text-center break-words">
         {workbook.name}
