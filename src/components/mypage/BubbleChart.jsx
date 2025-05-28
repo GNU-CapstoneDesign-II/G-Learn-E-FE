@@ -88,7 +88,7 @@ export default function BubbleChart({ nodes, width, height }) {
             .attr("fill", "#5F360A")
             .attr("text-anchor", "middle")
             .attr("dominant-baseline", "central")
-            .style("font-size", "0.75rem")
+            .style("font-size", "12px")
             .style("font-weight", 600)
             .attr("pointer-events", "none");
 
