@@ -170,7 +170,7 @@ const LeftSidebar = React.forwardRef(function LeftSidebar({
 
   return (
     <div className="fixed mt-[65px] left-0 w-[200px] h-[calc(100vh-60px)] border-r border-[#E6CEBA] bg-white text-sm">
-      <div className="pt-12 flex flex-col gap-2">
+      <div className="pt-8 flex flex-col gap-2 pr-4">
         {tabs.map(({ key, label, icon }) => (
           <button
             key={key}
@@ -186,76 +186,104 @@ const LeftSidebar = React.forwardRef(function LeftSidebar({
         ))}
       </div>
 
-      {/* Public 필터 */}
-      {selectedTab === "public" && (
-        <div className="bg-[#f8f1e7] mt-2 mr-4 p-3 rounded-xl flex flex-col gap-2">
-          {/* 단과대/교양 선택 */}
-          <select
-            value={state.main}
-            onChange={(e) => sync("SET_MAIN", e.target.value)}
-            className="border px-3 py-1 rounded"
-          >
-            <option value="">교양/단과대 선택</option>
-            {liberal && (
-              <option value={liberal.id}>{liberal.collegeName}</option>
+      <div className="bg-[#f8f1e7] mr-4 gap-2 rounded-2xl">
+        {/* Public 필터 */}
+        {selectedTab === "public" && (
+          <div className="text-[#5f360a] mx-2  p-3 rounded-2xl flex flex-col gap-1">
+            {/* 단과대/교양 선택 */}
+            <div className="relative">
+              <select
+                value={state.main}
+                onChange={(e) => sync("SET_MAIN", e.target.value)}
+                className="appearance-none w-full border px-3 py-2 pr-8 rounded text-sm text-[#5f360a] bg-white"
+              >
+                <option value="">교양/단과대 선택</option>
+                {liberal && (
+                  <option value={liberal.id}>{liberal.collegeName}</option>
+                )}
+                {colleges.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.collegeName}
+                  </option>
+                ))}
+              </select>
+              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#5f360a]">
+                ▼
+              </span>
+            </div>
+
+            {/* 학과/영역 선택 */}
+            {state.main && (
+              <div className="relative">
+                <select
+                  value={state.sub}
+                  onChange={(e) => sync("SET_SUB", e.target.value)}
+                  className="appearance-none w-full border px-3 py-2 pr-8 rounded text-sm text-[#5f360a] bg-white"
+                >
+                  <option value="">{isGeneral ? "영역" : "학과"} 선택</option>
+                  {lv2.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.departmentName}
+                    </option>
+                  ))}
+                </select>
+                <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#5f360a]">
+                  ▼
+                </span>
+              </div>
             )}
-            {colleges.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.collegeName}
-              </option>
-            ))}
-          </select>
 
-          {/* 학과/영역 선택 */}
-          {state.main && (
-            <select
-              value={state.sub}
-              onChange={(e) => sync("SET_SUB", e.target.value)}
-              className="border px-3 py-1 rounded"
-            >
-              <option value="">{isGeneral ? "영역" : "학과"} 선택</option>
-              {lv2.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.departmentName}
-                </option>
-              ))}
-            </select>
-          )}
+            {/* 학년 선택 */}
+            {!isGeneral && state.sub && grades.length > 0 && (
+              <div className="relative">
+                <select
+                  value={state.year}
+                  onChange={(e) => sync("SET_YEAR", e.target.value)}
+                  className="appearance-none w-full border px-3 py-2 pr-8 rounded text-sm text-[#5f360a] bg-white"
 
-          {/* 학년 선택 */}
-          {!isGeneral && state.sub && grades.length > 0 && (
-            <select
-              value={state.year}
-              onChange={(e) => sync("SET_YEAR", e.target.value)}
-              className="border px-3 py-1 rounded"
-            >
-              <option value="">학년 선택</option>
-              {grades.map((g) => (
-                <option key={g} value={g}>
-                  {g}
-                </option>
-              ))}
-            </select>
-          )}
+                >
+                  <option value="">학년 선택</option>
+                  {grades.map((g) => (
+                    <option key={g} value={g}>
+                      {g}
+                    </option>
+                  ))}
 
-          {/* 과목 선택 */}
-          {state.sub && (
-            <select
-              value={state.subject}
-              onChange={(e) => sync("SET_SUBJECT", e.target.value)}
-              className="border px-3 py-1 rounded"
-            >
-              <option value="">과목명 선택</option>
-              {filteredSubjects.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.subjectName}
-                  {s.grade ? ` (${s.grade})` : ""}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-      )}
+                </select>
+                <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#5f360a]">
+                  ▼
+                </span>
+              </div>
+            )}
+
+            {/* 과목 선택 */}
+            {
+              state.sub && (
+                <div className="relative">
+                  <select
+                    value={state.subject}
+                    onChange={(e) => sync("SET_SUBJECT", e.target.value)}
+                    className="appearance-none w-full border px-3 py-2 pr-8 rounded text-sm text-[#5f360a] bg-white"
+
+                  >
+                    <option value="">과목명 선택</option>
+                    {filteredSubjects.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.subjectName}
+                        {s.grade ? ` (${s.grade})` : ""}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#5f360a]">
+                    ▼
+                  </span>
+                </div>
+              )
+            }
+          </div >
+        )
+        }
+      </div >
     </div>
   );
 });
