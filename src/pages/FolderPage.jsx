@@ -170,19 +170,26 @@ const LeftSidebar = React.forwardRef(function LeftSidebar({
 
   return (
     <div className="fixed mt-[65px] left-0 w-[200px] h-[calc(100vh-60px)] border-r border-[#E6CEBA] bg-white text-sm">
-      <div className="pt-8 flex flex-col gap-2 pr-4">
-
+      <div className="pt-14 flex flex-col gap-2 pr-4">
         {tabs.map(({ key, label, icon }) => (
           <button
             key={key}
             onClick={() => onTabChange(key)}
             className={`
-              px-4 py-2 rounded-r-full flex items-center gap-2
-              ${selectedTab === key ? "bg-[#f8f1e7]" : ""}
-            `}
+        group relative pl-2 flex items-center gap-2 py-3 pr-4 rounded-tr-2xl rounded-br-2xl 
+        ${selectedTab === key ? "bg-[#f8f1e7]" : "hover:bg-[#FBF8F5]"}
+      `}
           >
+            {/* 세로선 */}
+            <div
+              className={`
+          absolute left-0 top-0 bottom-0 w-[3px] bg-[#5f360a]
+          ${selectedTab === key ? "opacity-100" : "opacity-0"}
+        `}
+            ></div>
+
             <img src={icon} alt={label} className="w-5 h-5 flex-shrink-0" />
-            <span>{label}</span>
+            <span className="text-[#5f360a]">{label}</span>
           </button>
         ))}
       </div>
