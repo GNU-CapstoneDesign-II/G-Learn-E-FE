@@ -34,6 +34,12 @@ export default function Ranking() {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  const displayPageInfo = {
+    pageNumber: currentPage,
+    totalPages,
+    hasPreviousPage: currentPage > 0,
+    hasNextPage: currentPage < totalPages - 1,
+  };
 
   const isUserTab = ['user', 'departmentUser', 'collegeUser'].includes(activeTab);
   const isDeptTab = activeTab === 'department';
@@ -203,19 +209,29 @@ export default function Ranking() {
               </div>
 
               {/* 페이지 네비게이션 */}
-              <div className="flex justify-center gap-2 mt-12">
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentPage(i)}
-                    className={`px-3 py-1 border rounded ${currentPage === i
-                      ? 'bg-brown text-white'
-                      : 'text-brown hover:bg-lightbrown/20'
-                      }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
+              <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center items-center gap-4">
+                {/* 이전 페이지 */}
+                <button
+                  onClick={() => setPage(p => Math.max(p - 1, 0))}
+                  disabled={!displayPageInfo.hasPreviousPage}
+                  className="px-3 py-1 border rounded disabled:opacity-40"
+                >
+                  ◀ Prev
+                </button>
+
+                {/* 현재 페이지 / 총 페이지 */}
+                <span className="px-2">
+                  {displayPageInfo.pageNumber + 1} / {displayPageInfo.totalPages}
+                </span>
+
+                {/* 다음 페이지 */}
+                <button
+                  onClick={() => setPage(p => Math.min(p + 1, displayPageInfo.totalPages - 1))}
+                  disabled={!displayPageInfo.hasNextPage}
+                  className="px-3 py-1 border rounded disabled:opacity-40"
+                >
+                  Next ▶
+                </button>
               </div>
             </>
           )}
