@@ -171,6 +171,7 @@ const LeftSidebar = React.forwardRef(function LeftSidebar({
   return (
     <div className="fixed mt-[65px] left-0 w-[200px] h-[calc(100vh-60px)] border-r border-[#E6CEBA] bg-white text-sm">
       <div className="pt-8 flex flex-col gap-2 pr-4">
+
         {tabs.map(({ key, label, icon }) => (
           <button
             key={key}
@@ -186,10 +187,10 @@ const LeftSidebar = React.forwardRef(function LeftSidebar({
         ))}
       </div>
 
-      <div className="bg-[#f8f1e7] mr-4 gap-2 rounded-2xl">
+      <div className="bg-[#f8f1e7] width-[10px] mr-4 rounded-2xl">
         {/* Public 필터 */}
         {selectedTab === "public" && (
-          <div className="text-[#5f360a] mx-2  p-3 rounded-2xl flex flex-col gap-1">
+          <div className="text-[#5f360a] mx-2 mt-1 pl-0 pr-1 pb-3 pt-3 rounded-2xl flex flex-col gap-1">
             {/* 단과대/교양 선택 */}
             <div className="relative">
               <select
