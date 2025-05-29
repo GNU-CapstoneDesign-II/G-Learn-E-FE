@@ -48,48 +48,49 @@ export default function MainPage() {
       <div className="pt-[65px] font-sans text-darkbrown h-screen">
         {/* Hero Section */}
         <section className={`${sectionWrapper} bg-white`}>
-          <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-12 px-4 md:px-8">
-
-            {/* 텍스트 영역 */}
-            <div className="space-y-6">
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                variants={staggerParent}
-              >
-                <motion.h1 className="text-4xl md:text-5xl font-namdhinggo mb-3 flex flex-wrap">
-                  <motion.span variants={fadeUpItem} className="text-darkbrown">G</motion.span>
-                  <motion.span variants={fadeUpItem} className="text-darkbrown/20">NU –&nbsp;</motion.span>
-                  <motion.span variants={fadeUpItem} className="text-darkbrown">Learn</motion.span>
-                  <motion.span variants={fadeUpItem} className="text-darkbrown/20">ing – Journ</motion.span>
-                  <motion.span variants={fadeUpItem} className="text-darkbrown">E</motion.span>
-                  <motion.span variants={fadeUpItem} className="text-darkbrown/20">y</motion.span>
-                </motion.h1>
-
-                <motion.h2
-                  className="text-2xl md:text-3xl font-namdhinggo text-darkbrown"
+          <div className="flex justify-center w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 place-items-center">
+              {/* 텍스트 영역 */}
+              <div className="space-y-6">
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
                   variants={staggerParent}
                 >
-                  <motion.span variants={fadeUpItem}>지식의 여정을 향해, </motion.span>
-                  <motion.span variants={fadeUpItem}>멈추지 않고 Run!</motion.span>
-                </motion.h2>
-              </motion.div>
+                  <motion.h1 className="text-4xl md:text-5xl font-namdhinggo mb-3 flex flex-wrap">
+                    <motion.span variants={fadeUpItem} className="text-darkbrown">G</motion.span>
+                    <motion.span variants={fadeUpItem} className="text-darkbrown/20">NU –&nbsp;</motion.span>
+                    <motion.span variants={fadeUpItem} className="text-darkbrown">Learn</motion.span>
+                    <motion.span variants={fadeUpItem} className="text-darkbrown/20">ing – Journ</motion.span>
+                    <motion.span variants={fadeUpItem} className="text-darkbrown">E</motion.span>
+                    <motion.span variants={fadeUpItem} className="text-darkbrown/20">y</motion.span>
+                  </motion.h1>
 
-              <p className="text-base md:text-lg leading-[1.7] text-darkbrown/60">
-                배움은 끝없는 여정입니다.<br />
-                지식은 정리될 때 단단해지고, 반복될 때 익숙해지며, 이해될 때 비로소 나의 것이 됩니다.<br />
-                필요한 개념을 찾고, 문제를 풀며 더 깊이 익혀가는 과정, 그 여정을 <span className="text-darkbrown font-medium">지런이</span>가 함께합니다.
-              </p>
-            </div>
+                  <motion.h2
+                    className="text-2xl md:text-3xl font-namdhinggo text-darkbrown"
+                    variants={staggerParent}
+                  >
+                    <motion.span variants={fadeUpItem}>지식의 여정을 향해, </motion.span>
+                    <motion.span variants={fadeUpItem}>멈추지 않고 Run!</motion.span>
+                  </motion.h2>
+                </motion.div>
 
-            {/* 이미지 영역 */}
-            <div className="w-full max-w-[400px] mx-auto aspect-[148/93]">
-              <img
-                src={logoImage}
-                alt="G-Learn-E 로고"
-                className="w-full h-full object-contain"
-                loading="eager"
-              />
+                <p className="text-base md:text-lg leading-[1.7] text-darkbrown/60">
+                  배움은 끝없는 여정입니다.<br />
+                  지식은 정리될 때 단단해지고, 반복될 때 익숙해지며, 이해될 때 비로소 나의 것이 됩니다.<br />
+                  필요한 개념을 찾고, 문제를 풀며 더 깊이 익혀가는 과정, 그 여정을 <span className="text-darkbrown font-medium">지런이</span>가 함께합니다.
+                </p>
+              </div>
+
+              {/* 이미지 영역 */}
+              <div className="max-w-[400px] aspect-[148/93]">
+                <img
+                  src={logoImage}
+                  alt="G-Learn-E 로고"
+                  className="w-full h-full object-contain"
+                  loading="eager"
+                />
+              </div>
             </div>
           </div>
         </section>
@@ -102,7 +103,7 @@ export default function MainPage() {
               "radial-gradient(circle at center, rgba(230,190,160,0.65) 0%, rgba(243,233,220,0.5) 70%)",
           }}
         >
-          <div className="max-w-[960px] mx-auto px-4 text-center">
+          <div className="mx-auto px-4 text-center">
             <motion.img
               {...fadeWithDelay(0.2)}
               src={textLogoImage}
@@ -127,7 +128,7 @@ export default function MainPage() {
 
         {/* 인용 섹션 1 */}
         <section className={`${sectionWrapper} bg-white px-4 md:px-16`}>
-          <div className="w-full max-w-[960px] text-left">
+          <div className="w-full text-left">
 
             <div className="border-l-4 border-darkbrown">
               <div className="border-l-2 border-[#C2AE97] pl-4 mb-8">
@@ -147,7 +148,7 @@ export default function MainPage() {
 
         {/* 인용 섹션 2 */}
         <section className={`${sectionWrapper} bg-[rgba(243,233,220,0.5)] justify-end px-4 md:px-16`}>
-          <div className="w-full max-w-[960px] text-right">
+          <div className="w-full text-right">
 
             {/* 인용 텍스트 박스 */}
             <div className="border-r-4 border-darkbrown">
