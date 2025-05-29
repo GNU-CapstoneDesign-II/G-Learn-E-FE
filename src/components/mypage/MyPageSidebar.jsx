@@ -13,9 +13,8 @@ const MyPageSidebar = ({ activeTab, onTabChange }) => {
     'block w-full text-left py-3 px-6 transition-colors border-l-4';
 
   return (
-    <aside className="w-[180px] h-[calc(100vh-65px)] sticky top-[65px] bg-[#fdf7f0]
-                 border-r border-[#e7d7c7] pt-8 box-border">
-      <ul className="list-none m-0 p-0 space-y-2">
+    <aside className="fixed w-[200px] h-[calc(100vh-65px)] sticky top-[65px] border-r border-[#E6CEBA] bg-white text-sm">
+      <ul className="list-none m-0 p-0 space-y-2 pr-4 pt-14">
         {menuItems.map(({ label, key }) => {
           const isActive = activeTab === key;
           return (
@@ -25,8 +24,8 @@ const MyPageSidebar = ({ activeTab, onTabChange }) => {
                 onClick={() => onTabChange(key)}
                 className={
                   isActive
-                    ? `${baseBtn} bg-[#fff5e9] font-bold text-[#774300] border-[#b3763c]`
-                    : `${baseBtn} font-medium text-[#5f360a] border-transparent hover:bg-[#f0e0d0] hover:text-[#3e2504] hover:border-[#c8a079]`
+                    ? `${baseBtn} bg-[#f8f1e7] font-bold text-[#774300] border-[#5f360a] rounded-tr-2xl rounded-br-2xl `
+                    : `${baseBtn} font-medium text-[#5f360a] border-transparent hover:bg-[#FBF8F5] hover:text-[#3e2504] hover:border-[#c8a079] rounded-tr-2xl rounded-br-2xl `
                 }
               >
                 {label}

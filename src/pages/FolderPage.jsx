@@ -169,7 +169,7 @@ const LeftSidebar = React.forwardRef(function LeftSidebar({
   ];
 
   return (
-    <div className="fixed mt-[65px] left-0 w-[200px] h-[calc(100vh-60px)] border-r border-[#E6CEBA] bg-white text-sm">
+    <div className="fixed mt-[65px] left-0 w-[200px] h-[calc(100vh-65px)] border-r border-[#E6CEBA] bg-white text-sm">
       <div className="pt-14 flex flex-col gap-2 pr-4">
         {tabs.map(({ key, label, icon }) => (
           <button
