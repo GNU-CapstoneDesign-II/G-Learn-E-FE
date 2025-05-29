@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { getSolvingStatistics } from '../../api/userApi.js';
 import LevelIcon from '../common/LevelIcon.jsx';
-import profileImageSrc from '../../assets/profile.JPG';
 
 
 const MyPageHome = () => {
@@ -42,11 +41,12 @@ const MyPageHome = () => {
         <div className="space-y-8 max-w-6xl mx-auto">
             {/* ───────── 블럭 ① : 프로필 카드 ───────── */}
             <section className="bg-white rounded-3xl px-10 py-12 shadow-lg text-center">
-                <div className="inline-block rounded-full border-[3px] border-[#e0d5c5] w-40 h-40 overflow-hidden mb-6">
+                <div className="inline-block rounded-full bg-[#f5f1eb] p-6 mb-6">
+                    {/* 원본 비율 유지 */}
                     <img
-                        src={profileImageSrc}
+                        src={profileImage}
                         alt="profile emoji"
-                        className="w-full h-full object-cover"
+                        className="w-24 h-auto object-contain"
                     />
                 </div>
                 <h2 className="text-3xl font-bold text-[#5F360A] mb-2">
