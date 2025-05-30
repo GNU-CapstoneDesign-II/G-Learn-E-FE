@@ -76,7 +76,7 @@ export default function PublicMain({
 
   // ───────────────── pagination state ─────────────────
   const [page, setPage] = useState(0);
-  const size = 20;
+  const size = 44;
   const [pageInfo, setPageInfo] = useState({
     totalPages: 1,
     pageNumber: 0,
@@ -366,7 +366,7 @@ export default function PublicMain({
         onSelectItem={handleSelect}
       />
       {/* ───── pagination controls ───── */}
-      <div className="fixed bottom-8 left-1/2  flex justify-center items-center gap-4 ">
+      <div className="fixed bottom-4 left-1/2  flex justify-center items-center gap-4 ">
         <button
           onClick={() => setPage(p => Math.max(p - 1, 0))}
           disabled={!displayPageInfo.hasPreviousPage}

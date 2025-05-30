@@ -72,11 +72,13 @@ function Navbar({ initialSearch = "" }) {
 
           </div>
 
-          {/* 🔔 알림 아이콘 */}
+          {/*
+          
           <div className="relative bg-[#f8f1e7] rounded-md p-2 text-[#9A7E5F] text-lg">
             <img src={alarm} alt="알람 아이콘" className="w-5 h-5 object-contain" />
             <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" />
           </div>
+          /*}
 
           {/* 로그인 상태별 분기 */}
           {!loading && user ? (
