@@ -7,7 +7,6 @@ import {
   verifyPasswordResetEmailCode,
   resetPassword,
 } from "../api/authApi.js";
-// 유틸리티 함수 import
 import { validatePassword, validatePasswordRule } from "../utils/passwordValidator.js";
 
 export default function FindPassword() {
@@ -39,7 +38,9 @@ export default function FindPassword() {
   const handleSendCode = async () => {
     try {
       setError("");
-      await issuePasswordResetEmailCode(email);
+      console.log(name);
+      console.log(email);
+      await issuePasswordResetEmailCode(name, email); // ✅ name도 함께 전송
       setEmailSent(true);
       setVerified(false);
       setPopupMessage("인증 메일이 전송되었습니다!");
@@ -143,14 +144,18 @@ export default function FindPassword() {
                   className="flex-1 border border-[#5F360A] px-4 py-2 rounded focus:outline-none"
                   required
                 />
+
                 <button
                   type="button"
                   onClick={handleSendCode}
-                  className="bg-[#AC957B] text-white px-3 py-2 text-sm rounded hover:bg-[#432707]"
+                  className="bg-[#AC957B] text-white px-3 py-2 text-sm rounded hover:bg-[#432707] disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!name || !email} // ✅ 입력 안 되면 버튼 비활성화
                 >
                   인증코드 전송
                 </button>
               </div>
+              {/* 이메일/인증 관련 에러 메시지 */}
+              {!verified && error && <p className="text-sm text-red-500 mt-1 text-left">{error}</p>}
             </div>
 
             <input
@@ -167,9 +172,6 @@ export default function FindPassword() {
             >
               인증 하기
             </button>
-            {/* 이메일/인증 관련 에러는 여기에 표시 */}
-            {!verified && error && <p className="text-sm text-red-500">{error}</p>}
-
 
             <hr className="my-4 border-[#ddd]" />
 
@@ -200,7 +202,7 @@ export default function FindPassword() {
                   />
                 </div>
 
-                {/* 비밀번호 관련 에러는 여기에 표시되도록 위치 변경 */}
+                {/* 비밀번호 관련 에러 */}
                 {error && <p className="text-sm text-red-500 text-left mt-1">{error}</p>}
 
                 <button
@@ -217,4 +219,3 @@ export default function FindPassword() {
     </>
   );
 }
-
