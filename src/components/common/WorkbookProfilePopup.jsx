@@ -282,5 +282,5 @@ export default function WorkbookProfilePopup({
         </div>
       </div>
     </div>
-);
+  );
 }
