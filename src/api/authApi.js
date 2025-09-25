@@ -33,8 +33,16 @@ export const signup = async (name, nickname, email, password, collegeId, departm
 
 
 // 비밀번호 초기화 관련
-export const issuePasswordResetEmailCode = async (email) => {
-    const res = await axios.get(`/api/auth/password-reset-code?email=${email}`);
+/**
+ * 이름과 이메일이 일치하는 사용자가 있는지 확인하고, 있다면 비밀번호 재설정 이메일 코드를 발급합니다.
+ * @param {string} name - 사용자 이름
+ * @param {string} email - 사용자 이메일
+ * @returns {Promise}
+ */
+export const issuePasswordResetEmailCode = async (name, email) => {
+    const res = await axios.get(`/api/auth/password-reset-code`, {
+        params: { name, email }
+    });
     return res; // { message }
 }
 

@@ -1,4 +1,3 @@
-// src/pages/SignUp.jsx
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
@@ -9,7 +8,8 @@ import {
   signup,
 } from "../api/authApi.js";
 import { getCollegesWith, getDepartments } from "../api/workbookApi.js";
-import { nav } from "framer-motion/client";
+// 유틸리티 함수 import
+import { validatePassword, validatePasswordRule } from "../utils/passwordValidator.js";
 
 export default function SignUp() {
   /* ─────────────────── state ─────────────────── */
@@ -25,12 +25,9 @@ export default function SignUp() {
   });
   const [colleges, setColleges] = useState([]);
   const [departments, setDepartments] = useState([]);
-  const deptCache = useRef({});            // 학과 캐시
-  const [timeLeft, setTimeLeft] = useState(0);   // ← 6 분(360 초) 타이머
+  const deptCache = useRef({});
+  const [timeLeft, setTimeLeft] = useState(0);
   const [shouldNavigate, setShouldNavigate] = useState(false);
-
-  const pwd = form.password;
-  const pwdRule = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
   /* ─────────────────── 인증 관련 ─────────────────── */
   const [emailSent, setEmailSent] = useState(false);
@@ -74,7 +71,7 @@ export default function SignUp() {
   useEffect(() => {
     if (!emailSent) return;
     if (timeLeft <= 0) {
-      setEmailSent(false);      // 만료 → 재요청 필요
+      setEmailSent(false);
       return;
     }
     const id = setInterval(() => setTimeLeft((t) => t - 1), 1000);
@@ -87,11 +84,8 @@ export default function SignUp() {
     setForm((prev) => ({ ...prev, [name]: value }));
 
     if (name === "password") {
-      if (!pwdRule.test(value)) {
-        setError("비밀번호는 최소 8자, 영문+숫자 포함");
-      } else {
-        setError("");
-      }
+      const errorMessage = validatePasswordRule({ password: value });
+      setError(errorMessage || "");
     }
   };
 
@@ -146,13 +140,13 @@ export default function SignUp() {
       return;
     }
 
-    if (!pwdRule.test(pwd)) {
-      setError("❗ 비밀번호는 최소 8자 이상, 영문자와 숫자를 각각 1개 이상 포함해야 합니다.");
-      return;
-    }
+    const passwordError = validatePassword({
+      password: form.password,
+      passwordConfirm: form.passwordConfirm,
+    });
 
-    if (form.password !== form.passwordConfirm) {
-      setError("❗ 비밀번호가 일치하지 않습니다.");
+    if (passwordError) {
+      setError(`❗ ${passwordError}`);
       return;
     }
 
@@ -174,7 +168,6 @@ export default function SignUp() {
       );
       openPopup("회원가입이 완료되었습니다!");
       setShouldNavigate(true);
-      // TODO: 필요 시 로그인 페이지 이동
     } catch (err) {
       setError(err.response?.data?.message || "회원가입에 실패했습니다.");
     }
@@ -195,13 +188,9 @@ export default function SignUp() {
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5 text-left">
-            {/* 이름 */}
             <InputField label="이름" name="name" value={form.name} onChange={handleChange} />
-
-            {/* 닉네임 */}
             <InputField label="닉네임" name="nickname" value={form.nickname} onChange={handleChange} />
 
-            {/* 단과대학 & 학과 */}
             <div>
               <label className="block text-sm mb-1">소속 대학 및 학과</label>
               <div className="flex gap-2">
@@ -223,7 +212,6 @@ export default function SignUp() {
               </div>
             </div>
 
-            {/* 이메일 */}
             <div>
               <label className="block text-sm mb-1">이메일</label>
               <div className="flex gap-2">
@@ -264,7 +252,6 @@ export default function SignUp() {
               </button>
             </div>
 
-            {/* 비밀번호 */}
             <InputField
               label="비밀번호"
               type="password"
@@ -282,7 +269,6 @@ export default function SignUp() {
 
             {error && <p className="text-sm text-red-500">{error}</p>}
 
-            {/* 제출 */}
             <button
               type="submit"
               className="w-full bg-[#AC957B] text-white py-2 rounded mt-2 hover:bg-[#5F360A]"
@@ -296,7 +282,6 @@ export default function SignUp() {
   );
 }
 
-/* ─────────────────── 재사용 컴포넌트 ─────────────────── */
 function InputField({ label, name, value, onChange, type = "text" }) {
   return (
     <div>

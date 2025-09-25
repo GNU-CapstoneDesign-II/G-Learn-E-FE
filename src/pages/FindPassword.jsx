@@ -1,4 +1,3 @@
-// src/pages/FindPassword.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
@@ -8,6 +7,7 @@ import {
   verifyPasswordResetEmailCode,
   resetPassword,
 } from "../api/authApi.js";
+import { validatePassword, validatePasswordRule } from "../utils/passwordValidator.js";
 
 export default function FindPassword() {
   const navigate = useNavigate();
@@ -21,7 +21,6 @@ export default function FindPassword() {
   const [error, setError] = useState("");
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
-  const [passwordMatch, setPasswordMatch] = useState(true);
 
   // Popup state
   const [popupMessage, setPopupMessage] = useState("");
@@ -39,7 +38,9 @@ export default function FindPassword() {
   const handleSendCode = async () => {
     try {
       setError("");
-      await issuePasswordResetEmailCode(email);
+      console.log(name);
+      console.log(email);
+      await issuePasswordResetEmailCode(name, email); // ✅ name도 함께 전송
       setEmailSent(true);
       setVerified(false);
       setPopupMessage("인증 메일이 전송되었습니다!");
@@ -69,17 +70,29 @@ export default function FindPassword() {
     }
   };
 
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    const errorMessage = validatePasswordRule({ password: newPassword });
+    setError(errorMessage || "");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!verified) {
       setError("❗ 인증이 진행되지 않았습니다.");
       return;
     }
-    if (password !== passwordCheck) {
-      setPasswordMatch(false);
+
+    const passwordError = validatePassword({
+      password: password,
+      passwordConfirm: passwordCheck,
+    });
+
+    if (passwordError) {
+      setError(`❗ ${passwordError}`);
       return;
     }
-    setPasswordMatch(true);
 
     try {
       setError("");
@@ -106,7 +119,6 @@ export default function FindPassword() {
           <h1 className="text-3xl font-bold border-b-2 border-[#5F360A] inline-block pb-1 mb-4">비밀번호 찾기</h1>
 
           <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-            {/* 이름 */}
             <div>
               <label htmlFor="name" className="block text-sm mb-1 text-left">이름</label>
               <input
@@ -120,7 +132,6 @@ export default function FindPassword() {
               />
             </div>
 
-            {/* 이메일 + 전송 */}
             <div>
               <label htmlFor="email" className="block text-sm mb-1 text-left">Email</label>
               <div className="flex gap-2">
@@ -133,17 +144,20 @@ export default function FindPassword() {
                   className="flex-1 border border-[#5F360A] px-4 py-2 rounded focus:outline-none"
                   required
                 />
+
                 <button
                   type="button"
                   onClick={handleSendCode}
-                  className="bg-[#AC957B] text-white px-3 py-2 text-sm rounded hover:bg-[#432707]"
+                  className="bg-[#AC957B] text-white px-3 py-2 text-sm rounded hover:bg-[#432707] disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!name || !email} // ✅ 입력 안 되면 버튼 비활성화
                 >
                   인증코드 전송
                 </button>
               </div>
+              {/* 이메일/인증 관련 에러 메시지 */}
+              {!verified && error && <p className="text-sm text-red-500 mt-1 text-left">{error}</p>}
             </div>
 
-            {/* 인증코드 입력 */}
             <input
               type="text"
               placeholder="인증코드 입력"
@@ -158,11 +172,9 @@ export default function FindPassword() {
             >
               인증 하기
             </button>
-            {error && <p className="text-sm text-red-500">{error}</p>}
 
             <hr className="my-4 border-[#ddd]" />
 
-            {/* 비밀번호 재설정 섹션 */}
             {verified && (
               <>
                 <div>
@@ -172,7 +184,7 @@ export default function FindPassword() {
                     type="password"
                     placeholder="비밀번호"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                     className="w-full border border-[#5F360A] px-4 py-2 rounded focus:outline-none"
                     required
                   />
@@ -185,15 +197,14 @@ export default function FindPassword() {
                     placeholder="비밀번호 확인"
                     value={passwordCheck}
                     onChange={(e) => setPasswordCheck(e.target.value)}
-                    className={`w-full border px-4 py-2 rounded focus:outline-none ${
-                      !passwordMatch ? "border-red-500" : "border-[#5F360A]"
-                    }`}
+                    className="w-full border border-[#5F360A] px-4 py-2 rounded focus:outline-none"
                     required
                   />
                 </div>
-                {!passwordMatch && (
-                  <p className="text-sm text-red-500">❗ 비밀번호가 일치하지 않습니다.</p>
-                )}
+
+                {/* 비밀번호 관련 에러 */}
+                {error && <p className="text-sm text-red-500 text-left mt-1">{error}</p>}
+
                 <button
                   type="submit"
                   className="w-full bg-[#AC957B] text-white py-2 rounded hover:bg-[#432707] mt-2"
