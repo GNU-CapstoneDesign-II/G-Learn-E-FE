@@ -1,29 +1,51 @@
-module.exports = {
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}", // 혹시 src 폴더가 없다면 "./**/*.jsx"로
-  ],
-  theme: {
-    extend: {
-      colors: {
-        brown1: '#FFE8D6',
-        brown2: '#DDA15E',
-        brown3: '#BC6C25',
-        brown4: '#964B24',
-        brown5: '#6F4E37',
-        brown6: '#5e3813',
+import React from "react";
+import level0to10 from "../../assets/Level_Icon/level_0to10.png";
+import level10to20 from "../../assets/Level_Icon/level_10to20.png";
+import level20to30 from "../../assets/Level_Icon/level_20to30.png";
+import level30to40 from "../../assets/Level_Icon/level_30to40.png";
+import level40to50 from "../../assets/Level_Icon/level_40to50.png";
 
-        white: '#FFFFFF',
-        grey1: '#D5D5D5',
-        grey2: '#AAAAAA',
-        grey3: '#808080',
-        grey4: '#555555',
-        grey5: '#2B2B2B',
-        black: '#000000',
-      },
-      fontFamily: {
-        namdhinggo: ['"Namdhinggo"', 'serif'],
-      },
-    }
-  },
-  plugins: [],
+const getIconSrc = (level) => {
+  if (level < 10) return level0to10;
+  if (level < 20) return level10to20;
+  if (level < 30) return level20to30;
+  if (level < 40) return level30to40;
+  return level40to50;
+};
+
+export default function LevelIcon({
+  level,
+  size = 64,
+  fontRatio = 0.35,
+  className = "",
+}) {
+  const src = getIconSrc(level);
+  const fontSize = size * fontRatio;
+
+  return (
+    <div
+      className={`relative inline-block ${className}`}
+      style={{ width: size, height: size }}
+    >
+      <img
+        src={src}
+        alt={`Level ${level}`}
+        className="w-full h-full object-contain"
+      />
+      <span
+        className={`
+          absolute inset-0 flex items-center justify-center 
+          text-brown5
+          [text-shadow:0_0_2px_theme(colors.black/50%)]
+        `}
+        style={{
+          fontSize: `${fontSize}px`,
+          lineHeight: 1,
+          fontWeight: 700,
+        }}
+      >
+        {level}
+      </span>
+    </div>
+  );
 }

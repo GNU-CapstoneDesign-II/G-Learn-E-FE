@@ -43,7 +43,7 @@ export default function ContextMenu({ x, y, options, onClose }) {
     return (
         <ul
             ref={ref}
-            className="fixed z-50 bg-white border border-[#8B623F] rounded-lg shadow-md py-1 min-w-[120px] divide-y divide-[#8B623F]"
+            className="fixed z-50 bg-white border border-brown2 rounded-lg shadow-md py-1 min-w-[120px] divide-y divide-brown2"
             style={{ top: y, left: x }}
             onContextMenu={e => e.preventDefault()}
         >
@@ -55,7 +55,7 @@ export default function ContextMenu({ x, y, options, onClose }) {
                         opt.onClick();
                         onClose();
                     }}
-                    className="px-4 py-2 text-sm text-[#5F360A] cursor-pointer hover:bg-[#F9F1E8]"
+                    className="px-4 py-2 text-sm text-brown5 cursor-pointer hover:bg-brown1"
                 >
                     {opt.label}
                 </li>
